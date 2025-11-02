@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
 import NavBar from '@/components/ui/NavBar';
+import Footer from '@/components/ui/Footer';
 import { MenuLink, MenuListProps, FeatureCardProp, FeatureCardsProps } from '@/types';
 import { MenuList } from '@/components/ui';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Averia_Serif_Libre } from 'next/font/google';
 import { Zilla_Slab } from 'next/font/google';
 import { useState, useEffect } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 import './globals.css';
 
 const categoryItems = [
@@ -15,12 +18,14 @@ const categoryItems = [
 const aSLibre = Averia_Serif_Libre({
   weight: ["300","400","700"],
   style: ["normal", "italic"],
-  subsets: ["latin"]
+  subsets: ["latin"],
+  variable: "--font-title",
 })
 const ziliaSlab = Zilla_Slab({
   weight: ["300","400","500","600","700"],
   style: ["normal", "italic"],
-  subsets: ["latin"]
+  subsets: ["latin"],
+  variable: "--font-context",
 })
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,56 +43,23 @@ export const metadata: Metadata = {
 };
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const messages = await getMessages();
+
   return (
     <html lang="en">
       <body
-        className={`${ziliaSlab.className} ${geistMono.variable} antialiased`}
+        className={`${aSLibre.variable} ${ziliaSlab.variable} ${geistMono.variable} antialiased`}
       >
-        <NavBar showBanner={true} bannerHeight={6} fontTitle={aSLibre.className} fontContext={ziliaSlab.className} ></NavBar>
-        {children}
-        <footer className="w-full bg-gray-100">
-          <div className="mx-auto w-full max-w-[1440px] flex px-4 pt-4 pb-20 justify-around">
-            <section className="flex flex-col w-56">
-              <h3 className={`${aSLibre.className} text-xl mb-2`}>INFORMATION</h3>
-              <nav className="flex flex-col ml-2 space-y-2">
-                <a href="#">Track your order</a>
-                <a href="#">Delivery</a>
-                <a href="#">Returns</a>
-                <a href="#">FAQs</a>
-                <a href="#">Exclusive Offers</a>
-              </nav>
-            </section>
-            <section className="flex flex-col w-56">
-              <h3 className={`${aSLibre.className} text-xl mb-2`}>CONNECT</h3>
-              <nav className="flex flex-col ml-2 space-y-2">
-                <a href="#">Instagram</a>
-                <a href="#">Facebook</a>
-                <a href="#">Youtube</a>
-                <a href="#">Linkedin</a>
-              </nav>
-            </section>
-            <section className="flex flex-col w-56">
-              <h3 className={`${aSLibre.className} text-xl mb-2`}>ABOUT</h3>
-              <nav className="flex flex-col ml-2 space-y-2">
-                <a href="#">Heritage</a>
-                <a href="#">Story</a>
-              </nav>
-            </section>
-            <section className="flex flex-col w-56">
-              <h3 className={`${aSLibre.className} text-xl mb-2`}>LEGAL</h3>
-              <nav className="flex flex-col ml-2 space-y-2">
-                <a href="#">Terms & Conditions</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Cookie Policy</a>
-              </nav>
-            </section>
-          </div>
-        </footer>
+        <NextIntlClientProvider messages={messages}>
+          <NavBar showBanner={true} bannerHeight={6} fontTitle={aSLibre.className} fontContext={ziliaSlab.className} />
+          {children}
+          <Footer titleClassName={aSLibre.className} />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

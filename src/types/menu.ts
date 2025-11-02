@@ -9,6 +9,9 @@ export interface MenuListProps {
     title?: string;
     items: MenuLink[];
     className?: string;
+    fontTitle: string;
+    fontContext: string;
+
 }
 
 export interface FeatureCardProp {

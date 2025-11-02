@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { MenuList, MenuCard } from "@/components/ui";
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 interface NavbarProps {
   showBanner?: boolean;
   bannerHeight?: number; 
@@ -15,17 +16,21 @@ const newItems = [
 ];
 const fragItems = [
   { label: "Icarus", href: "#" },
-  { label: "Greek Mythology", href: "#" }
+  { label: "Greek Mythology", href: "#" },
+  { label: "This is something VERY LONG, For testing the style", href: "#" }
 ];
+
 const aboutItems = [
   { label: "About AMPUL", href: "#" },
   { label: "Greek Mythology", href: "#" }
 ];
-const dropMenu = "bg-white z-40 left-0 right-0 px-6 flex transition-all justify-between";
-
-export default function NavBar({ showBanner = true, 
+const dropMenuStyle = "bg-white z-40 left-0 right-0 px-6 gap-6 flex transition-all justify-between";
+const navHeight = 14;
+const menuListStyle = "max-w-3xs min-w-30 pr-4";
+export default function NavBar({ showBanner = true,
     bannerHeight = 6 // h-6
     , fontTitle, fontContext }: NavbarProps) {
+  const t = useTranslations('NavBar');
   const [isNavVisible, setIsNavVisible] = useState(true)
   const [isDropdownVisible, setIsDropdownVisible] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
@@ -33,7 +38,7 @@ export default function NavBar({ showBanner = true,
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const currentBannerState = useRef(showBanner)
-  const navHeight = 14;
+  
   useEffect(() => {
     currentBannerState.current = showBanner
   }, [showBanner])
@@ -65,10 +70,6 @@ export default function NavBar({ showBanner = true,
     return () => window.removeEventListener('scroll', controlNavbar)
   }, [lastScrollY])
 
-    // const topPosition = hasBanner ? 'top-'+bannerHeight : 'top-0'
-    // const hiddenPosition = hasBanner ? '-top-16' : '-top-20'
-
-        // 計算導航欄的位置
     const getNavPosition = () => {
         if (!isNavVisible) {  // hide -> translate up
           return '-translate-y-full'
@@ -85,11 +86,11 @@ export default function NavBar({ showBanner = true,
     const menuItems = [
       {
         id: 'new',
-        label: 'New',
+        label: t('menu.new'),
         content: (
-          <div className={dropMenu}>
+          <div className={dropMenuStyle}>
             <div>
-              <MenuList items={newItems} className="mb-6"></MenuList>
+              <MenuList items={newItems} className="mb-6" fontTitle={fontTitle} fontContext={fontContext}></MenuList>
             </div>
             <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW" fontTitle={fontTitle} fontContext={fontContext}></MenuCard>
           </div>
@@ -97,23 +98,30 @@ export default function NavBar({ showBanner = true,
       },
       {
         id: 'fragrance',
-        label: 'Fragrance',
+        label: t('menu.fragrance'),
         content: (
-          <div className={dropMenu}>
-            <div>
-              <MenuList items={fragItems} className="mb-6"></MenuList>
+          <div className={dropMenuStyle}>
+            <div className="border-r border-gray-500">
+              <MenuList items={fragItems} className={menuListStyle} fontTitle={fontTitle} fontContext={fontContext}></MenuList>
             </div>
+            <div className="border-r border-gray-500">
+              <MenuList title="Mythology" items={fragItems} className={menuListStyle} fontTitle={fontTitle} fontContext={fontContext}></MenuList>
+            </div>
+            <div>
+              <MenuList items={fragItems} className={menuListStyle} fontTitle={fontTitle} fontContext={fontContext}></MenuList>
+            </div>
+            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW" fontTitle={fontTitle} fontContext={fontContext}></MenuCard>
             <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW" fontTitle={fontTitle} fontContext={fontContext}></MenuCard>
           </div>
         )
       },
       {
         id: 'about',
-        label: 'About',
+        label: t('menu.about'),
         content: (
-          <div className={dropMenu}>
+          <div className={dropMenuStyle}>
             <div>
-              <MenuList items={aboutItems} className="mb-6"></MenuList>
+              <MenuList items={aboutItems} className="mb-6" fontTitle={fontTitle} fontContext={fontContext}></MenuList>
             </div>
             <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW" fontTitle={fontTitle} fontContext={fontContext}></MenuCard>
           </div>
@@ -130,28 +138,56 @@ export default function NavBar({ showBanner = true,
     };
     return(
       <div>
-        <div className={`relative block content-center transition-all duration-600 items-center z-50 gap-x-6 h-6 ${isDropdownVisible ? "bg-gray-600" : "bg-gray-200"}`}>
+        <div className={`relative block content-center transition-all duration-600 items-center z-50 gap-x-6 h-4 lg:h-6 ${isDropdownVisible ? "bg-gray-600" : "bg-gray-200"}`}>
           <div className="block items-center gap-x-4 gap-y-2">
-            <p className={`text-center text-base ${fontTitle} ${isDropdownVisible ? "text-gray-100": "text-gray-900"}`}>
-              Enter the world of mythology
+            <p className={`text-center text-xs lg:text-base ${fontTitle} ${isDropdownVisible ? "text-gray-100": "text-gray-900"}`}>
+              {t('banner')}
             </p>
           </div>
         </div>        
-        <header className={`bg-white dark:bg-gray-900 top-0 left-0 right-0 w-full shadow-sm z-50 transition-all duration-300 ease-in-out ${getNavPosition()} ${getNavTopPosition()}`}>
-          <nav aria-label="Global" className="mx-auto flex min-w-2xs w-full max-w-[1440px] items-center px-4 h-14">
+        <header className={`bg-white dark:bg-gray-900 top-0 left-0 right-0 w-full transition-all duration-300 ease-in-out ${getNavPosition()} ${getNavTopPosition()} ${
+          isDropdownVisible
+            ? `shadow-none`
+            : `shadow-sm`
+        }
+        
+        `}>
+          <nav aria-label="Global" className="mx-auto flex min-w-2xs w-full max-w-[1440px] z-50 items-center px-2 lg:px-4 h-14">
               <div className="flex lg:hidden">
                   {/* Mobile menu button */}
                   <button
                   type="button"
-                  className="inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+                  className="inline-flex items-center justify-center rounded-md p-1 text-gray-700"
                   >
-                  <span className="sr-only">Open main menu</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                  <span className="sr-only">{t('openMenu')}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'round', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
+                    <g transform="matrix(0.882353,0,0,1,0.970588,2.5)">
+                      <path d="M4.567,4L20.433,4" fill="none" strokeWidth="1.1px" />
+                    </g>
+                    <g transform="matrix(0.882353,0,0,1,0.970588,-3.5)">
+                      <path d="M4.567,21L20.433,21" fill="none" strokeWidth="1.1px" />
+                    </g>
+                    <g transform="matrix(0.882353,0,0,1,0.970588,0)">
+                      <path d="M4.567,12L20.433,12" fill="none" strokeWidth="1.1px" />
+                    </g>
                   </svg>
                   </button>
               </div>
-              <div className="flex h-10 w-36 relative">
+              <button
+                type="button"
+                className="inline-flex lg:hidden items-center justify-center rounded-md p-1 text-gray-900"
+                >
+                <span className="sr-only">{t('search')}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'square', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
+                    <g transform="matrix(0.091376,0,0,0.091376,-2.83008,-2.4913)">
+                    <circle cx="155" cy="145" r="75" style={{fill: 'none', strokeWidth:'10.94px'}}/>
+                    </g>
+                    <g transform="matrix(0.0740887,0,0,0.0740887,1.14601,1.31192)">
+                    <path d="M199,200.773L248,260" style={{fill:'none', strokeWidth:'13.5px'}}/>
+                    </g>
+                </svg>
+              </button>
+              <div className="flex grow lg:grow-0 h-10 w-36 relative">
                   <a href="#" className="items-center py-auto">
                   <span className="sr-only">AMPUL</span>
                   <Image
@@ -166,9 +202,8 @@ export default function NavBar({ showBanner = true,
                 {menuItems.map((item) => (
                   <div
                     key={item.id}
-                    className="hidden lg:flex h-10"
+                    className="hidden lg:flex h-14"
                     onMouseEnter={() => handleMouseEnter(item.id) }
-                    // onMouseLeave={handleMouseLeave}
                   >
                     <button className={`w-[196px] text-xl transition-colors duration-200 ${isDropdownVisible && (activeDropdown === item.id) ? "text-gray-500 underline": "text-gray-900 no-underline"}`}>
                       {item.label}
@@ -195,7 +230,7 @@ export default function NavBar({ showBanner = true,
 
                   <button
                   type="button"
-                  className="inline-flex items-center justify-center rounded-md p-2 text-gray-900"
+                  className="inline-flex items-center justify-center rounded-md p-1 lg:p-2 text-gray-900"
                   >
                   <span className="sr-only">User</span>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={16} stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'round', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
@@ -209,7 +244,7 @@ export default function NavBar({ showBanner = true,
                   </button>
                   <button
                   type="button"
-                  className="inline-flex items-center justify-center rounded-md p-2 text-gray-900"
+                  className="inline-flex items-center justify-center rounded-md p-1 lg:p-2 text-gray-900"
                   >
                   <span className="sr-only">ShoppingBag</span>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'square', strokeMiterlimit: 1.5 }}>
@@ -222,26 +257,20 @@ export default function NavBar({ showBanner = true,
             {/* Background Blur */}
             {isDropdownVisible && (
               <div 
-                className={`fixed inset-0 bg-gray-800/20 h-screen z-0 transition-opacity backdrop-blur-xs duration-600 top-${navHeight}`}
+                className={`fixed inset-0 bg-gray-800/20 top-14 h-screen z-10 transition-all backdrop-blur-xs duration-600`}
                 onMouseEnter={handleMouseLeave}
               />
             )}
 
             {/* Dropdown Menu */}
             <div
-              className={`fixed hidden lg:block left-0 right-0 bg-white shadow-lg z-40 overflow-hidden transition-all duration-600 ease-out ${
+              className={`fixed hidden lg:block left-0 right-0 bg-white shadow-sm z-40 overflow-hidden transition-all duration-600 ease-in-out ${
                 isDropdownVisible
-                  ? `top-${navHeight} opacity-100 max-h-lvh`
-                  : `top-${navHeight} opacity-0 max-h-0`
+                  ? `top-14 opacity-100 max-h-lvh`
+                  : `top-14 max-h-0`
               }`}
-              style={{
-                transform: isDropdownVisible ? 'translateY(0)' : 'translateY(-20px)',
-                transitionProperty: 'opacity, max-height, transform',
-              }}
-              // onMouseEnter={() => setActiveDropdown(activeDropdown)}
-              // onMouseLeave={handleMouseLeave}
             >
-              <div className="max-w-[1440px] mx-auto">
+              <div className="max-w-[1440px] mx-8">
                 {activeDropdown && (
                   <div className="py-8">
                     {menuItems.find(item => item.id === activeDropdown)?.content}

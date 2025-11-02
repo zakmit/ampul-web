@@ -1,0 +1,47 @@
+{
+  "HomePage": {
+    "title": "Hello world!"
+  },
+  "NavBar": {
+    "banner": "Enter the world of mythology",
+    "menu": {
+      "new": "New",
+      "fragrance": "Fragrance",
+      "about": "About"
+    },
+    "search": "Search",
+    "user": "User",
+    "shoppingBag": "Shopping Bag",
+    "openMenu": "Open main menu"
+  },
+  "Footer": {
+    "sections": {
+      "information": {
+        "title": "INFORMATION",
+        "trackOrder": "Track your order",
+        "delivery": "Delivery",
+        "returns": "Returns",
+        "faqs": "FAQs",
+        "exclusiveOffers": "Exclusive Offers"
+      },
+      "connect": {
+        "title": "CONNECT",
+        "instagram": "Instagram",
+        "facebook": "Facebook",
+        "youtube": "Youtube",
+        "linkedin": "Linkedin"
+      },
+      "about": {
+        "title": "ABOUT",
+        "heritage": "Heritage",
+        "story": "Story"
+      },
+      "legal": {
+        "title": "LEGAL",
+        "terms": "Terms & Conditions",
+        "privacy": "Privacy Policy",
+        "cookies": "Cookie Policy"
+      }
+    }
+  }
+}
