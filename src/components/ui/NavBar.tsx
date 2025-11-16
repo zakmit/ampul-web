@@ -145,12 +145,12 @@ export default function NavBar({ showBanner = true,
             </p>
           </div>
         </div>        
-        <header className={`bg-white dark:bg-gray-900 top-0 left-0 right-0 w-full transition-all duration-300 ease-in-out ${getNavPosition()} ${getNavTopPosition()} ${
+        <header className={`bg-white dark:bg-gray-900 top-0 left-0 right-0 w-full z-50 transition-all duration-300 ease-in-out ${getNavPosition()} ${getNavTopPosition()} ${
           isDropdownVisible
             ? `shadow-none`
             : `shadow-sm`
         }
-        
+
         `}>
           <nav aria-label="Global" className="mx-auto flex min-w-2xs w-full max-w-[1440px] z-50 items-center px-2 lg:px-4 h-14">
               <div className="flex lg:hidden">
@@ -257,7 +257,7 @@ export default function NavBar({ showBanner = true,
             {/* Background Blur */}
             {isDropdownVisible && (
               <div 
-                className={`fixed inset-0 bg-gray-800/20 top-14 h-screen z-10 transition-all backdrop-blur-xs duration-600`}
+                className={`fixed inset-0 bg-gray-800/20 top-14 h-screen z-20 transition-all backdrop-blur-xs duration-600`}
                 onMouseEnter={handleMouseLeave}
               />
             )}

@@ -1,21 +1,19 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight } from 'lucide-react';
+import ProductImageGallery from '@/components/ProductImageGallery';
+import ExpandableSections from '@/components/ExpandableSections';
 
 interface ProductDetailPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
-export default function ProductDetailPage({ params }: ProductDetailPageProps) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+  const { slug } = await params;
 
-  // Mock data - replace with actual data fetching based on params.slug
+  // Mock data - replace with actual data fetching based on slug
+  // Example: const product = await fetchProduct(slug);
   const product = {
     name: 'Icarus',
     subtitle: 'Eau de Toilette',
@@ -24,22 +22,10 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     price: 200,
     sensations: 'Sea water choked in the nose, Cinnamon and amber bring the warmness of burning sun, Melting wax flowing on the skin',
     images: [
-      '/products/icare-0.jpg',
-      '/products/icare-1.jpg',
-      '/products/icare-2.jpg',
-      '/products/icare-3.jpg',
+      '/products/icare-cover.jpg',
+      '/products/icare-bottle.jpg',
+      '/products/icare-box.jpg',
     ],
-  };
-  const collection = {
-    product: ['Cassandre', 'Narcisse', 'Icare'],
-    images: [
-      '/products/cassandre-1.jpg',
-      '/products/narcisse-1.jpg',
-      '/products/icare-1.jpg',
-    ],
-  }
-  const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section);
   };
 
   const infoSections = [
@@ -64,166 +50,160 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     {
       name: 'Cassandra',
       subtitle: 'Eau de Toilette',
-      image: '/products/cassandre-1.jpg',
+      image: '/products/cassandre-bottle.jpg',
       slug: 'cassandre',
     },
     {
       name: 'Narcisse',
       subtitle: 'Eau de Toilette',
-      image: '/products/narcisse-1.jpg',
+      image: '/products/narcisse-bottle.jpg',
       slug: 'narcisse',
     },
     {
       name: 'Icarus',
       subtitle: 'Eau de Toilette',
-      image: '/products/icare-1.jpg',
+      image: '/products/icare-bottle.jpg',
       slug: 'icare',
     },
   ];
 
   return (
-    <div>
-      {/* Product Image Section */}
-      <div className="relative w-dvw h-dvw flex items-center justify-center -z-10">
-        <div className="w-full max-w-md h-full flex items-center justify-center">
-          {/* Product image */}
-            <Image
-              src={product.images[currentImageIndex]}
-              alt={`${product.name} - Image ${currentImageIndex + 1}`}
-              fill
-              className="object-contain"
-              priority={currentImageIndex === 0}
-            />
+    <div className="overflow-x-hidden max-w-[1440px] mx-auto">
+      {/* Main Product Section */}
+      <div className="lg:flex lg:min-h-screen">
+        {/* Product Image Section - Mobile: full width, Desktop: 5/8 width sticky */}
+        <div className="relative w-screen h-[100vw] lg:w-[62.5%] lg:h-[900px] lg:sticky lg:top-0 flex items-center justify-center bg-transparent">
+          <div className="w-full lg:max-w-none lg:w-full h-full flex items-center justify-center">
+            <ProductImageGallery images={product.images} productName={product.name} />
+          </div>
         </div>
 
-        {/* Image indicators */}
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-5">
-          {product.images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentImageIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentImageIndex ? 'bg-gray-900' : 'bg-gray-600'
-              }`}
-              aria-label={`View image ${index + 1}`}
-            />
-          ))}
+        {/* Product Details Section - Mobile: full width below, Desktop: 3/8 width */}
+        <div className="bg-white lg:w-[37.5%]">
+          <div className="max-w-md mx-auto lg:max-w-none px-6 lg:px-12 pt-2 lg:pt-8 pb-8 lg:pb-16">
+            {/* Product Title - Mobile: center, Desktop: right-aligned */}
+            <h1 className="text-4xl lg:text-5xl font-bold text-center lg:text-left lg:mb-2">
+              {product.name}
+            </h1>
+            <p className="text-center lg:text-left text-xs lg:text-base mb-2 lg:mb-6">
+              {product.subtitle}
+            </p>
+
+            {/* Quote - Mobile: center, Desktop: right-aligned */}
+            <h3 className="text-center lg:text-left italic font-light mb-2 lg:mb-6 leading-relaxed lg:text-lg">
+              {product.quote}
+            </h3>
+
+            {/* Volume and Add to Bag - Mobile: center, Desktop: right-aligned */}
+            <div className="flex items-center justify-center gap-4 mb-8 lg:mb-8">
+              <span className="text-gray-700">{product.volume}</span>
+              <button className="bg-gray-500 hover:bg-gray-800 text-gray-100 font-semibold px-5 lg:px-6 py-3 rounded-md transition-colors">
+                Add to bag · {product.price} $
+              </button>
+            </div>
+
+            {/* Sensations */}
+            <div className="mb-8 lg:mb-8 -mx-6 lg:mx-0 px-6 lg:px-0 py-6 lg:py-6 inset-shadow-[0_4px_4px_0] inset-shadow-gray-900/20 lg:inset-shadow-none bg-gray-100 ">
+              <h2 className="text-2xl lg:text-3xl italic font-bold text-center mb-1 lg:mb-2 mx-auto">
+                Sensations
+              </h2>
+              <p className="text-center italic text-sm lg:text-base text-gray-700 mx-auto">
+                {product.sensations}
+              </p>
+            </div>
+
+            {/* Expandable Sections */}
+            <ExpandableSections sections={infoSections} />
+
+            {/* Free Sample Note */}
+            <p className="text-sm text-gray-500 mt-6 lg:mt-8 italic">
+              *A free sample of your choice with every order
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Product Details Section */}
-      <div className="bg-white">
-        <div className="max-w-md mx-auto px-6 pt-2 pb-8">
-          {/* Product Title */}
-          <h1 className={`text-4xl font-bold text-center`}>{product.name}</h1>
-          <p className="text-center text-xs mb-2">{product.subtitle}</p>
+      {/* Explore the Collection - Mobile: scrollable, Desktop: grid */}
+      <div className="bg-gray-100 inset-shadow-[0_4px_4px_0] inset-shadow-gray-900/20 lg:inset-shadow-none">
+        <div className="max-w-md lg:max-w-7xl mx-auto px-6 lg:px-12 pt-6 lg:pt-16 lg:pb-16">
+          <h2 className="text-3xl lg:text-4xl italic font-bold text-center mb-8 lg:mb-12">
+            Explore the Collection
+          </h2>
 
-          {/* Quote */}
-          <h3 className="text-center italic font-light mb-2 leading-relaxed">
-            {product.quote}
-          </h3>
-
-          {/* Volume and Add to Bag */}
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <span className="text-gray-700">{product.volume}</span>
-            <button className="bg-gray-500 hover:bg-gray-800 text-gray-100 font-semibold px-5 py-3 rounded-md transition-colors">
-              Add to bag · {product.price} $
-            </button>
-          </div>
-
-          {/* Sensations */}
-          <div className="mb-8 -mx-6 px-6 py-6 inset-shadow-[0_4px_4px_0] inset-shadow-gray-900/20 bg-gray-100">
-            <h2 className="text-2xl italic font-bold text-center mb-1 mx-auto max-w-prose">Sensations</h2>
-            <p className="text-center italic text-sm text-gray-700 leading-relaxed mx-auto max-w-prose">
-              {product.sensations}
-            </p>
-          </div>
-
-          {/* Expandable Sections */}
-          <div>
-            {infoSections.map((section) => {
-              const isExpanded = expandedSection === section.id;
-              return (
-                <div key={section.id}>
-                  <button
-                    onClick={() => toggleSection(section.id)}
-                    className={`w-full flex items-center justify-between py-4 no-underline hover:text-gray-500 hover:underline transition-colors ${
-                      isExpanded ? 'border-transparent' : 'border-b border-gray-200'
-                    }`}
-                  >
-                    <h3 className="text-xl font-bold italic">{section.title}</h3>
-                    <ChevronRight
-                      className={`transform transition-transform ${
-                        isExpanded ? 'rotate-90' : ''
-                      }`}
-                    />
-                  </button>
-                  {isExpanded && (
-                    <div className="py-4 px-2 text-sm text-gray-600 border-b border-gray-200">
-                      <p>{section.content}</p>
-                    </div>
-                  )}
+          {/* Mobile: Horizontal scroll */}
+          <div className="flex lg:hidden gap-6 overflow-x-auto pb-6 -mx-6 px-6 snap-x snap-mandatory scrollbar-hide">
+            {relatedProducts.map((relatedProduct) => (
+              <Link
+                key={relatedProduct.slug}
+                href={`/p/${relatedProduct.slug}`}
+                className="group flex-shrink-0 w-48 snap-start"
+              >
+                <div className="aspect-[1] relative rounded-sm overflow-hidden mb-2">
+                  <Image
+                    src={relatedProduct.image}
+                    alt={relatedProduct.name}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
-              );
-            })}
+                <h3 className="text-center font-bold text-lg">
+                  {relatedProduct.name}
+                </h3>
+                <p className="text-center text-xs">
+                  {relatedProduct.subtitle}
+                </p>
+              </Link>
+            ))}
           </div>
 
-          {/* Free Sample Note */}
-          <p className="text-sm text-gray-500 mt-6 italic">
-            *A free sample of your choice with every order
-          </p>
-
-          {/* Explore the Collection */}
-          <div className="mt-6 -mx-6 px-6 pt-6 inset-shadow-[0_4px_4px_0] inset-shadow-gray-900/20 bg-gray-100">
-            <h2 className="text-3xl italic font-bold text-center mb-8">
-              Explore the Collection
-            </h2>
-            <div className="flex gap-6 overflow-x-auto pb-6 -mx-6 px-6 snap-x snap-mandatory scrollbar-hide">
-              {relatedProducts.map((relatedProduct) => (
-                <Link
-                  key={relatedProduct.slug}
-                  href={`/p/${relatedProduct.slug}`}
-                  className="group flex-shrink-0 w-48 snap-start"
-                >
-                  <div className="aspect-[1] relative rounded-sm overflow-hidden">
-                    <Image
-                      src={relatedProduct.image}
-                      alt={relatedProduct.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <h3 className="text-center font-bold text-lg">
-                    {relatedProduct.name}
-                  </h3>
-                  <p className="text-center text-xs">
-                    {relatedProduct.subtitle}
-                  </p>
-                </Link>
-              ))}
-            </div>
+          {/* Desktop: Grid */}
+          <div className="hidden lg:flex gap-8 justify-center">
+            {relatedProducts.map((relatedProduct) => (
+              <Link
+                key={relatedProduct.slug}
+                href={`/p/${relatedProduct.slug}`}
+                className="group flex-shrink-0 w-64"
+              >
+                <div className="aspect-[1] relative rounded-sm overflow-hidden mb-4">
+                  <Image
+                    src={relatedProduct.image}
+                    alt={relatedProduct.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <h3 className="text-center font-bold text-xl">
+                  {relatedProduct.name}
+                </h3>
+                <p className="text-center text-sm">
+                  {relatedProduct.subtitle}
+                </p>
+              </Link>
+            ))}
           </div>
+        </div>
+      </div>
 
-          {/* Breadcrumb Navigation */}
-          <div className="mt-8 text-sm text-gray-600">
-            <nav aria-label="Breadcrumb">
-              <ol className="flex items-center gap-2">
-                <li>
-                  <Link href="/" className="hover:underline">Home</Link>
-                </li>
-                <li>&gt;</li>
-                <li>
-                  <a href="/fragrances" className="hover:underline">Fragrances</a>
-                </li>
-                <li>&gt;</li>
-                <li>
-                  <a href="/collection" className="hover:underline">Collection</a>
-                </li>
-                <li>&gt;</li>
-                <li className="text-gray-900 font-medium">{product.name}</li>
-              </ol>
-            </nav>
-          </div>
+      {/* Breadcrumb Navigation */}
+      <div className="bg-white lg:bg-white py-8">
+        <div className="max-w-md lg:max-w-7xl mx-auto px-6 lg:px-12">
+          <nav aria-label="Breadcrumb" className="text-sm text-gray-600">
+            <ol className="flex items-center gap-2">
+              <li>
+                <Link href="/" className="hover:underline">Home</Link>
+              </li>
+              <li>&gt;</li>
+              <li>
+                <a href="/fragrances" className="hover:underline">Fragrances</a>
+              </li>
+              <li>&gt;</li>
+              <li>
+                <a href="/collection" className="hover:underline">Collection</a>
+              </li>
+              <li>&gt;</li>
+              <li className="text-gray-900 font-medium">{product.name}</li>
+            </ol>
+          </nav>
         </div>
       </div>
     </div>
