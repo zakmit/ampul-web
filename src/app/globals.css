@@ -2,10 +2,55 @@
 
 :root {
   --background: #ffffff;
-  --foreground: oklch(21% 0.034 264.665);
+  --foreground: oklch(0.1213 0.0248 256.33);
   font-family: var(--font-context);
 }
+@theme {
+  --color-gray-100: oklch(0.9572 0.0034 247.86);
+  --color-gray-200: oklch(0.882 0.0101 267.35);
+  --color-gray-300: oklch(0.7979 0.0134 266.68);
+  --color-gray-400: oklch(0.699 0.0184 267.73);
+  --color-gray-500: oklch(0.6121 0.0148 262.35);
+  --color-gray-600: oklch(0.4382 0.0192 266.1);
+  --color-gray-700: oklch(0.3169 0.0209 265.92);
+  --color-gray-800: oklch(0.2175 0.0278 262.43);
+  --color-gray-900: oklch(0.1213 0.0248 256.33);
 
+  --color-red-100: oklch(0.9659 0.0152 22.4);
+  --color-red-200: oklch(0.9269 0.0323 22.47);
+  --color-red-300: oklch(0.8228 0.084 23.57);
+  --color-red-400: oklch(0.7557 0.1211 24.64);
+  --color-red-500: oklch(0.6565 0.1931 28.59);
+  --color-red-600: oklch(0.5649 0.2168 30.12);
+  --color-red-700: oklch(0.4585 0.1755 30.12);
+  --color-red-800: oklch(0.3709 0.1397 30.3);
+  --color-red-900: oklch(0.2728 0.1032 32.07);
+}
+
+/* @theme {
+  --color-red-50: oklch(0.971 0.013 17.38);
+  --color-red-100: oklch(0.936 0.032 17.717);  
+  --color-red-200: oklch(0.885 0.062 18.334);  
+  --color-red-300: oklch(0.808 0.114 19.571);  
+  --color-red-400: oklch(0.704 0.191 22.216);  
+  --color-red-500: oklch(0.637 0.237 25.331);  
+  --color-red-600: oklch(0.577 0.245 27.325);  
+  --color-red-700: oklch(0.505 0.213 27.518);  
+  --color-red-800: oklch(0.444 0.177 26.899);  
+  --color-red-900: oklch(0.396 0.141 25.723);  
+  --color-red-950: oklch(0.258 0.092 26.042);
+  
+  --color-gray-100: oklch(96.7% 0.003 264.542);
+  --color-gray-200: oklch(92.8% 0.006 264.531);
+  --color-gray-300: oklch(87.2% 0.01 258.338);
+  --color-gray-400: oklch(70.7% 0.022 261.325);
+  --color-gray-500: oklch(55.1% 0.027 264.364);
+  --color-gray-600: oklch(44.6% 0.03 256.802);
+  --color-gray-700: oklch(37.3% 0.034 259.733);
+  --color-gray-800: oklch(27.8% 0.033 256.848);
+  --color-gray-900: oklch(21% 0.034 264.665);
+
+} */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -23,12 +68,12 @@ p, body {
   font-family: var(--font-context);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
   background: var(--background);

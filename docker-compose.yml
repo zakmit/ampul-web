@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ampul_dev
+      POSTGRES_PASSWORD: dev_9126
+      POSTGRES_DB: ampul_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ampul_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  ampul_postgres_data:

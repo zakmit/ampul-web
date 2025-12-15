@@ -1,25 +1,25 @@
 'use client';
 
-import { useState } from 'react';
-import { Menu } from 'lucide-react';
+import { useState, useMemo } from 'react';
 import ProductCard, { Product } from '@/components/ProductCard';
-import ProductFilters from '@/components/ProductFilters';
+import ProductFilters, { FilterSection } from '@/components/ProductFilters';
 import MobileFilterPanel from '@/components/MobileFilterPanel';
 
 interface ProductOverviewClientProps {
   products: Product[];
+  filterSections: FilterSection[];
 }
 
-export default function ProductOverviewClient({ products }: ProductOverviewClientProps) {
+export default function ProductOverviewClient({ products, filterSections }: ProductOverviewClientProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortBy, setSortBy] = useState('default');
-  const [volumeFilter, setVolumeFilter] = useState<string[]>([]);
-  const [collectionFilter, setCollectionFilter] = useState<string[]>([]);
-  const [fragranceNotesFilter, setFragranceNotesFilter] = useState<string[]>([]);
 
-  // Apply filters and sorting
-  const getFilteredAndSortedProducts = () => {
+  // Apply filters and sorting - memoized to avoid re-sorting on every render
+  const displayProducts = useMemo(() => {
     const filtered = [...products];
+
+    // Find sort section
+    const sortSection = filterSections.find(s => s.id === 'sort');
+    const sortBy = sortSection?.value as string || 'default';
 
     // Apply sorting
     switch (sortBy) {
@@ -41,9 +41,7 @@ export default function ProductOverviewClient({ products }: ProductOverviewClien
     }
 
     return filtered;
-  };
-
-  const displayProducts = getFilteredAndSortedProducts();
+  }, [products, filterSections]);
 
   return (
     <>
@@ -64,7 +62,7 @@ export default function ProductOverviewClient({ products }: ProductOverviewClien
       </div>
 
       {/* Main Content */}
-      <div className="flex">
+      <div className="flex border-b">
         {/* Desktop Filter Sidebar */}
         <aside className="hidden lg:block w-64 px-8 py-8 sticky top-0 h-screen overflow-y-auto">
           <div className="flex items-center justify-start mb-4">
@@ -76,30 +74,14 @@ export default function ProductOverviewClient({ products }: ProductOverviewClien
             </svg>
             <h2 className="ml-4 text-2xl font-bold">Filters</h2>
           </div>
-          <ProductFilters
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            volumeFilter={volumeFilter}
-            setVolumeFilter={setVolumeFilter}
-            collectionFilter={collectionFilter}
-            setCollectionFilter={setCollectionFilter}
-            fragranceNotesFilter={fragranceNotesFilter}
-            setFragranceNotesFilter={setFragranceNotesFilter}
-          />
+          <ProductFilters sections={filterSections} />
         </aside>
 
         {/* Mobile Filter Panel */}
         <MobileFilterPanel
           isOpen={isFilterOpen}
           onClose={() => setIsFilterOpen(false)}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          volumeFilter={volumeFilter}
-          setVolumeFilter={setVolumeFilter}
-          collectionFilter={collectionFilter}
-          setCollectionFilter={setCollectionFilter}
-          fragranceNotesFilter={fragranceNotesFilter}
-          setFragranceNotesFilter={setFragranceNotesFilter}
+          filterSections={filterSections}
         />
 
         {/* Product Grid */}

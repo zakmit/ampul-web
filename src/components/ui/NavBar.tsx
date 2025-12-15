@@ -145,7 +145,7 @@ export default function NavBar({ showBanner = true,
             </p>
           </div>
         </div>        
-        <header className={`bg-white dark:bg-gray-900 top-0 left-0 right-0 w-full z-50 transition-all duration-300 ease-in-out ${getNavPosition()} ${getNavTopPosition()} ${
+        <header className={`bg-white top-0 left-0 right-0 w-full z-50 transition-all duration-300 ease-in-out ${getNavPosition()} ${getNavTopPosition()} ${
           isDropdownVisible
             ? `shadow-none`
             : `shadow-sm`

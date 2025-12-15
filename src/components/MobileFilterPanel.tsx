@@ -2,32 +2,18 @@
 
 import { X } from 'lucide-react';
 import { useEffect } from 'react';
-import ProductFilters from './ProductFilters';
+import ProductFilters, { FilterSection } from './ProductFilters';
 
 interface MobileFilterPanelProps {
   isOpen: boolean;
   onClose: () => void;
-  sortBy: string;
-  setSortBy: (value: string) => void;
-  volumeFilter: string[];
-  setVolumeFilter: (value: string[]) => void;
-  collectionFilter: string[];
-  setCollectionFilter: (value: string[]) => void;
-  fragranceNotesFilter: string[];
-  setFragranceNotesFilter: (value: string[]) => void;
+  filterSections: FilterSection[];
 }
 
 export default function MobileFilterPanel({
   isOpen,
   onClose,
-  sortBy,
-  setSortBy,
-  volumeFilter,
-  setVolumeFilter,
-  collectionFilter,
-  setCollectionFilter,
-  fragranceNotesFilter,
-  setFragranceNotesFilter,
+  filterSections,
 }: MobileFilterPanelProps) {
   // Prevent body scroll when panel is open
   useEffect(() => {
@@ -80,16 +66,7 @@ export default function MobileFilterPanel({
 
           {/* Filter Content */}
           <div className="flex-1 overflow-y-auto py-2 px-6">
-            <ProductFilters
-              sortBy={sortBy}
-              setSortBy={setSortBy}
-              volumeFilter={volumeFilter}
-              setVolumeFilter={setVolumeFilter}
-              collectionFilter={collectionFilter}
-              setCollectionFilter={setCollectionFilter}
-              fragranceNotesFilter={fragranceNotesFilter}
-              setFragranceNotesFilter={setFragranceNotesFilter}
-            />
+            <ProductFilters sections={filterSections} />
           </div>
         </div>
       </div>

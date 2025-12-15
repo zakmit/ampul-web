@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ProductImageGallery from '@/components/ProductImageGallery';
 import ExpandableSections from '@/components/ExpandableSections';
+import Breadcrumb from '@/components/ui/Breadcrumb';
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -185,27 +186,13 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       </div>
 
       {/* Breadcrumb Navigation */}
-      <div className="bg-white lg:bg-white py-8">
-        <div className="max-w-md lg:max-w-7xl mx-auto px-6 lg:px-12">
-          <nav aria-label="Breadcrumb" className="text-sm text-gray-600">
-            <ol className="flex items-center gap-2">
-              <li>
-                <Link href="/" className="hover:underline">Home</Link>
-              </li>
-              <li>&gt;</li>
-              <li>
-                <a href="/fragrances" className="hover:underline">Fragrances</a>
-              </li>
-              <li>&gt;</li>
-              <li>
-                <a href="/collection" className="hover:underline">Collection</a>
-              </li>
-              <li>&gt;</li>
-              <li className="text-gray-900 font-medium">{product.name}</li>
-            </ol>
-          </nav>
-        </div>
-      </div>
+      <Breadcrumb
+        items={[
+          { href: '/', label: 'Home' },
+          { href: '/p', label: 'Fragrances' },
+          { label: product.name },
+        ]}
+      />
     </div>
   );
 }

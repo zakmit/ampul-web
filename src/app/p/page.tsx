@@ -1,5 +1,10 @@
+'use client';
+
+import { useState } from 'react';
 import ProductOverviewClient from '@/components/ProductOverviewClient';
 import { Product } from '@/components/ProductCard';
+import Breadcrumb from '@/components/ui/Breadcrumb';
+import { FilterSection } from '@/components/ProductFilters';
 
 // Mock products data - in production, this would be fetched from a database or API
 const products: Product[] = [
@@ -42,6 +47,61 @@ const products: Product[] = [
 ];
 
 export default function ProductsPage() {
+  const [sortBy, setSortBy] = useState('default');
+  const [volumeFilter, setVolumeFilter] = useState<string[]>([]);
+  const [collectionFilter, setCollectionFilter] = useState<string[]>([]);
+  const [fragranceNotesFilter, setFragranceNotesFilter] = useState<string[]>([]);
+
+  // Define filter sections for this page
+  const filterSections: FilterSection[] = [
+    {
+      id: 'sort',
+      title: 'Sort By',
+      type: 'radio',
+      options: [
+        { id: 'default', label: 'Default' },
+        { id: 'name-asc', label: 'Name A-Z' },
+        { id: 'name-desc', label: 'Name Z-A' },
+        { id: 'price-asc', label: 'Price from low to high' },
+        { id: 'price-desc', label: 'Price from high to low' },
+      ],
+      value: sortBy,
+      onChange: (value) => setSortBy(value as string),
+    },
+    {
+      id: 'volume',
+      title: 'Volume',
+      type: 'checkbox',
+      options: [
+        { id: '100ml', label: '100 ml' },
+      ],
+      value: volumeFilter,
+      onChange: (value) => setVolumeFilter(value as string[]),
+    },
+    {
+      id: 'collection',
+      title: 'Collection',
+      type: 'checkbox',
+      options: [
+        { id: 'greek-mythology', label: 'Greek Mythology' },
+      ],
+      value: collectionFilter,
+      onChange: (value) => setCollectionFilter(value as string[]),
+    },
+    {
+      id: 'fragrance-notes',
+      title: 'Fragrance Notes',
+      type: 'checkbox',
+      options: [
+        { id: 'citrus', label: 'Citrus' },
+        { id: 'floral', label: 'Floral' },
+        { id: 'leather', label: 'Leather' },
+      ],
+      value: fragranceNotesFilter,
+      onChange: (value) => setFragranceNotesFilter(value as string[]),
+    },
+  ];
+
   return (
     <div className="max-w-[1440px] mx-auto">
       {/* Header Section */}
@@ -55,7 +115,14 @@ export default function ProductsPage() {
       </div>
 
       {/* Client Component with Filter State */}
-      <ProductOverviewClient products={products} />
+      <ProductOverviewClient products={products} filterSections={filterSections} />
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb
+        items={[
+          { href: '/', label: 'Home' },
+          { label: 'Fragrances' },
+        ]}
+      />
     </div>
   );
 }

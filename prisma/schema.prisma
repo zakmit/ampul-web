@@ -1,0 +1,139 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Collection {
+  id                Int           @id @default(autoincrement())
+  slug              String        @unique
+  coverImageDesktop String
+  coverImageMobile  String
+  products          Product[]
+  translations      CollectionTranslation[]
+}
+
+model CollectionTranslation {
+  collectionId      Int
+  locale            String
+  name              String
+  description       String
+  collection        Collection    @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, locale])
+}
+
+model Category {
+  id                Int           @id @default(autoincrement())
+  slug              String        @unique
+  products          Product[]
+  translations      CategoryTranslation[]
+}
+
+model CategoryTranslation {
+  categoryId        Int
+  locale            String
+  name              String
+  description       String
+  category          Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([categoryId, locale])
+}
+
+model Volume {
+  id           Int                 @id @default(autoincrement())
+  value        String              
+  translations VolumeTranslation[]
+  products     ProductVolume[]    
+}
+
+model VolumeTranslation {
+  volumeId    Int
+  locale      String
+  displayName String              
+  volume      Volume @relation(fields: [volumeId], references: [id], onDelete: Cascade)
+  
+  @@id([volumeId, locale])
+}
+
+model ProductVolume {
+  productId String
+  volumeId  Int
+  locale    String
+  price     Decimal  @db.Decimal(10, 2)
+  stock     Int?     
+  
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  volume    Volume   @relation(fields: [volumeId], references: [id], onDelete: Cascade)
+  
+  @@id([productId, volumeId, locale])
+}
+
+model Product {
+  id                String        @id @default(cuid())
+  slug              String        @unique
+  categoryId        Int
+  collectionId      Int
+  coverImageDesktop String
+  coverImageMobile  String
+  productImage      String
+  boxImage          String
+  galleryImages     String[]      @default([])
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  category          Category      @relation(fields: [categoryId], references: [id])
+  collection        Collection    @relation(fields: [collectionId], references: [id])
+  translations      ProductTranslation[]
+  volumes           ProductVolume[]
+  tags              ProductTag[]
+}
+
+model ProductTranslation {
+  productId     String
+  locale        String
+  name          String
+  concept       String
+  sensations    String
+  product       Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@id([productId, locale])
+}
+
+model Tag {
+  id           Int               @id @default(autoincrement())
+  slug         String            @unique
+  // type         TagType
+  translations TagTranslation[]
+  products     ProductTag[]
+}
+
+// enum TagType {
+//   NOTE
+// }
+
+model TagTranslation {
+  tagId       Int
+  locale      String
+  name        String
+  tag         Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@id([tagId, locale])
+}
+
+model ProductTag {
+  productId String
+  tagId     Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@id([productId, tagId])
+}
