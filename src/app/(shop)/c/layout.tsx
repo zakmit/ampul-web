@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-export default function ProductLayout({
+export default function CollectionLayout({
   children,
 }: {
   children: ReactNode;

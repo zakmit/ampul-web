@@ -5,9 +5,7 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 interface NavbarProps {
   showBanner?: boolean;
-  bannerHeight?: number; 
-  fontTitle: string;
-  fontContext: string;
+  bannerHeight?: number;
 }
 const desPlaceHolder = "“How does it feel like when Icarus falls into the ground?”, experience for our sensational feast, with the most iconic one in our selections."
 const newItems = [
@@ -29,7 +27,7 @@ const navHeight = 14;
 const menuListStyle = "max-w-3xs min-w-30 pr-4";
 export default function NavBar({ showBanner = true,
     bannerHeight = 6 // h-6
-    , fontTitle, fontContext }: NavbarProps) {
+    }: NavbarProps) {
   const t = useTranslations('NavBar');
   const [isNavVisible, setIsNavVisible] = useState(true)
   const [isDropdownVisible, setIsDropdownVisible] = useState(false)
@@ -90,9 +88,9 @@ export default function NavBar({ showBanner = true,
         content: (
           <div className={dropMenuStyle}>
             <div>
-              <MenuList items={newItems} className="mb-6" fontTitle={fontTitle} fontContext={fontContext}></MenuList>
+              <MenuList items={newItems} className="mb-6"></MenuList>
             </div>
-            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW" fontTitle={fontTitle} fontContext={fontContext}></MenuCard>
+            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW"></MenuCard>
           </div>
         )
       },
@@ -102,16 +100,16 @@ export default function NavBar({ showBanner = true,
         content: (
           <div className={dropMenuStyle}>
             <div className="border-r border-gray-500">
-              <MenuList items={fragItems} className={menuListStyle} fontTitle={fontTitle} fontContext={fontContext}></MenuList>
+              <MenuList items={fragItems} className={menuListStyle}></MenuList>
             </div>
             <div className="border-r border-gray-500">
-              <MenuList title="Mythology" items={fragItems} className={menuListStyle} fontTitle={fontTitle} fontContext={fontContext}></MenuList>
+              <MenuList title="Mythology" items={fragItems} className={menuListStyle}></MenuList>
             </div>
             <div>
-              <MenuList items={fragItems} className={menuListStyle} fontTitle={fontTitle} fontContext={fontContext}></MenuList>
+              <MenuList items={fragItems} className={menuListStyle}></MenuList>
             </div>
-            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW" fontTitle={fontTitle} fontContext={fontContext}></MenuCard>
-            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW" fontTitle={fontTitle} fontContext={fontContext}></MenuCard>
+            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW"></MenuCard>
+            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW"></MenuCard>
           </div>
         )
       },
@@ -121,9 +119,9 @@ export default function NavBar({ showBanner = true,
         content: (
           <div className={dropMenuStyle}>
             <div>
-              <MenuList items={aboutItems} className="mb-6" fontTitle={fontTitle} fontContext={fontContext}></MenuList>
+              <MenuList items={aboutItems} className="mb-6"></MenuList>
             </div>
-            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW" fontTitle={fontTitle} fontContext={fontContext}></MenuCard>
+            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW"></MenuCard>
           </div>
         )
       }
@@ -140,9 +138,9 @@ export default function NavBar({ showBanner = true,
       <div>
         <div className={`relative block content-center transition-all duration-600 items-center z-50 gap-x-6 h-4 lg:h-6 ${isDropdownVisible ? "bg-gray-600" : "bg-gray-200"}`}>
           <div className="block items-center gap-x-4 gap-y-2">
-            <p className={`text-center text-xs lg:text-base ${fontTitle} ${isDropdownVisible ? "text-gray-100": "text-gray-900"}`}>
+            <h4 className={`text-center text-xs lg:text-base ${isDropdownVisible ? "text-gray-100": "text-gray-900"}`}>
               {t('banner')}
-            </p>
+            </h4>
           </div>
         </div>        
         <header className={`bg-white top-0 left-0 right-0 w-full z-50 transition-all duration-300 ease-in-out ${getNavPosition()} ${getNavTopPosition()} ${
@@ -198,7 +196,7 @@ export default function NavBar({ showBanner = true,
                   />
                   </a>
               </div>
-              <div className={`hidden lg:flex-1 lg:flex lg:mr-4 ${fontTitle}`}>
+              <div className={`hidden lg:flex-1 lg:flex lg:mr-4 font-title`}>
                 {menuItems.map((item) => (
                   <div
                     key={item.id}

@@ -18,7 +18,7 @@ const DUMMY_COLLECTIONS = [
   {
     id: 1,
     slug: 'greek-mythology',
-    coverImageDesktop: '/promo/collection-gm-d.jpg',
+    coverImageDesktop: '/promo/collection-gm-sq.jpg',
     coverImageMobile: '/promo/collection-gm-m.jpg',
     translations: {
       'en-US': { name: 'Greek Mythology', description: 'Inspired by the most famous tragedies in Greek mythology' },
@@ -157,15 +157,15 @@ export default function CollectionsPage() {
         </div>
       )}
 
-      <div className={`lg:grid lg:grid-cols-12 lg:h-screen lg:max-h-400 lg:min-h-160 ${isEditing ? 'lg:grid-flow-col' : ''}`}>
+      <div className={`lg:grid lg:grid-cols-12 lg:min-h-screen ${isEditing ? 'lg:grid-flow-col' : ''}`}>
         {/* Collections Content Area */}
         <div className={`border-gray-300 lg:overflow-y-auto lg:h-full transition-all ${isEditing ? 'lg:col-span-7 lg:border-r' : 'lg:col-span-12'}`}>
           {/* Header */}
-          <div className="border-b border-gray-500 lg:mx-6 lg:mt-2 lg:mb-0">
-            <div className="w-full flex items-center justify-between p-6 lg:px-2 bg-white">
+          <div className="lg:mx-6 lg:mt-2 lg:mb-0">
+            <div className="w-full flex items-center justify-center lg:justify-between p-6 lg:px-2 bg-white">
               <div className="flex flex-col items-start gap-1">
                 <h2 className="text-3xl font-bold lg:text-4xl">Collections</h2>
-                <span className="text-sm">
+                <span className="hidden lg:block text-sm">
                   {collections.length > 1 ? `${collections.length} collections` : `${collections.length} collection`}
                 </span>
               </div>
@@ -176,9 +176,9 @@ export default function CollectionsPage() {
             </div>
 
             {/* Content Section */}
-            <div className="border-t border-gray-500">
+            <div className="border-t  border-gray-500">
               {/* Mobile Filter and Plus */}
-              <div className="flex lg:hidden px-6 py-4 items-center justify-between text-sm">
+              <div className="flex border-b border-gray-500 lg:hidden px-6 py-4 mb-4 items-center justify-between text-sm">
                 <button
                   onClick={() => setIsFilterOpen(true)}
                   className="flex items-center gap-2 hover:text-gray-600"
@@ -189,7 +189,9 @@ export default function CollectionsPage() {
                     <path d="M9.5,7.648l0,0.704c0,0.194 -0.158,0.351 -0.352,0.351l-1.296,0c-0.194,0 -0.352,-0.157 -0.352,-0.351l0,-0.704c0,-0.194 0.158,-0.351 0.352,-0.351l1.296,-0c0.194,-0 0.352,0.157 0.352,0.351Z" fill="none" strokeWidth="1.04px" style={{strokeMiterlimit:2}} />
                     <path d="M16.5,15.648l0,0.704c0,0.194 -0.158,0.351 -0.352,0.351l-1.296,0c-0.194,0 -0.352,-0.157 -0.352,-0.351l0,-0.704c0,-0.194 0.158,-0.351 0.352,-0.351l1.296,-0c0.194,-0 0.352,0.157 0.352,0.351Z" fill="none" strokeWidth="1.04px" style={{strokeMiterlimit:2}} />
                   </svg>
-                  <span>Filter</span>
+                  <span className="text-sm">
+                    {collections.length > 1 ? `${collections.length} collections` : `${collections.length} collection`}
+                  </span>
                 </button>
                 <button onClick={handleCreateCollection} className="hover:text-gray-600">
                   <Plus className="w-4 h-4" />
@@ -351,7 +353,7 @@ function CollectionEditForm({
 
   return (
     <div>
-      <h3 className="block text-xl text-center lg:text-4xl lg:text-left font-bold pb-3 mb-3 border-b border-gray-500 lg:border-0 lg:pb-0 lg:mb-12">
+      <h3 className="block text-xl text-center lg:text-4xl lg:text-left font-bold pb-3 mb-3 border-b border-gray-500 lg:border-0 lg:pb-0 lg:mb-8">
         {isNew ? 'New Collection' : 'Edit Collection'}
       </h3>
 
@@ -371,12 +373,14 @@ function CollectionEditForm({
             )}
 
             {/* Description */}
-            <div className="absolute top-4 left-4 text-sm font-medium text-gray-900 group-hover:text-gray-700 transition-colors">
+            <div className={`absolute w-full h-full text-center content-center text-sm font-medium transition group-hover:-top-1/6 ${
+              coverImageMobile ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
+            }`}>
               16:9 Promotional <span className="text-red-600">*</span>
             </div>
 
             {/* Upload/Change Button - shows on hover */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-0 flex top-1/5 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -404,12 +408,14 @@ function CollectionEditForm({
             )}
 
             {/* Description */}
-            <div className="absolute top-4 left-4 text-sm font-medium text-gray-900 group-hover:text-gray-700 transition-colors">
+            <div className={`absolute w-full h-full text-center content-center text-sm font-medium transition group-hover:-top-1/6 ${
+              coverImageDesktop ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
+            }`}>
               1:1 Promotional <span className="text-red-600">*</span>
             </div>
 
             {/* Upload/Change Button - shows on hover */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-0 flex top-1/5 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -457,7 +463,7 @@ function CollectionEditForm({
                   <Eye className="w-6 h-6" />
                 </button>
               </div>
-              <button className={`${coverImageMobile ? 'bg-gray-900' : 'bg-gray-500'} text-white px-4 py-2 text-sm hover:opacity-80 transition-opacity`}>
+              <button className={`${coverImageMobile ? 'bg-gray-900' : 'bg-gray-500'} text-white w-20 px-4 py-2 text-sm hover:opacity-80 transition-opacity`}>
                 {coverImageMobile ? 'Change' : 'Upload'}
               </button>
             </div>
@@ -478,7 +484,7 @@ function CollectionEditForm({
                   <Eye className="w-6 h-6" />
                 </button>
               </div>
-              <button className={`${coverImageDesktop ? 'bg-gray-900' : 'bg-gray-500'} text-white px-4 py-2 text-sm hover:opacity-80 transition-opacity`}>
+              <button className={`${coverImageDesktop ? 'bg-gray-900' : 'bg-gray-500'} text-white w-20 px-4 py-2 text-sm hover:opacity-80 transition-opacity`}>
                 {coverImageDesktop ? 'Change' : 'Upload'}
               </button>
             </div>
@@ -559,7 +565,7 @@ function CollectionEditForm({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-between gap-4 pt-4 px-6 lg:mx-0 border-t lg:border-0 border-gray-500">
+        <div className="flex justify-between gap-4 pt-4 px-6 lg:pt-0 lg:mx-0 border-t lg:border-0 border-gray-500">
           <div className="flex gap-4">
             <button
               onClick={handleSubmit}

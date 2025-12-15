@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
@@ -51,7 +51,7 @@ model CategoryTranslation {
 
 model Volume {
   id           Int                 @id @default(autoincrement())
-  value        String              
+  value        String              @unique
   translations VolumeTranslation[]
   products     ProductVolume[]    
 }

@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import NavBar from '@/components/ui/NavBar';
-import Footer from '@/components/ui/Footer';
 import { MenuLink, MenuListProps, FeatureCardProp, FeatureCardsProps } from '@/types';
 import { MenuList } from '@/components/ui';
 import { Geist, Geist_Mono } from 'next/font/google';
@@ -56,9 +54,7 @@ export default async function RootLayout({
         className={`${aSLibre.variable} ${ziliaSlab.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <NavBar showBanner={true} bannerHeight={6} fontTitle={aSLibre.className} fontContext={ziliaSlab.className} />
           {children}
-          <Footer titleClassName={aSLibre.className} />
         </NextIntlClientProvider>
       </body>
     </html>

@@ -6,10 +6,9 @@ import { useTranslations } from 'next-intl';
 interface FooterSectionProps {
   title: string;
   links: { label: string; href: string }[];
-  titleClassName: string;
 }
 
-function FooterSection({ title, links, titleClassName }: FooterSectionProps) {
+function FooterSection({ title, links }: FooterSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -20,7 +19,7 @@ function FooterSection({ title, links, titleClassName }: FooterSectionProps) {
         className="flex items-center justify-between w-full md:cursor-default md:pointer-events-none py-3 md:py-0"
         aria-expanded={isExpanded}
       >
-        <h3 className={`${titleClassName} text-xl mb-0 md:mb-2`}>{title}</h3>
+        <h3 className={`font-title text-xl mb-0 md:mb-2`}>{title}</h3>
         <span className="md:hidden text-2xl font-light transition-transform duration-300 ease-in-out"
               style={{ transform: isExpanded ? 'rotate(45deg)' : 'rotate(0deg)' }}>
           +
@@ -43,11 +42,7 @@ function FooterSection({ title, links, titleClassName }: FooterSectionProps) {
   );
 }
 
-interface FooterProps {
-  titleClassName: string;
-}
-
-export default function Footer({ titleClassName }: FooterProps) {
+export default function Footer() {
   const t = useTranslations('Footer.sections');
 
   const sections = [
@@ -95,7 +90,6 @@ export default function Footer({ titleClassName }: FooterProps) {
             key={index}
             title={section.title}
             links={section.links}
-            titleClassName={titleClassName}
           />
         ))}
       </div>
