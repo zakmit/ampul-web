@@ -6,10 +6,10 @@ import LanguageSelector, { type Locale } from '@/components/ui/LanguageSelector'
 import Image from 'next/image';
 
 // Style constants
-export const INPUT_STYLE = "w-full text-sm px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic";
-export const INPUT_STYLE_ERROR = "w-full text-sm px-4 py-2 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 placeholder:italic";
-export const SELECT_STYLE = "w-full text-sm px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 appearance-none pr-10";
-export const SELECT_STYLE_ERROR = "w-full text-sm px-4 py-2 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 appearance-none pr-10";
+export const INPUT_STYLE = "min-h-8 w-full lg:w-60 text-sm px-4 py-1 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic";
+export const INPUT_STYLE_ERROR = "min-h-8 w-full lg:w-60 text-sm px-4 py-1 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 placeholder:italic";
+export const SELECT_STYLE = "w-full h-8 lg:w-60 text-sm px-4 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 appearance-none pr-10";
+export const SELECT_STYLE_ERROR = "w-full h-8 lg:w-60 text-sm px-4 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 appearance-none pr-10";
 export const SUBMIT_BUTTON = "max-w-30 bg-gray-900 text-white px-3 py-2 text-base hover:bg-gray-700 transition-colors disabled:opacity-50";
 export const CANCEL_BUTTON = "max-w-30 bg-white text-gray-900 px-3 py-2 text-base border border-gray-900 hover:bg-gray-300 transition-colors disabled:opacity-50";
 export const DELETE_BUTTON = "max-w-30 bg-red-700 text-red-100 px-3 py-2 text-base border border-red-900 hover:bg-red-900 transition-colors disabled:opacity-50";
@@ -56,12 +56,12 @@ function SearchableDropdown({
   const displayLabel = getItemLabel || ((item: { id: number; label: string }) => item.label);
 
   return (
-    <div className="mx-6 lg:mx-0 lg:flex lg:items-start lg:gap-4">
+    <div className="mx-6 lg:mx-0 lg:flex lg:items-start lg:justify-between lg:gap-4">
       <label className="block lg:w-48 text-sm font-medium mb-2 lg:mb-0 lg:pt-2">{label}</label>
-      <div className="relative lg:flex-1" ref={dropdownRef}>
+      <div className="relative lg:w-60" ref={dropdownRef}>
         {/* Display selected items with X buttons */}
         <div
-          className={`min-h-12 border rounded-md p-2 cursor-pointer flex flex-wrap gap-2 ${
+          className={`h-8 border text-center rounded-md px-2 py-1 cursor-pointer flex flex-wrap gap-2 ${
             error ? 'border-red-700' : 'border-gray-300'
           }`}
           onClick={() => setIsOpen(!isOpen)}
@@ -69,7 +69,7 @@ function SearchableDropdown({
           {selectedItems.map(item => (
             <span
               key={item.id}
-              className="inline-flex items-center gap-1 bg-yellow-200 border border-yellow-600 px-2 py-1 text-sm"
+              className="inline-flex items-center gap-1 bg-olive-200 border rounded-md text-olive-900 border-olive-600 px-2 text-xs"
             >
               {displayLabel(item)}
               <button
@@ -85,7 +85,7 @@ function SearchableDropdown({
             </span>
           ))}
           {selectedItems.length === 0 && (
-            <span className="text-gray-400 text-sm py-1">{placeholder}</span>
+            <span className="text-gray-500 px-2 text-center italic text-sm">{placeholder}</span>
           )}
         </div>
 
@@ -98,7 +98,7 @@ function SearchableDropdown({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={`Search ${label.toLowerCase()}...`}
-                className="w-full text-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900"
+                className="w-full text-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 placeholder:italic focus:ring-gray-900"
                 onClick={(e) => e.stopPropagation()}
               />
             </div>
@@ -114,8 +114,8 @@ function SearchableDropdown({
                       e.stopPropagation();
                       onToggle(item.id);
                     }}
-                    className={`w-full text-left text-sm px-3 py-2 hover:bg-gray-100 rounded ${
-                      selectedIds.includes(item.id) ? 'bg-yellow-50 font-medium' : ''
+                    className={`w-full text-left text-sm px-3 py-2 hover:bg-olive-300 rounded-md ${
+                      selectedIds.includes(item.id) ? 'bg-olive-100 font-bold' : ''
                     }`}
                   >
                     {displayLabel(item)}
@@ -375,7 +375,7 @@ export function ProductEditForm({
   };
 
   return (
-    <div className="lg:grid lg:grid-flow-col justify-around lg:h-screen">
+    <div className="lg:grid lg:grid-flow-col lg:content-center justify-around lg:h-screen">
       {/* Mobile Header */}
       <h3 className="block text-xl text-center font-bold pb-3 mb-3 border-b border-gray-500 lg:hidden">
         {isNew ? 'Edit Product' : 'Edit Product'}
@@ -403,12 +403,12 @@ export function ProductEditForm({
             {coverImageMobile && (
               <div className="absolute inset-0 bg-gray-700/20 group-hover:bg-gray-900/20 transition-colors" />
             )}
-            <div className={`absolute w-full h-full flex items-center justify-center text-sm font-medium transition ${
+            <div className={`absolute w-full h-full flex items-center justify-center text-sm font-medium transition group-hover:-top-1/6 ${
               coverImageMobile ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
             }`}>
               16:9 Promotional <span className="text-red-600">*</span>
             </div>
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-0 flex top-1/5 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <button type="button" onClick={(e) => { e.stopPropagation(); mobileInputRef.current?.click(); }}
                 className="bg-gray-900 text-white px-6 py-2 text-sm hover:bg-gray-700 transition-colors disabled:opacity-50"
                 disabled={isUploading !== null}>
@@ -433,12 +433,12 @@ export function ProductEditForm({
             {coverImageDesktop && (
               <div className="absolute inset-0 bg-gray-700/20 group-hover:bg-gray-900/20 transition-colors" />
             )}
-            <div className={`absolute w-full h-full flex items-center justify-center text-sm font-medium transition ${
+            <div className={`absolute w-full h-full flex items-center justify-center text-sm font-medium transition group-hover:-top-1/6 ${
               coverImageDesktop ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
             }`}>
               1:1 Promotional <span className="text-red-600">*</span>
             </div>
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-0 flex top-1/5 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <button type="button" onClick={(e) => { e.stopPropagation(); desktopInputRef.current?.click(); }}
                 className="bg-gray-900 text-white px-6 py-2 text-sm hover:bg-gray-700 transition-colors disabled:opacity-50"
                 disabled={isUploading !== null}>
@@ -466,12 +466,12 @@ export function ProductEditForm({
             {productImage && (
               <div className="absolute inset-0 bg-gray-700/20 group-hover:bg-gray-900/20 transition-colors" />
             )}
-            <div className={`absolute w-full h-full flex items-center justify-center text-sm font-medium transition ${
+            <div className={`absolute w-full h-full flex items-center justify-center text-sm font-medium transition group-hover:-top-1/9 ${
               productImage ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
             }`}>
               Product <span className="text-red-600">*</span>
             </div>
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-0 flex top-1/5 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <button type="button" onClick={(e) => { e.stopPropagation(); productInputRef.current?.click(); }}
                 className="bg-gray-900 text-white px-6 py-2 text-sm hover:bg-gray-700 transition-colors disabled:opacity-50"
                 disabled={isUploading !== null}>
@@ -496,12 +496,12 @@ export function ProductEditForm({
             {boxImage && (
               <div className="absolute inset-0 bg-gray-700/20 group-hover:bg-gray-900/20 transition-colors" />
             )}
-            <div className={`absolute w-full h-full flex items-center justify-center text-sm font-medium transition ${
+            <div className={`absolute w-full h-full flex items-center justify-center text-sm font-medium transition group-hover:-top-1/9 ${
               boxImage ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
             }`}>
               Box <span className="text-red-600">*</span>
             </div>
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-0 flex top-1/5 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <button type="button" onClick={(e) => { e.stopPropagation(); boxInputRef.current?.click(); }}
                 className="bg-gray-900 text-white px-6 py-2 text-sm hover:bg-gray-700 transition-colors disabled:opacity-50"
                 disabled={isUploading !== null}>
@@ -514,21 +514,32 @@ export function ProductEditForm({
         </div>
 
         {/* Gallery Images Section - Height 236px */}
-        <div className="bg-gray-100 p-4 flex flex-col shadow-md/30" style={{ height: '236px' }}>
-          <div className="flex-1 overflow-y-auto">
-            <div className="flex flex-wrap gap-4">
+        <div className="bg-gray-100 p-4 flex flex-col shadow-md/30 items-end" style={{ height: '236px' }}>
+          <div className="flex-1 overflow-y-auto w-full">
+            <div className="flex gap-4 overflow-x-auto">
               {galleryImages.map((img, idx) => (
-                <div key={idx} className="relative bg-gray-200 group shrink-0" style={{ width: '160px', height: '160px' }}>
+                <div key={idx} className="relative bg-gray-200 hover:bg-gray-500 group shrink-0 overflow-hidden" style={{ width: '160px', height: '160px' }}>
                   <Image src={img} alt={`Gallery ${idx + 1}`} fill className="object-cover" />
+                  <div className="absolute inset-0 bg-gray-700/20 group-hover:bg-gray-900/20 transition-colors" />
                   <button
                     type="button"
-                    onClick={() => removeGalleryImage(idx)}
-                    className="absolute top-1 right-1 bg-red-700 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => { e.stopPropagation(); removeGalleryImage(idx); }}
+                    className="absolute top-1 right-1 bg-red-700 text-white p-1 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity z-10"
                   >
                     <X className="w-3 h-3" />
                   </button>
-                  <div className="absolute bottom-1 left-1 bg-gray-900/70 text-white text-xs px-1">
+                  <div className="absolute bottom-1 left-1 bg-gray-900/70 text-white text-xs px-1 z-10">
                     {String(idx + 1).padStart(2, '0')}
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); galleryInputRef.current?.click(); }}
+                      className="bg-gray-900 text-white px-4 py-2 text-sm hover:bg-gray-700 cursor-pointer transition-colors disabled:opacity-50"
+                      disabled={isUploading !== null}
+                    >
+                      {isUploading === 'gallery' ? 'Wait...' : 'Change'}
+                    </button>
                   </div>
                 </div>
               ))}
@@ -537,10 +548,10 @@ export function ProductEditForm({
           <button
             type="button"
             onClick={() => galleryInputRef.current?.click()}
-            className="mt-4 bg-gray-900 text-white px-4 py-2 text-sm hover:bg-gray-700 transition-colors disabled:opacity-50"
+            className=" bg-gray-900 text-white w-38 h-8 text-sm hover:bg-gray-700 transition-colors disabled:opacity-50"
             disabled={isUploading !== null}
           >
-            {isUploading === 'gallery' ? 'Uploading...' : 'Add optional Image'}
+            {isUploading === 'gallery' ? 'Uploading...' : 'Add optional image'}
           </button>
           <input ref={galleryInputRef} type="file" accept="image/jpeg,image/jpg,image/png,image/webp"
             onChange={(e) => handleImageSelect(e, 'gallery')} className="hidden" />
@@ -548,10 +559,10 @@ export function ProductEditForm({
       </div>
 
       {/* Right Side - Form Fields */}
-      <div className="flex-1 bg-white overflow-y-auto">
-        <div className="space-y-6 p-6 lg:p-8">
+      <div className="flex-1 bg-white overflow-y-auto content-center">
+        <div className="space-y-6 p-6 lg:max-w-124 lg:py-4 lg:px-0">
         {/* Product Unique Name */}
-        <div className="mx-6 lg:mx-0 lg:flex lg:items-center lg:gap-4">
+        <div className="mx-6 lg:mx-0 lg:flex lg:justify-between lg:items-center lg:gap-4">
           <label className="block lg:w-48 text-sm font-medium mb-2 lg:mb-0">
             Product Unique Name <span className="text-red-600">*</span>
           </label>
@@ -571,7 +582,7 @@ export function ProductEditForm({
         </div>
 
         {/* Product Category */}
-        <div className="mx-6 lg:mx-0 lg:flex lg:items-center lg:gap-4">
+        <div className="mx-6 lg:mx-0 lg:flex lg:justify-between lg:items-center lg:gap-4">
           <label className="block lg:w-48 text-sm font-medium mb-2 lg:mb-0">
             Product Category
           </label>
@@ -601,7 +612,7 @@ export function ProductEditForm({
         </div>
 
         {/* Collection */}
-        <div className="mx-6 lg:mx-0 lg:flex lg:items-center lg:gap-4">
+        <div className="mx-6 lg:mx-0 lg:flex lg:justify-between lg:items-center lg:gap-4">
           <label className="block lg:w-48 text-sm font-medium mb-2 lg:mb-0">
             Collection
           </label>
@@ -741,7 +752,7 @@ export function ProductEditForm({
           </div>
 
           {/* Box Image */}
-          <div className="ml-4">
+          <div className="mb-4 ml-4">
             <div className="flex items-center gap-4 justify-between">
               <div className="flex items-center">
                 <label className="text-sm w-32">
@@ -766,6 +777,41 @@ export function ProductEditForm({
               </button>
             </div>
           </div>
+
+          {/* Gallery Images */}
+          {galleryImages.map((img, idx) => (
+            <div key={idx} className="mb-4 ml-4">
+              <div className="flex items-center gap-4 justify-between">
+                <div className="flex items-center">
+                  <label className="text-sm w-32">
+                    Gallery {String(idx + 1).padStart(2, '0')}
+                  </label>
+                  <button type="button" onClick={() => setPreviewImage(img)}
+                    className="text-gray-900 hover:opacity-70 mr-4 transition-opacity">
+                    <Eye className="w-6 h-6" />
+                  </button>
+                  <button type="button" onClick={() => removeGalleryImage(idx)}
+                    className="text-red-700 hover:opacity-50 transition-opacity">
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+                <button type="button" onClick={() => galleryInputRef.current?.click()}
+                  className="bg-gray-900 text-white w-20 py-2 text-sm hover:opacity-80 transition-opacity disabled:opacity-50"
+                  disabled={isUploading !== null}>
+                  {isUploading === 'gallery' ? 'Wait...' : 'Change'}
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {/* Add optional Image button */}
+          <div className="ml-4 mt-6 text-center">
+            <button type="button" onClick={() => galleryInputRef.current?.click()}
+              className="w-40 bg-gray-900 text-white py-2 text-sm hover:opacity-80 transition-opacity disabled:opacity-50"
+              disabled={isUploading !== null}>
+              {isUploading === 'gallery' ? 'Uploading...' : 'Add optional image'}
+            </button>
+          </div>
         </div>
 
         {/* Image Preview Overlay */}
@@ -785,13 +831,15 @@ export function ProductEditForm({
         )}
 
         {/* Language Selector */}
-        <LanguageSelector
-          value={selectedLocale}
-          onChange={(locale) => setSelectedLocale(locale)}
-        />
+        <div className="border-b -mx-6 lg:mx-8 text-center">
+          <LanguageSelector
+            value={selectedLocale}
+            onChange={(locale) => setSelectedLocale(locale)}
+          />
+        </div>
 
         {/* Localized Product Name */}
-        <div className="mx-6 lg:mx-0 lg:flex lg:items-center lg:gap-4">
+        <div className="mx-6 lg:mx-0 lg:flex lg:justify-between lg:items-center lg:gap-4">
           <label className="block lg:w-48 text-sm font-medium mb-2 lg:mb-0">
             Localized Product Name {selectedLocale === 'en-US' && <span className="text-red-600">*</span>}
           </label>
@@ -817,7 +865,7 @@ export function ProductEditForm({
         </div>
 
         {/* Concept of product */}
-        <div className="mx-6 lg:mx-0 lg:flex lg:items-start lg:gap-4">
+        <div className="mx-6 lg:mx-0 lg:flex lg:items-start lg:justify-between lg:gap-4">
           <label className="block lg:w-48 text-sm font-medium mb-2 lg:mb-0 lg:pt-2">
             Concept of product {selectedLocale === 'en-US' && <span className="text-red-600">*</span>}
           </label>
@@ -843,7 +891,7 @@ export function ProductEditForm({
         </div>
 
         {/* Sensation */}
-        <div className="mx-6 lg:mx-0 lg:flex lg:items-center lg:gap-4">
+        <div className="mx-6 lg:mx-0 lg:flex lg:justify-between lg:items-center lg:gap-4">
           <label className="block lg:w-48 text-sm font-medium mb-2 lg:mb-0">
             Sensation {selectedLocale === 'en-US' && <span className="text-red-600">*</span>}
           </label>
@@ -874,13 +922,13 @@ export function ProductEditForm({
             <label className="block lg:w-48 text-sm font-medium mb-2 lg:mb-0 lg:pt-2">
               Price <span className="text-red-600">*</span>
             </label>
-            <div className="space-y-2 lg:flex-1">
+            <div className="space-y-2 lg:w-60">
               {selectedVolumes.map(volumeId => {
                 const volume = volumes.find(v => v.id === volumeId);
                 if (!volume) return null;
                 return (
-                  <div key={volumeId} className="flex items-center gap-2">
-                    <div className="w-20 text-sm font-medium bg-gray-200 px-3 py-2 text-center">
+                  <div key={volumeId} className="flex items-center gap-2 lg:justify-between">
+                    <div className="w-29 h-8 content-center text-sm font-medium bg-gray-200 border border-gray-500 rounded-md px-3 text-center">
                       {volume.value}
                     </div>
                     <input
@@ -902,7 +950,7 @@ export function ProductEditForm({
                         });
                       }}
                       placeholder="Price"
-                      className={INPUT_STYLE + ' flex-1'}
+                      className={'min-h-8 w-full lg:w-29 text-sm px-4 py-1 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic'}
                       disabled={isPending || isUploading !== null}
                     />
                   </div>

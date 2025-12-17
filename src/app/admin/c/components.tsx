@@ -360,12 +360,14 @@ export function CollectionEditForm({
         )}
 
         {/* Language Selector */}
-        <LanguageSelector
-          value={selectedLocale}
-          onChange={(locale) => {
-            setSelectedLocale(locale);
-          }}
-        />
+        <div className="border-b -mx-6 lg:-mx-22 xl:-mx-28 text-center">
+          <LanguageSelector
+            value={selectedLocale}
+            onChange={(locale) => {
+              setSelectedLocale(locale);
+            }}
+          />
+        </div>
 
         {/* Localized Collection Name */}
         <div className="mx-6 lg:mx-0">

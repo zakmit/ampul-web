@@ -484,12 +484,14 @@ export function CategoryEditForm({
         </div>
 
         {/* Language Selector */}
-        <LanguageSelector
-          value={selectedLocale}
-          onChange={(locale) => {
-            setSelectedLocale(locale);
-          }}
-        />
+        <div className="border-b -mx-6 lg:-mx-22 xl:-mx-28 text-center">
+          <LanguageSelector
+            value={selectedLocale}
+            onChange={(locale) => {
+              setSelectedLocale(locale);
+            }}
+          />
+        </div>
 
         {/* Localized Category Name */}
         <div>
@@ -653,12 +655,14 @@ export function TagEditForm({
         </div>
 
         {/* Language Selector */}
-        <LanguageSelector
-          value={selectedLocale}
-          onChange={(locale) => {
-            setSelectedLocale(locale);
-          }}
-        />
+        <div className="border-b -mx-6 lg:-mx-22 xl:-mx-28 text-center">
+          <LanguageSelector
+            value={selectedLocale}
+            onChange={(locale) => {
+              setSelectedLocale(locale);
+            }}
+          />
+        </div>
 
         {/* Localized Tag Name */}
         <div>
@@ -795,12 +799,14 @@ export function VolumeEditForm({
         </div>
 
         {/* Language Selector */}
-        <LanguageSelector
-          value={selectedLocale}
-          onChange={(locale) => {
-            setSelectedLocale(locale);
-          }}
-        />
+        <div className="border-b -mx-6 lg:-mx-22 xl:-mx-28 text-center">
+          <LanguageSelector
+            value={selectedLocale}
+            onChange={(locale) => {
+              setSelectedLocale(locale);
+            }}
+          />
+        </div>
 
         {/* Localized Display Name */}
         <div>
