@@ -115,29 +115,29 @@ export default function ProductsClient({
   const clearAllEditing = async () => {
     // Clean up current form images if user is canceling
     const imagesToDelete = [];
-    if (currentFormImages.desktop && currentFormImages.desktop.startsWith('/uploads/')) {
+    if (currentFormImages.desktop && currentFormImages.desktop.startsWith('/uploads/products/')) {
       if (!originalImages || currentFormImages.desktop !== originalImages.desktop) {
         imagesToDelete.push(currentFormImages.desktop);
       }
     }
-    if (currentFormImages.mobile && currentFormImages.mobile.startsWith('/uploads/')) {
+    if (currentFormImages.mobile && currentFormImages.mobile.startsWith('/uploads/products/')) {
       if (!originalImages || currentFormImages.mobile !== originalImages.mobile) {
         imagesToDelete.push(currentFormImages.mobile);
       }
     }
-    if (currentFormImages.product && currentFormImages.product.startsWith('/uploads/')) {
+    if (currentFormImages.product && currentFormImages.product.startsWith('/uploads/products/')) {
       if (!originalImages || currentFormImages.product !== originalImages.product) {
         imagesToDelete.push(currentFormImages.product);
       }
     }
-    if (currentFormImages.box && currentFormImages.box.startsWith('/uploads/')) {
+    if (currentFormImages.box && currentFormImages.box.startsWith('/uploads/products/')) {
       if (!originalImages || currentFormImages.box !== originalImages.box) {
         imagesToDelete.push(currentFormImages.box);
       }
     }
     if (currentFormImages.gallery.length > 0) {
       const newGalleryImages = currentFormImages.gallery.filter(img =>
-        (!originalImages || !originalImages.gallery.includes(img)) && img.startsWith('/uploads/')
+        (!originalImages || !originalImages.gallery.includes(img)) && img.startsWith('/uploads/products/')
       );
       imagesToDelete.push(...newGalleryImages);
     }
@@ -216,11 +216,11 @@ export default function ProductsClient({
       });
 
       if (result.success && result.data) {
-        // Transform and add to products list
-        // For now, just add the new product
-        setProducts([newProduct as Product, ...products]);
+        // Close the creation form and refresh to show updated data
         setIsCreating(false);
-        setCurrentFormImages({ desktop: '', mobile: '', product: '', box: '', gallery: [] });
+        // Force a hard refresh by navigating to the same route
+        // This ensures we fetch the latest validated data from the database
+        window.location.href = '/admin/p';
       } else {
         alert(result.error || 'Failed to create product');
       }
@@ -260,10 +260,11 @@ export default function ProductsClient({
       }, originalImages || undefined);
 
       if (result.success && result.data) {
-        setProducts(products.map((p) => (p.id === id ? { ...updatedProduct, id } as Product : p)));
+        // Close the editing form and refresh to show updated data
         setEditingProduct(null);
-        setCurrentFormImages({ desktop: '', mobile: '', product: '', box: '', gallery: [] });
-        setOriginalImages(null);
+        // Force a hard refresh by navigating to the same route
+        // This ensures we fetch the latest validated data from the database
+        window.location.href = '/admin/p';
       } else {
         alert(result.error || 'Failed to update product');
       }
@@ -300,6 +301,8 @@ export default function ProductsClient({
     const result = await uploadProductImage(formData);
 
     if (result.success && result.data) {
+      const uploadedUrl = result.data.url;
+
       // Delete the old image if it exists and is not the original
       if (currentImageUrl && currentImageUrl.startsWith('/uploads/')) {
         const isOriginal = originalImages && originalImages[imageType as keyof typeof originalImages] === currentImageUrl;
@@ -312,16 +315,16 @@ export default function ProductsClient({
       if (imageType === 'gallery') {
         setCurrentFormImages((prev) => ({
           ...prev,
-          gallery: [...prev.gallery, result.data.url],
+          gallery: [...prev.gallery, uploadedUrl],
         }));
       } else {
         setCurrentFormImages((prev) => ({
           ...prev,
-          [imageType]: result.data.url,
+          [imageType]: uploadedUrl,
         }));
       }
 
-      return result.data.url;
+      return uploadedUrl;
     } else {
       alert(result.error || 'Failed to upload image');
       return null;

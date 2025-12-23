@@ -1,32 +1,50 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { notFound } from 'next/navigation';
 import ProductImageGallery from '@/components/ProductImageGallery';
 import ExpandableSections from '@/components/ExpandableSections';
 import Breadcrumb from '@/components/ui/Breadcrumb';
+import { getProductBySlug, getCollectionProducts, getAllProductSlugs } from './data';
+import type { Locale } from '@/i18n/config';
 
 interface ProductDetailPageProps {
   params: Promise<{
+    locale: Locale;
     slug: string;
   }>;
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
 
-  // Mock data - replace with actual data fetching based on slug
-  // Example: const product = await fetchProduct(slug);
+  // Fetch product data from Prisma
+  const productData = await getProductBySlug(slug, locale);
+
+  if (!productData) {
+    notFound();
+  }
+
+  // Image order: [coverImageDesktop, productImage, boxImage, ...galleryImages]
+  const productImages = [
+    productData.images.coverImageDesktop,
+    productData.images.productImage,
+    productData.images.boxImage,
+    ...productData.images.galleryImages,
+  ];
+
+  // Get first volume for display
+  const firstVolume = productData.volumes[0];
+  const volumeDisplay = firstVolume ? `${firstVolume.displayName}` : '';
+  const price = firstVolume ? firstVolume.price : 0;
+
   const product = {
-    name: 'Icarus',
-    subtitle: 'Eau de Toilette',
-    quote: '"His desire for a brilliant, burning dream melts his wings of survival."',
-    volume: '100ml · 3.4 fl oz',
-    price: 200,
-    sensations: 'Sea water choked in the nose, Cinnamon and amber bring the warmness of burning sun, Melting wax flowing on the skin',
-    images: [
-      '/products/icare-cover.jpg',
-      '/products/icare-bottle.jpg',
-      '/products/icare-box.jpg',
-    ],
+    name: productData.name,
+    subtitle: productData.category.name,
+    quote: productData.concept,
+    volume: volumeDisplay,
+    price: price,
+    sensations: productData.sensations,
+    images: productImages,
   };
 
   const infoSections = [
@@ -47,33 +65,22 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     },
   ];
 
-  const relatedProducts = [
-    {
-      name: 'Cassandra',
-      subtitle: 'Eau de Toilette',
-      image: '/products/cassandre-bottle.jpg',
-      slug: 'cassandre',
-    },
-    {
-      name: 'Narcisse',
-      subtitle: 'Eau de Toilette',
-      image: '/products/narcisse-bottle.jpg',
-      slug: 'narcisse',
-    },
-    {
-      name: 'Icarus',
-      subtitle: 'Eau de Toilette',
-      image: '/products/icare-bottle.jpg',
-      slug: 'icare',
-    },
-  ];
+  // Fetch products from the same collection
+  const collectionProducts = await getCollectionProducts(productData.collection.id, productData.id, locale);
+
+  const relatedProducts = collectionProducts.map(p => ({
+    name: p.name,
+    subtitle: p.concept,
+    image: p.productImage,
+    slug: p.slug,
+  }));
 
   return (
-    <div className="overflow-x-hidden max-w-[1440px] mx-auto">
+    <div className="overflow-x-hidden max-w-360 mx-auto">
       {/* Main Product Section */}
       <div className="lg:flex lg:min-h-screen">
         {/* Product Image Section - Mobile: full width, Desktop: 5/8 width sticky */}
-        <div className="relative w-screen h-[100vw] lg:w-[62.5%] lg:h-[900px] lg:sticky lg:top-0 flex items-center justify-center bg-transparent">
+        <div className="relative w-screen h-[100vw] lg:w-[62.5%] lg:h-225 lg:sticky lg:top-0 flex items-center justify-center bg-transparent">
           <div className="w-full lg:max-w-none lg:w-full h-full flex items-center justify-center">
             <ProductImageGallery images={product.images} productName={product.name} />
           </div>
@@ -83,7 +90,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         <div className="bg-white lg:w-[37.5%]">
           <div className="max-w-md mx-auto lg:max-w-none px-6 lg:px-12 pt-2 lg:pt-8 pb-8 lg:pb-16">
             {/* Product Title - Mobile: center, Desktop: right-aligned */}
-            <h1 className="text-4xl lg:text-5xl font-bold text-center lg:text-left lg:mb-2">
+            <h1 className="text-4xl lg:text-5xl font-bold text-center mb-1 lg:text-left lg:mb-2">
               {product.name}
             </h1>
             <p className="text-center lg:text-left text-xs lg:text-base mb-2 lg:mb-6">
@@ -96,9 +103,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </h3>
 
             {/* Volume and Add to Bag - Mobile: center, Desktop: right-aligned */}
-            <div className="flex items-center justify-center gap-4 mb-8 lg:mb-8">
+            <div className="flex items-center justify-center gap-8 mb-8 lg:mb-8">
               <span className="text-gray-700">{product.volume}</span>
-              <button className="bg-gray-500 hover:bg-gray-800 text-gray-100 font-semibold px-5 lg:px-6 py-3 rounded-md transition-colors">
+              <button className="bg-gray-500 hover:bg-gray-800 text-gray-100 font-semibold px-5 lg:px-6 py-3 transition-colors">
                 Add to bag · {product.price} $
               </button>
             </div>
@@ -108,7 +115,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <h2 className="text-2xl lg:text-3xl italic font-bold text-center mb-1 lg:mb-2 mx-auto">
                 Sensations
               </h2>
-              <p className="text-center italic text-sm lg:text-base text-gray-700 mx-auto">
+              <p className="text-center italic text-sm lg:text-base lg:px-4 text-gray-700 mx-auto">
                 {product.sensations}
               </p>
             </div>
@@ -137,7 +144,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <Link
                 key={relatedProduct.slug}
                 href={`/p/${relatedProduct.slug}`}
-                className="group flex-shrink-0 w-48 snap-start"
+                className="group shrink-0 w-48 snap-start"
               >
                 <div className="aspect-[1] relative rounded-sm overflow-hidden mb-2">
                   <Image
@@ -150,20 +157,20 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 <h3 className="text-center font-bold text-lg">
                   {relatedProduct.name}
                 </h3>
-                <p className="text-center text-xs">
+                <p className="text-center text-xs px-1">
                   {relatedProduct.subtitle}
                 </p>
               </Link>
             ))}
           </div>
 
-          {/* Desktop: Grid */}
-          <div className="hidden lg:flex gap-8 justify-center">
+          {/* Desktop: Flex with overflow-x */}
+          <div className="hidden lg:flex gap-8 overflow-x-auto pb-6 -mx-12 px-12">
             {relatedProducts.map((relatedProduct) => (
               <Link
                 key={relatedProduct.slug}
                 href={`/p/${relatedProduct.slug}`}
-                className="group flex-shrink-0 w-64"
+                className="group shrink-0 w-64"
               >
                 <div className="aspect-[1] relative rounded-sm overflow-hidden mb-4">
                   <Image
@@ -173,10 +180,10 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                <h3 className="text-center font-bold text-xl">
+                <h3 className="text-center font-bold text-xl mb-1">
                   {relatedProduct.name}
                 </h3>
-                <p className="text-center text-sm">
+                <p className="text-center text-sm italic px-2">
                   {relatedProduct.subtitle}
                 </p>
               </Link>
@@ -190,9 +197,17 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         items={[
           { href: '/', label: 'Home' },
           { href: '/p', label: 'Fragrances' },
+          { href: `/c/${productData.collection.slug}`, label: productData.collection.name },
           { label: product.name },
         ]}
       />
     </div>
   );
+}
+
+// Generate static params for all products across all locales
+export async function generateStaticParams() {
+  const slugs = await getAllProductSlugs();
+  // Return slugs without locale - the [locale] segment will handle that
+  return slugs;
 }

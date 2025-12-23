@@ -1,18 +1,9 @@
 import type { Metadata } from 'next';
-import { MenuLink, MenuListProps, FeatureCardProp, FeatureCardsProps } from '@/types';
-import { MenuList } from '@/components/ui';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist_Mono } from 'next/font/google';
 import { Averia_Serif_Libre } from 'next/font/google';
 import { Zilla_Slab } from 'next/font/google';
-import { useState, useEffect } from 'react';
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
 import './globals.css';
 
-const categoryItems = [
-  { label: "Gift for Chrismas", href: "/" },
-  { label: "Greek Mythology", href: "/" }
-];
 const aSLibre = Averia_Serif_Libre({
   weight: ["300","400","700"],
   style: ["normal", "italic"],
@@ -25,10 +16,6 @@ const ziliaSlab = Zilla_Slab({
   subsets: ["latin"],
   variable: "--font-context",
 })
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -41,21 +28,17 @@ export const metadata: Metadata = {
 };
 
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const messages = await getMessages();
-
   return (
     <html lang="en">
       <body
         className={`${aSLibre.variable} ${ziliaSlab.variable} ${geistMono.variable} antialiased`}
       >
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        {children}
       </body>
     </html>
   );

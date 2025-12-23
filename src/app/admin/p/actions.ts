@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import type { Prisma } from '@/generated/prisma/client'
 import { revalidatePath } from 'next/cache'
 import { CreateProductSchema, UpdateProductSchema } from './validation'
 import { writeFile, unlink, mkdir } from 'fs/promises'
@@ -13,9 +14,20 @@ type ActionResult<T = unknown> = {
   error?: string
 }
 
+// Helper to convert Decimal to number for client serialization
+function serializeProduct(product: any) {
+  return {
+    ...product,
+    volumes: product.volumes?.map((v: any) => ({
+      ...v,
+      price: Number(v.price),
+    })) || [],
+  }
+}
+
 // Helper to ensure upload directory exists
 async function ensureUploadDir() {
-  const uploadDir = join(process.cwd(), 'public', 'uploads')
+  const uploadDir = join(process.cwd(), 'public', 'uploads', 'products')
   if (!existsSync(uploadDir)) {
     await mkdir(uploadDir, { recursive: true })
   }
@@ -44,7 +56,7 @@ export async function uploadProductImage(formData: FormData): Promise<ActionResu
 
     await writeFile(filepath, buffer)
 
-    const url = `/uploads/${filename}`
+    const url = `/uploads/products/${filename}`
     return { success: true, data: { url } }
   } catch (error) {
     console.error('Error uploading image:', error)
@@ -56,8 +68,8 @@ export async function uploadProductImage(formData: FormData): Promise<ActionResu
 export async function deleteProductImages(imagePaths: string[]): Promise<ActionResult> {
   try {
     for (const imagePath of imagePaths) {
-      // Only delete files in the uploads directory
-      if (imagePath.startsWith('/uploads/')) {
+      // Only delete files in the uploads/products directory
+      if (imagePath.startsWith('/uploads/products/')) {
         const filepath = join(process.cwd(), 'public', imagePath)
         if (existsSync(filepath)) {
           await unlink(filepath)
@@ -82,7 +94,7 @@ export async function createProduct(
     productImage: string
     boxImage: string
     galleryImages: string[]
-    translations: { locale: string; name: string; concept: string; sensations: string }[]
+    translations: { locale: string; name?: string; concept?: string; sensations?: string }[]
     volumes: { volumeId: number; locale: string; price: number; stock: number | null }[]
     tagIds: number[]
   }
@@ -103,7 +115,12 @@ export async function createProduct(
         boxImage: validatedData.boxImage,
         galleryImages: validatedData.galleryImages,
         translations: {
-          create: validatedData.translations,
+          create: validatedData.translations.map(t => ({
+            locale: t.locale,
+            name: t.name || '',
+            concept: t.concept || '',
+            sensations: t.sensations || '',
+          })),
         },
         volumes: {
           create: validatedData.volumes,
@@ -148,7 +165,7 @@ export async function createProduct(
     })
 
     revalidatePath('/admin/p')
-    return { success: true, data: product }
+    return { success: true, data: serializeProduct(product) }
   } catch (error) {
     console.error('Error creating product:', error)
     return { success: false, error: error instanceof Error ? error.message : 'Failed to create product' }
@@ -167,7 +184,7 @@ export async function updateProduct(
     productImage?: string
     boxImage?: string
     galleryImages?: string[]
-    translations?: { locale: string; name: string; concept: string; sensations: string }[]
+    translations?: { locale: string; name?: string; concept?: string; sensations?: string }[]
     volumes?: { volumeId: number; locale: string; price: number; stock: number | null }[]
     tagIds?: number[]
   },
@@ -180,66 +197,72 @@ export async function updateProduct(
   }
 ): Promise<ActionResult> {
   try {
-    // Validate input
+    // Validate and sanitize input
     const validatedData = UpdateProductSchema.parse({ ...input, id })
 
-    // Determine which images to delete
+    // Determine which images to delete (use original input for image comparison)
     const imagesToDelete: string[] = []
 
     if (originalImages) {
-      if (input.coverImageDesktop && input.coverImageDesktop !== originalImages.desktop && originalImages.desktop.startsWith('/uploads/')) {
+      if (validatedData.coverImageDesktop && validatedData.coverImageDesktop !== originalImages.desktop && originalImages.desktop.startsWith('/uploads/products/')) {
         imagesToDelete.push(originalImages.desktop)
       }
-      if (input.coverImageMobile && input.coverImageMobile !== originalImages.mobile && originalImages.mobile.startsWith('/uploads/')) {
+      if (validatedData.coverImageMobile && validatedData.coverImageMobile !== originalImages.mobile && originalImages.mobile.startsWith('/uploads/products/')) {
         imagesToDelete.push(originalImages.mobile)
       }
-      if (input.productImage && input.productImage !== originalImages.product && originalImages.product.startsWith('/uploads/')) {
+      if (validatedData.productImage && validatedData.productImage !== originalImages.product && originalImages.product.startsWith('/uploads/products/')) {
         imagesToDelete.push(originalImages.product)
       }
-      if (input.boxImage && input.boxImage !== originalImages.box && originalImages.box.startsWith('/uploads/')) {
+      if (validatedData.boxImage && validatedData.boxImage !== originalImages.box && originalImages.box.startsWith('/uploads/products/')) {
         imagesToDelete.push(originalImages.box)
       }
-      if (input.galleryImages) {
+      if (validatedData.galleryImages) {
         const removedGalleryImages = originalImages.gallery.filter(img =>
-          !input.galleryImages!.includes(img) && img.startsWith('/uploads/')
+          !validatedData.galleryImages!.includes(img) && img.startsWith('/uploads/products/')
         )
         imagesToDelete.push(...removedGalleryImages)
       }
     }
 
-    // Update product
-    const updateData: any = {}
+    // Build update data dynamically using validated data
+    // Using Prisma.ProductUncheckedUpdateInput allows us to use IDs directly
+    const updateData: Prisma.ProductUncheckedUpdateInput = {}
 
-    if (input.slug !== undefined) updateData.slug = input.slug
-    if (input.categoryId !== undefined) updateData.categoryId = input.categoryId
-    if (input.collectionId !== undefined) updateData.collectionId = input.collectionId
-    if (input.coverImageDesktop !== undefined) updateData.coverImageDesktop = input.coverImageDesktop
-    if (input.coverImageMobile !== undefined) updateData.coverImageMobile = input.coverImageMobile
-    if (input.productImage !== undefined) updateData.productImage = input.productImage
-    if (input.boxImage !== undefined) updateData.boxImage = input.boxImage
-    if (input.galleryImages !== undefined) updateData.galleryImages = input.galleryImages
+    if (validatedData.slug !== undefined) updateData.slug = validatedData.slug
+    if (validatedData.categoryId !== undefined) updateData.categoryId = validatedData.categoryId
+    if (validatedData.collectionId !== undefined) updateData.collectionId = validatedData.collectionId
+    if (validatedData.coverImageDesktop !== undefined) updateData.coverImageDesktop = validatedData.coverImageDesktop
+    if (validatedData.coverImageMobile !== undefined) updateData.coverImageMobile = validatedData.coverImageMobile
+    if (validatedData.productImage !== undefined) updateData.productImage = validatedData.productImage
+    if (validatedData.boxImage !== undefined) updateData.boxImage = validatedData.boxImage
+    if (validatedData.galleryImages !== undefined) updateData.galleryImages = validatedData.galleryImages
 
     // Handle translations update
-    if (input.translations) {
+    if (validatedData.translations) {
       updateData.translations = {
         deleteMany: {},
-        create: input.translations,
+        create: validatedData.translations.map(t => ({
+          locale: t.locale,
+          name: t.name || '',
+          concept: t.concept || '',
+          sensations: t.sensations || '',
+        })),
       }
     }
 
     // Handle volumes update
-    if (input.volumes) {
+    if (validatedData.volumes) {
       updateData.volumes = {
         deleteMany: {},
-        create: input.volumes,
+        create: validatedData.volumes,
       }
     }
 
     // Handle tags update
-    if (input.tagIds) {
+    if (validatedData.tagIds) {
       updateData.tags = {
         deleteMany: {},
-        create: input.tagIds.map(tagId => ({ tagId })),
+        create: validatedData.tagIds.map(tagId => ({ tagId })),
       }
     }
 
@@ -285,7 +308,7 @@ export async function updateProduct(
     }
 
     revalidatePath('/admin/p')
-    return { success: true, data: product }
+    return { success: true, data: serializeProduct(product) }
   } catch (error) {
     console.error('Error updating product:', error)
     return { success: false, error: error instanceof Error ? error.message : 'Failed to update product' }
@@ -323,7 +346,7 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
       product.productImage,
       product.boxImage,
       ...product.galleryImages,
-    ].filter(img => img.startsWith('/uploads/'))
+    ].filter(img => img.startsWith('/uploads/products/'))
 
     if (imagesToDelete.length > 0) {
       await deleteProductImages(imagesToDelete)

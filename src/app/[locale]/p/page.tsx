@@ -103,7 +103,7 @@ export default function ProductsPage() {
   ];
 
   return (
-    <div className="max-w-[1440px] mx-auto">
+    <div className="max-w-360 mx-auto">
       {/* Header Section */}
       <div className="px-6 lg:px-12 pt-8 lg:pt-12 pb-6 lg:pb-8 border-b">
         <h1 className="text-4xl lg:text-5xl font-bold text-center mb-4">

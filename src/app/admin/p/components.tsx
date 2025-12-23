@@ -61,7 +61,7 @@ function SearchableDropdown({
       <div className="relative lg:w-60" ref={dropdownRef}>
         {/* Display selected items with X buttons */}
         <div
-          className={`h-8 border text-center rounded-md px-2 py-1 cursor-pointer flex flex-wrap gap-2 ${
+          className={`min-h-8 border text-center rounded-md px-2 py-1 cursor-pointer flex overflow-x-auto gap-2 ${
             error ? 'border-red-700' : 'border-gray-300'
           }`}
           onClick={() => setIsOpen(!isOpen)}
@@ -560,7 +560,7 @@ export function ProductEditForm({
 
       {/* Right Side - Form Fields */}
       <div className="flex-1 bg-white overflow-y-auto content-center">
-        <div className="space-y-6 p-6 lg:max-w-124 lg:py-4 lg:px-0">
+        <div className="space-y-6 p-6 lg:max-w-126 lg:py-4 lg:px-2">
         {/* Product Unique Name */}
         <div className="mx-6 lg:mx-0 lg:flex lg:justify-between lg:items-center lg:gap-4">
           <label className="block lg:w-48 text-sm font-medium mb-2 lg:mb-0">
@@ -884,19 +884,18 @@ export function ProductEditForm({
               }
             }}
             placeholder="Description appears below the product"
-            rows={4}
+            rows={3}
             className={selectedLocale === 'en-US' && validationErrors.concept ? INPUT_STYLE_ERROR : INPUT_STYLE}
             disabled={isPending || isUploading !== null}
           />
         </div>
 
         {/* Sensation */}
-        <div className="mx-6 lg:mx-0 lg:flex lg:justify-between lg:items-center lg:gap-4">
+        <div className="mx-6 lg:mx-0 lg:flex lg:items-start lg:justify-between lg:gap-4">
           <label className="block lg:w-48 text-sm font-medium mb-2 lg:mb-0">
             Sensation {selectedLocale === 'en-US' && <span className="text-red-600">*</span>}
           </label>
-          <input
-            type="text"
+          <textarea
             value={translations[selectedLocale].sensations}
             onChange={(e) => {
               setTranslations({
@@ -911,6 +910,7 @@ export function ProductEditForm({
               }
             }}
             placeholder="How the costumer will feel?"
+            rows={3}
             className={selectedLocale === 'en-US' && validationErrors.sensations ? INPUT_STYLE_ERROR : INPUT_STYLE}
             disabled={isPending || isUploading !== null}
           />

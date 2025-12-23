@@ -1,0 +1,47 @@
+{
+  "HomePage": {
+    "title": "Bonjour le monde!"
+  },
+  "NavBar": {
+    "banner": "Entrez dans le monde de la mythologie",
+    "menu": {
+      "new": "Nouveau",
+      "fragrance": "Parfum",
+      "about": "À propos"
+    },
+    "search": "Rechercher",
+    "user": "Utilisateur",
+    "shoppingBag": "Panier",
+    "openMenu": "Ouvrir le menu principal"
+  },
+  "Footer": {
+    "sections": {
+      "information": {
+        "title": "INFORMATION",
+        "trackOrder": "Suivre votre commande",
+        "delivery": "Livraison",
+        "returns": "Retours",
+        "faqs": "FAQ",
+        "exclusiveOffers": "Offres exclusives"
+      },
+      "connect": {
+        "title": "CONNECTER",
+        "instagram": "Instagram",
+        "facebook": "Facebook",
+        "youtube": "Youtube",
+        "linkedin": "Linkedin"
+      },
+      "about": {
+        "title": "À PROPOS",
+        "heritage": "Héritage",
+        "story": "Histoire"
+      },
+      "legal": {
+        "title": "LÉGAL",
+        "terms": "Conditions générales",
+        "privacy": "Politique de confidentialité",
+        "cookies": "Politique des cookies"
+      }
+    }
+  }
+}

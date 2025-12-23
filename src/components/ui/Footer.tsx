@@ -84,7 +84,7 @@ export default function Footer() {
 
   return (
     <footer className="w-full bg-gray-100">
-      <div className="mx-auto w-full max-w-[1440px] flex flex-col md:flex-row px-4 pt-4 lg:pt-8 pb-20 md:justify-around divide-y md:divide-y-0 divide-gray-300">
+      <div className="mx-auto w-full max-w-[1440px] flex flex-col md:flex-row px-4 pt-4 lg:pt-8 pb-10 md:justify-around divide-y md:divide-y-0 divide-gray-300">
         {sections.map((section, index) => (
           <FooterSection
             key={index}

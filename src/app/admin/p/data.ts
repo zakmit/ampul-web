@@ -1,4 +1,7 @@
 import { prisma } from '@/lib/prisma'
+import type { Locale } from '@/components/ui/LanguageSelector'
+import type { Prisma } from '@/generated/prisma/client'
+import type { Product, Category, Collection, Volume, Tag } from './components'
 
 // Type definitions matching the Prisma schema
 export type ProductWithRelations = {
@@ -192,4 +195,147 @@ export async function getTagsData() {
     console.error('Error fetching tags:', error)
     throw error
   }
+}
+
+// Transformation functions to convert Prisma data to component format
+type CategoryWithTranslations = Prisma.CategoryGetPayload<{
+  include: { translations: true };
+}>;
+
+type CollectionWithTranslations = Prisma.CollectionGetPayload<{
+  include: { translations: true };
+}>;
+
+type VolumeWithTranslations = Prisma.VolumeGetPayload<{
+  include: { translations: true };
+}>;
+
+type TagWithTranslations = Prisma.TagGetPayload<{
+  include: { translations: true };
+}>;
+
+type ProductWithFullRelations = Prisma.ProductGetPayload<{
+  include: {
+    translations: true;
+    volumes: true;
+    tags: true;
+  };
+}>;
+
+export function transformCategories(prismaCategories: CategoryWithTranslations[]): Category[] {
+  return prismaCategories.map(cat => ({
+    id: cat.id,
+    slug: cat.slug,
+    translations: cat.translations.reduce((acc: Record<Locale, { name: string }>, t) => {
+      acc[t.locale as Locale] = { name: t.name };
+      return acc;
+    }, {} as Record<Locale, { name: string }>),
+  }));
+}
+
+export function transformCollections(prismaCollections: CollectionWithTranslations[]): Collection[] {
+  return prismaCollections.map(col => ({
+    id: col.id,
+    slug: col.slug,
+    translations: col.translations.reduce((acc: Record<Locale, { name: string }>, t) => {
+      acc[t.locale as Locale] = { name: t.name };
+      return acc;
+    }, {} as Record<Locale, { name: string }>),
+  }));
+}
+
+export function transformVolumes(prismaVolumes: VolumeWithTranslations[]): Volume[] {
+  return prismaVolumes.map(vol => ({
+    id: vol.id,
+    value: vol.value,
+    translations: vol.translations.reduce((acc: Record<Locale, { displayName: string }>, t) => {
+      acc[t.locale as Locale] = { displayName: t.displayName };
+      return acc;
+    }, {} as Record<Locale, { displayName: string }>),
+  }));
+}
+
+export function transformTags(prismaTags: TagWithTranslations[]): Tag[] {
+  return prismaTags.map(tag => ({
+    id: tag.id,
+    slug: tag.slug,
+    translations: tag.translations.reduce((acc: Record<Locale, { name: string }>, t) => {
+      acc[t.locale as Locale] = { name: t.name };
+      return acc;
+    }, {} as Record<Locale, { name: string }>),
+  }));
+}
+
+export function transformProducts(prismaProducts: ProductWithFullRelations[]): Product[] {
+  return prismaProducts.map(product => {
+    // Group translations by locale
+    const translations = product.translations.reduce((acc: Record<Locale, { name: string; concept: string; sensations: string }>, t) => {
+      acc[t.locale as Locale] = {
+        name: t.name,
+        concept: t.concept,
+        sensations: t.sensations,
+      };
+      return acc;
+    }, {} as Record<Locale, { name: string; concept: string; sensations: string }>);
+
+    // Group volumes by volumeId
+    const volumesMap = new Map<number, { volumeId: number; prices: Record<Locale, { price: number; stock: number | null }> }>();
+
+    product.volumes.forEach((pv) => {
+      if (!volumesMap.has(pv.volumeId)) {
+        volumesMap.set(pv.volumeId, {
+          volumeId: pv.volumeId,
+          prices: {} as Record<Locale, { price: number; stock: number | null }>,
+        });
+      }
+      const volumeEntry = volumesMap.get(pv.volumeId)!;
+      volumeEntry.prices[pv.locale as Locale] = {
+        price: Number(pv.price),
+        stock: pv.stock,
+      };
+    });
+
+    return {
+      id: product.id,
+      slug: product.slug,
+      categoryId: product.categoryId,
+      collectionId: product.collectionId,
+      coverImageDesktop: product.coverImageDesktop,
+      coverImageMobile: product.coverImageMobile,
+      productImage: product.productImage,
+      boxImage: product.boxImage,
+      galleryImages: product.galleryImages,
+      translations,
+      volumes: Array.from(volumesMap.values()),
+      tagIds: product.tags.map((pt) => pt.tagId),
+    };
+  });
+}
+
+// Fetch and transform all data needed for the admin page
+export async function getAllAdminData() {
+  const [categories, collections, volumes, tags, products] = await Promise.all([
+    getCategoriesData(),
+    getCollectionsData(),
+    getVolumesData(),
+    getTagsData(),
+    prisma.product.findMany({
+      include: {
+        translations: true,
+        volumes: true,
+        tags: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    }),
+  ]);
+
+  return {
+    categories: transformCategories(categories),
+    collections: transformCollections(collections),
+    volumes: transformVolumes(volumes),
+    tags: transformTags(tags),
+    products: transformProducts(products),
+  };
 }

@@ -1,0 +1,47 @@
+{
+  "HomePage": {
+    "title": "你好世界！"
+  },
+  "NavBar": {
+    "banner": "進入神話世界",
+    "menu": {
+      "new": "新品",
+      "fragrance": "香氛",
+      "about": "關於"
+    },
+    "search": "搜尋",
+    "user": "用戶",
+    "shoppingBag": "購物袋",
+    "openMenu": "開啟主選單"
+  },
+  "Footer": {
+    "sections": {
+      "information": {
+        "title": "資訊",
+        "trackOrder": "追蹤訂單",
+        "delivery": "配送",
+        "returns": "退貨",
+        "faqs": "常見問題",
+        "exclusiveOffers": "專屬優惠"
+      },
+      "connect": {
+        "title": "聯繫我們",
+        "instagram": "Instagram",
+        "facebook": "Facebook",
+        "youtube": "Youtube",
+        "linkedin": "Linkedin"
+      },
+      "about": {
+        "title": "關於我們",
+        "heritage": "傳承",
+        "story": "故事"
+      },
+      "legal": {
+        "title": "法律",
+        "terms": "條款與細則",
+        "privacy": "隱私政策",
+        "cookies": "Cookie 政策"
+      }
+    }
+  }
+}
