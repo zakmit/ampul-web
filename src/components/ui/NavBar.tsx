@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { MenuList, MenuCard } from "@/components/ui";
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import SignInModal from './SignInModal';
 interface NavbarProps {
   showBanner?: boolean;
   bannerHeight?: number;
@@ -34,6 +35,7 @@ export default function NavBar({ showBanner = true,
   const [lastScrollY, setLastScrollY] = useState(0)
   const [isAtTop, setIsAtTop] = useState(true)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
 
   const currentBannerState = useRef(showBanner)
   
@@ -150,7 +152,7 @@ export default function NavBar({ showBanner = true,
         }
 
         `}>
-          <nav aria-label="Global" className="mx-auto flex min-w-2xs w-full max-w-[1440px] z-50 items-center px-2 lg:px-4 h-14">
+          <nav aria-label="Global" className="mx-auto flex min-w-2xs w-full max-w-360 z-50 items-center px-2 lg:px-4 h-14">
               <div className="flex lg:hidden">
                   {/* Mobile menu button */}
                   <button
@@ -203,7 +205,7 @@ export default function NavBar({ showBanner = true,
                     className="hidden lg:flex h-14"
                     onMouseEnter={() => handleMouseEnter(item.id) }
                   >
-                    <button className={`w-[196px] text-xl transition-colors duration-200 ${isDropdownVisible && (activeDropdown === item.id) ? "text-gray-500 underline": "text-gray-900 no-underline"}`}>
+                    <button className={`w-49 text-xl transition-colors duration-200 ${isDropdownVisible && (activeDropdown === item.id) ? "text-gray-500 underline": "text-gray-900 no-underline"}`}>
                       {item.label}
                       
                     </button>
@@ -228,6 +230,8 @@ export default function NavBar({ showBanner = true,
 
                   <button
                   type="button"
+                  onClick={() => setIsSignInModalOpen(true)}
+                  onMouseEnter={() => setIsDropdownVisible(false)}
                   className="inline-flex items-center justify-center rounded-md p-1 lg:p-2 text-gray-900"
                   >
                   <span className="sr-only">User</span>
@@ -277,6 +281,13 @@ export default function NavBar({ showBanner = true,
               </div>
             </div>
           </header>
+
+          {/* Sign In Modal */}
+          <SignInModal
+            isOpen={isSignInModalOpen}
+            showBanner={isAtTop}
+            onClose={() => setIsSignInModalOpen(false)}
+          />
         </div>
     )
 }

@@ -40,7 +40,7 @@ export default function ExpandableSections({ sections }: ExpandableSectionsProps
               />
             </button>
             {isExpanded && (
-              <div className="py-4 px-2 lg:pl-3 lg:pr-0 text-sm lg:text-base text-gray-600 border-b border-gray-200">
+              <div className="pt-2 pb-4 px-2 lg:pl-3 text-sm italic lg:text-base text-gray-600 border-b border-gray-200">
                 <p>{section.content}</p>
               </div>
             )}

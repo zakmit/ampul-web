@@ -51,17 +51,17 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     {
       id: 'delivery',
       title: 'Delivery',
-      content: 'Delivery information will be displayed here.',
+      content: 'All orders are delivered within 7 business days with free shipping.'
     },
     {
       id: 'returns',
       title: 'Free Returns',
-      content: 'Free returns information will be displayed here.',
+      content: 'Not quite the right scent? Return within 30 days for a full refund or exchange.'
     },
     {
       id: 'refill',
       title: 'Refill Bottle',
-      content: 'Refill bottle information will be displayed here.',
+      content: 'Preserve your bottle and refill at selected locations.'
     },
   ];
 
@@ -105,7 +105,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             {/* Volume and Add to Bag - Mobile: center, Desktop: right-aligned */}
             <div className="flex items-center justify-center gap-8 mb-8 lg:mb-8">
               <span className="text-gray-700">{product.volume}</span>
-              <button className="bg-gray-500 hover:bg-gray-800 text-gray-100 font-semibold px-5 lg:px-6 py-3 transition-colors">
+              <button className="bg-gray-600 hover:bg-gray-900 text-gray-100 font-semibold px-5 lg:px-6 py-3 transition-colors">
                 Add to bag · {product.price} $
               </button>
             </div>
@@ -143,7 +143,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             {relatedProducts.map((relatedProduct) => (
               <Link
                 key={relatedProduct.slug}
-                href={`/p/${relatedProduct.slug}`}
+                href={`/${locale}/p/${relatedProduct.slug}`}
                 className="group shrink-0 w-48 snap-start"
               >
                 <div className="aspect-[1] relative rounded-sm overflow-hidden mb-2">
@@ -169,7 +169,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             {relatedProducts.map((relatedProduct) => (
               <Link
                 key={relatedProduct.slug}
-                href={`/p/${relatedProduct.slug}`}
+                href={`/${locale}/p/${relatedProduct.slug}`}
                 className="group shrink-0 w-64"
               >
                 <div className="aspect-[1] relative rounded-sm overflow-hidden mb-4">
@@ -195,9 +195,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       {/* Breadcrumb Navigation */}
       <Breadcrumb
         items={[
-          { href: '/', label: 'Home' },
-          { href: '/p', label: 'Fragrances' },
-          { href: `/c/${productData.collection.slug}`, label: productData.collection.name },
+          { href: `/${locale}`, label: 'Home' },
+          { href: `/${locale}/p`, label: 'Fragrances' },
+          { href: `/${locale}/c/${productData.collection.slug}`, label: productData.collection.name },
           { label: product.name },
         ]}
       />
