@@ -8,13 +8,16 @@ interface MobileFilterPanelProps {
   isOpen: boolean;
   onClose: () => void;
   filterSections: FilterSection[];
+  filtersText?: string; // Optional text for "Filters" header (for non-i18n contexts)
 }
 
 export default function MobileFilterPanel({
   isOpen,
   onClose,
   filterSections,
+  filtersText = 'Filters', // Default to 'Filters' for admin routes
 }: MobileFilterPanelProps) {
+
   // Prevent body scroll when panel is open
   useEffect(() => {
     if (isOpen) {
@@ -53,7 +56,7 @@ export default function MobileFilterPanel({
               <path d="M9.5,7.648l0,0.704c0,0.194 -0.158,0.351 -0.352,0.351l-1.296,0c-0.194,0 -0.352,-0.157 -0.352,-0.351l0,-0.704c0,-0.194 0.158,-0.351 0.352,-0.351l1.296,-0c0.194,-0 0.352,0.157 0.352,0.351Z" fill="none" strokeWidth="1.04px" style={{strokeMiterlimit:2}} />
               <path d="M16.5,15.648l0,0.704c0,0.194 -0.158,0.351 -0.352,0.351l-1.296,0c-0.194,0 -0.352,-0.157 -0.352,-0.351l0,-0.704c0,-0.194 0.158,-0.351 0.352,-0.351l1.296,-0c0.194,-0 0.352,0.157 0.352,0.351Z" fill="none" strokeWidth="1.04px" style={{strokeMiterlimit:2}} />
             </svg>
-            <h2 className="ml-4 text-2xl font-bold">Filters</h2>
+            <h2 className="ml-4 text-2xl font-bold">{filtersText}</h2>
           </div>
             <button
               onClick={onClose}

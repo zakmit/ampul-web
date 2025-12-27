@@ -1,33 +1,114 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import ProductCard, { Product } from '@/components/ProductCard';
 import ProductFilters, { FilterSection } from '@/components/ProductFilters';
 import MobileFilterPanel from '@/components/MobileFilterPanel';
 
+type FilterOption = {
+  id: string;
+  label: string;
+};
+
 interface ProductOverviewClientProps {
   products: Product[];
-  filterSections: FilterSection[];
+  filterOptions: {
+    volumes: FilterOption[];
+    collections: FilterOption[];
+    tags: FilterOption[];
+  };
 }
 
-export default function ProductOverviewClient({ products, filterSections }: ProductOverviewClientProps) {
+export default function ProductOverviewClient({ products, filterOptions }: ProductOverviewClientProps) {
+  const t = useTranslations('ProductOverview');
+  const locale = useLocale();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [sortBy, setSortBy] = useState('default');
+  const [volumeFilter, setVolumeFilter] = useState<string[]>([]);
+  const [collectionFilter, setCollectionFilter] = useState<string[]>([]);
+  const [fragranceNotesFilter, setFragranceNotesFilter] = useState<string[]>([]);
+
+  // Build filter sections with state (filter out empty sections)
+  const filterSections: FilterSection[] = useMemo(() => [
+    {
+      id: 'sort',
+      title: t('sort.title'),
+      type: 'radio',
+      options: [
+        { id: 'default', label: t('sort.default') },
+        { id: 'name-asc', label: t('sort.nameAsc') },
+        { id: 'name-desc', label: t('sort.nameDesc') },
+        { id: 'price-asc', label: t('sort.priceAsc') },
+        { id: 'price-desc', label: t('sort.priceDesc') },
+      ],
+      value: sortBy,
+      onChange: (value) => setSortBy(value as string),
+    },
+    ...(filterOptions.volumes.length > 0 ? [{
+      id: 'volume' as const,
+      title: t('filterSections.volume'),
+      type: 'checkbox' as const,
+      options: filterOptions.volumes,
+      value: volumeFilter,
+      onChange: (value: string | string[]) => setVolumeFilter(value as string[]),
+    }] : []),
+    ...(filterOptions.collections.length > 0 ? [{
+      id: 'collection' as const,
+      title: t('filterSections.collection'),
+      type: 'checkbox' as const,
+      options: filterOptions.collections,
+      value: collectionFilter,
+      onChange: (value: string | string[]) => setCollectionFilter(value as string[]),
+    }] : []),
+    ...(filterOptions.tags.length > 0 ? [{
+      id: 'fragrance-notes' as const,
+      title: t('filterSections.fragranceNotes'),
+      type: 'checkbox' as const,
+      options: filterOptions.tags,
+      value: fragranceNotesFilter,
+      onChange: (value: string | string[]) => setFragranceNotesFilter(value as string[]),
+    }] : []),
+  ], [sortBy, volumeFilter, collectionFilter, fragranceNotesFilter, filterOptions, t]);
 
   // Apply filters and sorting - memoized to avoid re-sorting on every render
   const displayProducts = useMemo(() => {
-    const filtered = [...products];
+    let filtered = [...products];
 
-    // Find sort section
+    // Find filter sections
     const sortSection = filterSections.find(s => s.id === 'sort');
-    const sortBy = sortSection?.value as string || 'default';
+    const volumeSection = filterSections.find(s => s.id === 'volume');
+    const collectionSection = filterSections.find(s => s.id === 'collection');
+    const fragranceNotesSection = filterSections.find(s => s.id === 'fragrance-notes');
+
+    // Apply volume filter
+    const volumeFilters = (volumeSection?.value as string[]) || [];
+    if (volumeFilters.length > 0) {
+      filtered = filtered.filter(p => p.volumeValue && volumeFilters.includes(p.volumeValue));
+    }
+
+    // Apply collection filter
+    const collectionFilters = (collectionSection?.value as string[]) || [];
+    if (collectionFilters.length > 0) {
+      filtered = filtered.filter(p => p.collectionSlug && collectionFilters.includes(p.collectionSlug));
+    }
+
+    // Apply fragrance notes filter (tags)
+    const fragranceNotesFilters = (fragranceNotesSection?.value as string[]) || [];
+    if (fragranceNotesFilters.length > 0) {
+      filtered = filtered.filter(p =>
+        p.tagSlugs && p.tagSlugs.some(slug => fragranceNotesFilters.includes(slug))
+      );
+    }
 
     // Apply sorting
+    const sortBy = sortSection?.value as string || 'default';
     switch (sortBy) {
       case 'name-asc':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        filtered.sort((a, b) => a.name.localeCompare(b.name, locale));
         break;
       case 'name-desc':
-        filtered.sort((a, b) => b.name.localeCompare(a.name));
+        filtered.sort((a, b) => b.name.localeCompare(a.name, locale));
         break;
       case 'price-asc':
         filtered.sort((a, b) => a.price - b.price);
@@ -41,7 +122,7 @@ export default function ProductOverviewClient({ products, filterSections }: Prod
     }
 
     return filtered;
-  }, [products, filterSections]);
+  }, [products, filterSections, locale]);
 
   return (
     <>
@@ -58,7 +139,7 @@ export default function ProductOverviewClient({ products, filterSections }: Prod
               <path d="M16.5,15.648l0,0.704c0,0.194 -0.158,0.351 -0.352,0.351l-1.296,0c-0.194,0 -0.352,-0.157 -0.352,-0.351l0,-0.704c0,-0.194 0.158,-0.351 0.352,-0.351l1.296,-0c0.194,-0 0.352,0.157 0.352,0.351Z" fill="none" strokeWidth="1.04px" style={{strokeMiterlimit:2}} />
             </svg>
         </button>
-        <span className="text-sm text-gray-700">{displayProducts.length} samples</span>
+        <span className="text-sm text-gray-700">{displayProducts.length} {t('samples')}</span>
       </div>
 
       {/* Main Content */}
@@ -72,7 +153,7 @@ export default function ProductOverviewClient({ products, filterSections }: Prod
               <path d="M9.5,7.648l0,0.704c0,0.194 -0.158,0.351 -0.352,0.351l-1.296,0c-0.194,0 -0.352,-0.157 -0.352,-0.351l0,-0.704c0,-0.194 0.158,-0.351 0.352,-0.351l1.296,-0c0.194,-0 0.352,0.157 0.352,0.351Z" fill="none" strokeWidth="1.04px" style={{strokeMiterlimit:2}} />
               <path d="M16.5,15.648l0,0.704c0,0.194 -0.158,0.351 -0.352,0.351l-1.296,0c-0.194,0 -0.352,-0.157 -0.352,-0.351l0,-0.704c0,-0.194 0.158,-0.351 0.352,-0.351l1.296,-0c0.194,-0 0.352,0.157 0.352,0.351Z" fill="none" strokeWidth="1.04px" style={{strokeMiterlimit:2}} />
             </svg>
-            <h2 className="ml-4 text-2xl font-bold">Filters</h2>
+            <h2 className="ml-4 text-2xl font-bold">{t('filters')}</h2>
           </div>
           <ProductFilters sections={filterSections} />
         </aside>
@@ -82,13 +163,14 @@ export default function ProductOverviewClient({ products, filterSections }: Prod
           isOpen={isFilterOpen}
           onClose={() => setIsFilterOpen(false)}
           filterSections={filterSections}
+          filtersText={t('filters')}
         />
 
         {/* Product Grid */}
         <main className="flex-1 px-4 lg:px-12 py-8">
           {/* Desktop Product Count */}
           <div className="hidden lg:flex justify-end mb-6">
-            <span className="text-sm text-gray-600">{displayProducts.length} samples</span>
+            <span className="text-sm text-gray-600">{displayProducts.length} {t('samples')}</span>
           </div>
 
           {/* Products Grid */}

@@ -1,400 +1,89 @@
-import Link from 'next/link';
-import Image from 'next/image';
+import ProductOverviewClient from '@/components/ProductOverviewClient';
+import { Product } from '@/components/ProductCard';
 import Breadcrumb from '@/components/ui/Breadcrumb';
+import { getCollectionBySlug, getProductsByCollectionSlug, getFilterOptionsForCollection, getAllCollectionSlugs } from './data';
+import type { Locale } from '@/i18n/config';
+import { getTranslations } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 
-interface CollectionItem {
-  title: string;
-  description: string;
-  sideNote: string;
-  textColor: 'dark' | 'light';
-  alignment: 'left' | 'right';
-  imageMobile: string;
-  imageDesktop: string;
-  productSlug?: string;
-  productId?: string;
-  price?: number;
-  volume?: string;
-  relatedLink?: string;
-}
+export default async function CollectionPage({
+  params,
+}: {
+  params: Promise<{ locale: Locale; slug: string }>;
+}) {
+  const { locale, slug } = await params;
+  const tBreadcrumb = await getTranslations({ locale, namespace: 'Breadcrumb' });
 
-interface CollectionData {
-  title: string;
-  description: string;
-  type: 'Collection' | 'Event';
-  heroImageMobile: string;
-  heroImageDesktop: string;
-  items: CollectionItem[];
-  relatedProducts: {
-    title: string;
-    description: string;
-    price: number;
-    volume: string;
-    image: string;
-    slug: string;
-  }[];
-}
+  // Fetch collection data, products, and filter options from database
+  const [collectionData, productsData, filterOptionsData] = await Promise.all([
+    getCollectionBySlug(slug, locale),
+    getProductsByCollectionSlug(slug, locale),
+    getFilterOptionsForCollection(slug, locale),
+  ]);
 
-interface CollectionPageProps {
-  params: Promise<{
-    slug: string;
-  }>;
-}
+  // If collection not found, show 404
+  if (!collectionData) {
+    notFound();
+  }
 
-export default async function CollectionPage({ params }: CollectionPageProps) {
-  const { slug } = await params;
+  // Transform database products to Product interface for ProductCard
+  const products: Product[] = productsData.map(p => ({
+    id: p.id,
+    name: p.name,
+    quote: p.concept,
+    price: p.price,
+    volume: p.volume,
+    volumeValue: p.volumeValue,
+    image: p.productImage,
+    slug: p.slug,
+    collectionId: p.collectionId,
+    collectionSlug: p.collectionSlug,
+    tagIds: p.tagIds,
+    tagSlugs: p.tagSlugs,
+  }));
 
-  // Mock data - replace with actual data fetching based on slug
-  const collectionData: CollectionData = {
-    title: 'Greek Mythology Collection',
-    description: 'Inspired by the most famous tragedies, how did they come to this? What\'s the decisive moment in their destiny?',
-    type: 'Collection',
-    heroImageMobile: '/promo/collection-gm-m.jpg',
-    heroImageDesktop: '/promo/collection-gm-sq.jpg',
-    items: [
-      {
-        title: 'Antigone',
-        description: '"Her belief for justice, for everything should be done right"',
-        sideNote: 'Earth, Myrrh, Orange Blossom, Olive',
-        textColor: 'dark',
-        alignment: 'right',
-        imageMobile: '/products/antigone-cover.jpg',
-        imageDesktop: '/products/antigone-promo.jpg',
-        productSlug: 'antigone',
-        productId: 'antigone-001',
-        price: 200,
-        volume: '100ml',
-      },
-      {
-        title: 'Narcissus',
-        description: '"His love, for an ethereal illusion, makes him lose himself"',
-        sideNote: 'Narcisse, Reeds, Plane tree',
-        textColor: 'light',
-        alignment: 'left',
-        imageMobile: '/products/narcisse-cover.jpg',
-        imageDesktop: '/products/narcisse-promo.jpg',
-        productSlug: 'narcisse',
-        productId: 'narcisse-001',
-        price: 200,
-        volume: '100ml',
-      },
-      {
-        title: 'Icarus',
-        description: '"His desire for a brilliant, burning dream melts his wings of survival."',
-        sideNote: 'Seaweed and salt, Cloves and amber, Melting wax',
-        textColor: 'light',
-        alignment: 'right',
-        imageMobile: '/products/icare-cover.jpg',
-        imageDesktop: '/products/icare-promo.jpg',
-        productSlug: 'icare',
-        productId: 'icare-001',
-        price: 200,
-        volume: '100ml',
-      },
-      {
-        title: 'Cassandre',
-        description: '"For those awake among the numb, compelled to cry out"',
-        sideNote: 'Floral, Laurel and incense, Charred wood and leather',
-        textColor: 'light',
-        alignment: 'left',
-        imageMobile: '/products/cassandre-cover.jpg',
-        imageDesktop: '/products/cassandre-promo.jpg',
-        productSlug: 'cassandre',
-        productId: 'cassandre-001',
-        price: 200,
-        volume: '100ml',
-      },
-    ],
-    relatedProducts: [
-      {
-        title: 'Icarus',
-        description: '"His desire for a brilliant, burning dream melts his wings of survival."',
-        price: 200,
-        volume: '100ml',
-        image: '/products/icare-bottle.jpg',
-        slug: 'icare',
-      },
-      {
-        title: 'Narcissus',
-        description: '"His love, to a beautiful illusion which never exist, makes him lost his mind"',
-        price: 200,
-        volume: '100ml',
-        image: '/products/narcisse-bottle.jpg',
-        slug: 'narcisse',
-      },
-      {
-        title: 'Cassandre',
-        description: '"For those awake among the numb, compelled to cry out"',
-        price: 200,
-        volume: '100ml',
-        image: '/products/cassandre-bottle.jpg',
-        slug: 'cassandre',
-      },
-      {
-        title: 'Antigone',
-        description: '"Her belief for justice, for everything should be done right"',
-        price: 200,
-        volume: '100ml',
-        image: '/products/antigone-bottle.jpg',
-        slug: 'antigone',
-      },
-    ],
+  // Prepare filter options (serializable data only, no functions)
+  // Note: No collections filter since we're already in a collection
+  const filterOptions = {
+    volumes: filterOptionsData.volumes.map(v => ({
+      id: v.value,
+      label: v.displayName,
+    })),
+    collections: [], // No collection filter in collection view
+    tags: filterOptionsData.tags.map(t => ({
+      id: t.slug,
+      label: t.name,
+    })),
   };
 
-  const relatedSectionTitle = collectionData.type === 'Collection'
-    ? 'Explore the Collection'
-    : 'Related Products';
-
   return (
-    <div className="overflow-x-hidden max-w-360 mx-auto">
-      {/* Hero Section - Mobile */}
-      <div className="lg:hidden relative w-full bg-white"
-      style={{ height: 'calc(100vw / 1.618)' }}>
-        <Image
-          src={collectionData.heroImageMobile}
-          alt={collectionData.title}
-          fill
-          className="object-cover object-center"
-          priority
-        />
-      </div>
-      <div className="lg:hidden w-full h-40 inset-0 flex flex-col text-center px-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2 mt-4">
-            {collectionData.title}
-          </h1>
-          <p className="text-sm italic text-gray-700 mx-6">
-            {collectionData.description}
-          </p>
-      </div>
-      {/* Hero Section - Desktop */}
-      <div className="hidden lg:block relative w-full h-[810px] bg-gray-200">
-        <Image
-          src={collectionData.heroImageDesktop}
-          alt={collectionData.title}
-          fill
-          className="object-cover object-center"
-          priority
-        />
-        <div className="absolute inset-0 flex flex-col items-center justify-end text-center px-6 mb-6">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            {collectionData.title}
-          </h1>
-          <p className="text-base italic text-gray-700 max-w-2xl">
-            {collectionData.description}
-          </p>
-        </div>
+    <div className="max-w-360 mx-auto">
+      {/* Header Section */}
+      <div className="px-6 lg:px-12 pt-8 lg:pt-12 pb-6 lg:pb-8 border-b">
+        <h1 className="text-4xl lg:text-5xl font-bold text-center mb-4">
+          {collectionData.name}
+        </h1>
+        <p className="text-center italic text-gray-700 max-w-3xl mx-auto">
+          {collectionData.description}
+        </p>
       </div>
 
-      {/* Product Showcase Sections */}
-      {collectionData.items.map((item, index) => (
-        <div key={index} className="relative">
-          {/* Mobile Layout - Side by side grid */}
-          <div className="lg:hidden">
-            <div
-              className="grid grid-cols-2 bg-gray-100"
-              style={{ height: 'calc(50vw * 1.618)' }}
-            >
-              {index % 2 === 0 ? (
-                <>
-                  {/* Image first (left) */}
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={item.imageMobile}
-                      alt={item.title}
-                      fill
-                      className="object-cover object-center"
-                    />
-                  </div>
-                  {/* Content second (right) */}
-                  <div className="relative w-full h-full flex items-center justify-center px-8">
-                    <div className="text-left">
-                      <h2 className="text-xl font-bold mb-2">{item.title}</h2>
-                      <p className="italic text-sm mb-4 text-balance">{item.description}</p>
-                      <p className="italic font-light text-xs text-right mb-3">{item.sideNote}</p>
-                      {item.price && item.volume && (
-                        <p className="text-xs text-center mb-3">{item.volume} · {item.price} $</p>
-                      )}
-                      <div className="flex flex-col gap-2 px-2 mx-auto max-w-60">
-                        {(item.productSlug || item.relatedLink) && (
-                          <Link
-                            href={item.productSlug ? `/p/${item.productSlug}` : item.relatedLink!}
-                            className="inline-block border border-gray-900  hover:bg-gray-800 hover:text-gray-100 px-4 py-1.5 text-xs transition-colors text-center"
-                          >
-                            Check Detail
-                          </Link>
-                        )}
-                        {item.price && (
-                          <button className="bg-gray-500 text-gray-100 px-4 py-1.5 text-xs hover:bg-gray-800 transition-colors">
-                            Add to bag
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  {/* Content first (left) */}
-                  <div className="relative w-full h-full flex items-center justify-center px-8">
-                    <div className="text-left">
-                      <h2 className="text-xl font-bold mb-2">{item.title}</h2>
-                      <p className="italic text-sm mb-4 text-balance">{item.description}</p>
-                      <p className="italic font-light text-xs text-right mb-3">{item.sideNote}</p>
-                      {item.price && item.volume && (
-                        <p className="text-xs text-center mb-3">{item.volume} · {item.price} $</p>
-                      )}
-                      <div className="flex flex-col gap-2 px-2 mx-auto max-w-60">
-                        {(item.productSlug || item.relatedLink) && (
-                          <Link
-                            href={item.productSlug ? `/p/${item.productSlug}` : item.relatedLink!}
-                            className="inline-block border border-gray-900  hover:bg-gray-800 hover:text-gray-100 px-4 py-1.5 text-xs transition-colors text-center"
-                          >
-                            Check Detail
-                          </Link>
-                        )}
-                        {item.price && (
-                          <button className="bg-gray-500 text-gray-100 px-4 py-1.5 text-xs hover:bg-gray-800 transition-colors">
-                            Add to bag
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  {/* Image second (right) */}
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={item.imageMobile}
-                      alt={item.title}
-                      fill
-                      className="object-cover object-center"
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Desktop Layout */}
-          <div className="hidden lg:block relative h-[810px]">
-            <Image
-              src={item.imageDesktop}
-              alt={item.title}
-              fill
-              className="object-cover object-center"
-            />
-            <div
-              className={`absolute top-1/2 -translate-y-1/2 w-72 ${
-                item.alignment === 'left'
-                  ? 'left-[12.5%]'
-                  : 'right-[12.5%]'
-              }`}
-            >
-              <div className={item.textColor === 'light' ? 'text-gray-100' : 'text-gray-900'}>
-                <h2 className="text-5xl font-bold mb-4">{item.title}</h2>
-                <p className="italic text-xl mb-4 leading-relaxed">{item.description}</p>
-                <p className="italic font-light text-sm mb-6">{item.sideNote}</p>
-                {item.price && item.volume && (
-                  <p className="text-sm text-center mb-6">{item.volume} · {item.price} $</p>
-                )}
-                <div className="flex flex-col gap-3">
-                  {(item.productSlug || item.relatedLink) && (
-                    <Link
-                      href={item.productSlug ? `/p/${item.productSlug}` : item.relatedLink!}
-                      className={`inline-block border px-6 py-2 text-sm text-center bg-gray-100/30 backdrop-blur-sm transition-colors hover:bg-gray-700 hover:text-gray-100 hover:border-gray-700 ${
-                        item.textColor === 'light'
-                          ? 'border-gray-100 text-gray-100 '
-                          : 'border-gray-900 text-gray-900 '
-                      }`}
-                    >
-                      Check Detail
-                    </Link>
-                  )}
-                  {item.price && (
-                    <button
-                      className={`px-6 py-2 text-sm transition-colors hover:bg-gray-700 ${
-                        item.textColor === 'light'
-                          ? 'bg-gray-100 text-gray-900 hover:text-gray-100'
-                          : 'bg-gray-900 text-gray-100'
-                      }`}
-                    >
-                      Add to bag
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
-
-      {/* Related Products / Explore Collection Section */}
-      <div className="bg-gray-100 inset-shadow-[0_4px_4px_0] inset-shadow-gray-900/20 lg:inset-shadow-none">
-        <div className="max-w-7xl mx-auto px-4 lg:px-12 pt-6 pb-6 lg:pt-16 lg:pb-16">
-          <h2 className="text-2xl lg:text-4xl italic font-bold text-center mb-8 lg:mb-12">
-            {relatedSectionTitle}
-          </h2>
-
-          {/* Mobile: 2-column grid */}
-          <div className="grid grid-cols-2 gap-4 lg:hidden text-center">
-            {collectionData.relatedProducts.map((product) => (
-              <div key={product.slug} className="flex flex-col">
-                <Link href={`/p/${product.slug}`} className="block">
-                  <div className="aspect-square relative mb-3">
-                    <Image
-                      src={product.image}
-                      alt={product.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                </Link>
-                <h3 className="font-bold text-base mb-1">{product.title}</h3>
-                <p className="content-center text-xs px-2 h-12 italic mb-2 line-clamp-3">
-                  {product.description}
-                </p>
-                <p className="text-xs mb-3">{product.volume} · {product.price} $</p>
-                <button className="bg-gray-500 text-white px-4 py-2 mx-8 text-xs hover:bg-gray-700 transition-colors">
-                  Add to bag
-                </button>
-              </div>
-            ))}
-          </div>
-
-          {/* Desktop: 4-column grid */}
-          <div className="hidden lg:grid lg:grid-cols-4 gap-8 text-center">
-            {collectionData.relatedProducts.map((product) => (
-              <div key={product.slug} className="flex flex-col">
-                <Link href={`/p/${product.slug}`} className="block">
-                  <div className="aspect-square relative mb-4 overflow-hidden group">
-                    <Image
-                      src={product.image}
-                      alt={product.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                <h3 className="font-bold  text-xl mb-2">{product.title}</h3>
-                <p className="text-sm italic text-gray-700 mb-3 line-clamp-2">
-                  {product.description}
-                </p>
-                </Link>
-
-                <p className="text-sm mb-4">{product.volume} · {product.price} $</p>
-                <button className="bg-gray-500 text-white px-6 py-2 mx-10 text-sm hover:bg-gray-700 transition-colors">
-                  Add to bag
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Client Component with Filter State */}
+      <ProductOverviewClient products={products} filterOptions={filterOptions} />
       {/* Breadcrumb Navigation */}
       <Breadcrumb
         items={[
-          { href: '/', label: 'Home' },
-          { href: '/c', label: 'Collections & Events' },
-          { label: collectionData.title },
+          { href: `/${locale}`, label: tBreadcrumb('home') },
+          { label: collectionData.name },
         ]}
       />
     </div>
   );
+}
+
+// Generate static params for all collections across all locales
+export async function generateStaticParams() {
+  const slugs = await getAllCollectionSlugs();
+  // Return slugs without locale - the [locale] segment will handle that
+  return slugs;
 }

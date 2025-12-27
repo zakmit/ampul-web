@@ -2,6 +2,10 @@
   "HomePage": {
     "title": "Hello world!"
   },
+  "Breadcrumb": {
+    "home": "Home",
+    "fragrances": "Fragrances"
+  },
   "NavBar": {
     "banner": "Enter the world of mythology",
     "menu": {
@@ -43,5 +47,100 @@
         "cookies": "Cookie Policy"
       }
     }
+  },
+  "ProductDetail": {
+    "addToBag": "Add to bag",
+    "sensations": "Sensations",
+    "freeSample": "*A free sample of your choice with every order",
+    "exploreCollection": "Explore the Collection",
+    "infoSections": {
+      "delivery": {
+        "title": "Delivery",
+        "content": "All orders are delivered within 7 business days with free shipping."
+      },
+      "returns": {
+        "title": "Free Returns",
+        "content": "Not quite the right scent? Return within 30 days for a full refund or exchange."
+      },
+      "refill": {
+        "title": "Refill Bottle",
+        "content": "Preserve your bottle and refill at selected locations."
+      }
+    }
+  },
+  "ProductsPage": {
+    "title": "Fragrance",
+    "description": "Inspired by memorable demises — what led to their inevitable destiny? What was the decisive moment in their lives?"
+  },
+  "ProductOverview": {
+    "filters": "Filters",
+    "samples": "samples",
+    "sort": {
+      "title": "Sort By",
+      "default": "Default",
+      "nameAsc": "Name A-Z",
+      "nameDesc": "Name Z-A",
+      "priceAsc": "Price from low to high",
+      "priceDesc": "Price from high to low"
+    },
+    "filterSections": {
+      "volume": "Volume",
+      "collection": "Collection",
+      "fragranceNotes": "Fragrance Notes"
+    }
+  },
+  "OrdersPage": {
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "OrderCard": {
+    "total": "TOTAL",
+    "orderId": "Order ID",
+    "shipTo": "SHIP TO",
+    "tracking": "TRACKING",
+    "trackingNotAvailable": "Processing",
+    "cancelOrder": "Cancel the order",
+    "status": {
+      "PENDING": "PENDING",
+      "PAID": "PAID",
+      "PROCESSING": "PROCESSING",
+      "SHIPPED": "SHIPPED",
+      "DELIVERED": "DELIVERED",
+      "CANCELLED": "CANCELLED",
+      "REFUNDED": "REFUNDED"
+    }
+  },
+  "UserLayout": {
+    "myInformation": "MY INFORMATION",
+    "myOrders": "MY ORDERS"
+  },
+  "ProfilePage": {
+    "fields": {
+      "name": "Name",
+      "birthday": "Birthday",
+      "emailAddress": "Email Address",
+      "phoneNumber": "Phone Number",
+      "address": "Address",
+      "addressLine1": "Address Line 1",
+      "addressLine2": "Address Line 2 (Optional)",
+      "city": "City",
+      "region": "State/Region (Optional)",
+      "postalCode": "Zip Code",
+      "country": "Country"
+    },
+    "placeholders": {
+      "name": "Enter your full name",
+      "birthday": "MM/DD/YYYY",
+      "phone": "Enter phone number",
+      "addressLine1": "Street address, building name, floor",
+      "addressLine2": "Apartment, suite, unit number (optional)",
+      "city": "City name",
+      "region": "State or region (optional)",
+      "postalCode": "Postal / ZIP code",
+      "country": "Country name"
+    },
+    "save": "SAVE"
   }
 }

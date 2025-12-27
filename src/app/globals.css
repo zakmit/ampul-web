@@ -75,8 +75,6 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
   --font-title: var(--font-title);
   --font-context: var(--font-context);
 }
@@ -85,7 +83,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-title);
 }
 
-p, body {
+p, body, span, div, input {
   font-family: var(--font-context);
 }
 

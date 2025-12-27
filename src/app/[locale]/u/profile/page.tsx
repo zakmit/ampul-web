@@ -1,18 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 export const INPUT_STYLE = "w-full text-base px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
 
 export default function ProfilePage() {
+  const t = useTranslations('ProfilePage');
   const [formData, setFormData] = useState({
     name: 'Apollodorus',
     birthday: '05/05/1955',
     email: 'Apollodorus@exemple.com',
     phone: '+44912345678',
-    streetAddress: '',
-    unit: '',
-    cityStateZip: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    region: '',
+    postalCode: '',
     country: '',
   });
 
@@ -34,33 +38,33 @@ export default function ProfilePage() {
       <div className="max-w-3xl mx-auto">
         {/* Name */}
         <div className="mb-8">
-          <label className="block text-base font-title italic mb-3">Name</label>
+          <label className="block text-base font-title italic mb-3">{t('fields.name')}</label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
             className={INPUT_STYLE}
-            placeholder="Your Name"
+            placeholder={t('placeholders.name')}
           />
         </div>
 
         {/* Birthday */}
         <div className="mb-8">
-          <label className="block text-base font-title italic mb-3">Birthday</label>
+          <label className="block text-base font-title italic mb-3">{t('fields.birthday')}</label>
           <input
             type="date"
             name="birthday"
             value={formData.birthday}
             onChange={handleChange}
             className={INPUT_STYLE}
-            placeholder="MM/DD/YYYY"
+            placeholder={t('placeholders.birthday')}
           />
         </div>
 
         {/* Email Address */}
         <div className="mb-8">
-          <label className="block text-base font-title italic mb-3">Email Address</label>
+          <label className="block text-base font-title italic mb-3">{t('fields.emailAddress')}</label>
           <div className="px-4 py-2">
             {formData.email || 'Apollodorus@exemple.com'}
           </div>
@@ -68,52 +72,70 @@ export default function ProfilePage() {
 
         {/* Phone Number */}
         <div className="mb-8">
-          <label className="block text-base font-title italic mb-3">Phone Number</label>
+          <label className="block text-base font-title italic mb-3">{t('fields.phoneNumber')}</label>
           <input
             type="tel"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
             className={INPUT_STYLE}
-            placeholder="+1 (555) 123-4567"
+            placeholder={t('placeholders.phone')}
           />
         </div>
 
         {/* Address */}
         <div className="mb-7">
-          <label className="block text-base font-title italic mb-3">Address</label>
+          <label className="block text-base font-title italic mb-3">{t('fields.address')}</label>
           <div className="space-y-4">
             <input
               type="text"
-              name="streetAddress"
-              value={formData.streetAddress}
+              name="addressLine1"
+              value={formData.addressLine1}
               onChange={handleChange}
               className={INPUT_STYLE}
-              placeholder="Street Address"
+              placeholder={t('placeholders.addressLine1')}
             />
             <input
               type="text"
-              name="unit"
-              value={formData.unit}
+              name="addressLine2"
+              value={formData.addressLine2}
               onChange={handleChange}
               className={INPUT_STYLE}
-              placeholder="Unit(Optional)"
+              placeholder={t('placeholders.addressLine2')}
             />
-            <input
-              type="text"
-              name="cityStateZip"
-              value={formData.cityStateZip}
-              onChange={handleChange}
-              className={INPUT_STYLE}
-              placeholder="City, State, Zip Code"
-            />
+            <div className='flex flex-row gap-2 lg:gap-4'>
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                className={INPUT_STYLE}
+                placeholder={t('placeholders.city')}
+              />
+              <input
+                type="text"
+                name="region"
+                value={formData.region}
+                onChange={handleChange}
+                className={INPUT_STYLE}
+                placeholder={t('placeholders.region')}
+              />
+              <input
+                type="text"
+                name="postalCode"
+                value={formData.postalCode}
+                onChange={handleChange}
+                className="w-full lg:max-w-40 text-base px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
+                placeholder={t('placeholders.postalCode')}
+              />
+            </div>
             <input
               type="text"
               name="country"
               value={formData.country}
               onChange={handleChange}
               className={INPUT_STYLE}
-              placeholder="Country"
+              placeholder={t('placeholders.country')}
             />
           </div>
         </div>
@@ -124,7 +146,7 @@ export default function ProfilePage() {
             onClick={handleSave}
             className="px-12 py-2 bg-gray-700 text-white font-semibold text-sm lg:text-base uppercase tracking-wider hover:bg-gray-900 transition-colors"
           >
-            SAVE
+            {t('save')}
           </button>
         </div>
       </div>

@@ -1,14 +1,20 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations, useLocale } from 'next-intl';
 
 export interface Product {
   id: string;
   name: string;
   quote: string;
   price: number;
-  volume: string;
+  volume: string; // Display name (translated, e.g., "50 ml")
+  volumeValue?: string; // Raw value for filtering (e.g., "50ml")
   image: string;
   slug: string;
+  collectionId?: number;
+  collectionSlug?: string;
+  tagIds?: number[];
+  tagSlugs?: string[];
 }
 
 interface ProductCardProps {
@@ -16,9 +22,12 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const t = useTranslations('ProductDetail');
+  const locale = useLocale();
+
   return (
     <div className="flex flex-col">
-      <Link href={`/p/${product.slug}`} className="group">
+      <Link href={`/${locale}/p/${product.slug}`} className="group">
         <div className="relative aspect-square mb-4 overflow-hidden">
           <Image
             src={product.image}
@@ -30,7 +39,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </Link>
 
       <div className="flex flex-col flex-1">
-        <Link href={`/p/${product.slug}`}>
+        <Link href={`/${locale}/p/${product.slug}`}>
           <h3 className="text-center text-2xl font-bold mb-1 hover:underline">{product.name}</h3>
         </Link>
 
@@ -38,13 +47,13 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.quote}
         </p>
 
-        <div className="mt-auto mx-6 lg:mx-2 lg:grid lg:grid-cols-2">
+        <div className="mt-auto mx-6 lg:mx-0 lg:grid lg:grid-cols-2">
           <div className="flex items-center justify-center mb-3 lg:my-auto">
             <span className="text-sm text-gray-900">{product.volume} · {product.price} $</span>
           </div>
 
-          <button className="w-full text-sm bg-gray-500 hover:bg-gray-800 text-white shadow-sm font-semibold py-2 transition-colors">
-            Add to bag
+          <button className="w-full text-sm bg-gray-700 hover:bg-gray-900 text-white shadow-sm font-semibold py-2 transition-colors">
+            {t('addToBag')}
           </button>
         </div>
       </div>

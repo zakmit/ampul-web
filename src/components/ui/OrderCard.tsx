@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 
@@ -39,6 +40,7 @@ type OrderCardProps = {
 };
 
 export default function OrderCard({ order }: OrderCardProps) {
+  const t = useTranslations('OrderCard');
   const [isExpanded, setIsExpanded] = useState(false);
   const [formattedDate, setFormattedDate] = useState('');
 
@@ -59,11 +61,11 @@ export default function OrderCard({ order }: OrderCardProps) {
           <h3 className="italic font-bold text-base">{formattedDate}</h3>
           <div className="flex items-center gap-4 lg:gap-8">
             <h3 className={`hidden font-bold italic text-base  ${isExpanded ? "": "lg:inline"}`}>
-              TOTAL: {order.total}$
+              {t('total')}: {order.total}$
             </h3>
             <div className="flex items-center gap-2">
-              <h4 className="text-sm italic lg:text-base text-end w-20">
-                {order.status}
+              <h4 className="text-sm italic lg:text-base text-end w-30 lg:w-34">
+                {t(`status.${order.status}`)}
               </h4>
               <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? '' : '-rotate-90'}`}/>
             </div>
@@ -88,7 +90,7 @@ export default function OrderCard({ order }: OrderCardProps) {
               ))}
             </div>
             <div className="text-right mt-2 lg:hidden">
-              <span className="text-sm italic">TOTAL: {order.total}$</span>
+              <span className="text-sm italic">{t('total')}: {order.total}$</span>
             </div>
           </div>
         )}
@@ -99,7 +101,7 @@ export default function OrderCard({ order }: OrderCardProps) {
         <div className="bg-gray-100 px-4 lg:px-8 py-6 lg:grid lg:grid-cols-3 lg:gap-2">
           <div className='lg:col-span-2'>
             {/* Product List */}
-            <h3 className="text-base lg:text-xl font-bold italic mb-4">Order ID: {order.orderNumber}</h3>
+            <h3 className="text-base lg:text-xl font-bold italic mb-4">{t('orderId')}: {order.orderNumber}</h3>
             <div className="space-y-4 mb-8">
               {order.items.map((item) => (
                 <div key={item.id} className="flex gap-4 items-start">
@@ -126,14 +128,14 @@ export default function OrderCard({ order }: OrderCardProps) {
 
             {/* Total */}
             <div className="text-right mb-8">
-              <h3 className="text-base lg:text-lg italic font-bold">TOTAL: {order.total}$</h3>
+              <h3 className="text-base lg:text-lg italic font-bold">{t('total')}: {order.total}$</h3>
             </div>
           </div>
           <div className='lg:col-span-1'>
             {/* Shipping and Payment Info */}
             <div className="grid grid-flow-col gap-8 mb-8 mx-2 lg:mr-0 lg:ml-4">
               <div>
-                <h4 className="text-base font-bold mb-2 italic">SHIP TO</h4>
+                <h4 className="text-base font-bold mb-2 italic">{t('shipTo')}</h4>
                 <p className="text-sm ml-2">{order.recipientName}</p>
                 {order.recipientPhone && <p className="text-sm ml-2">{order.recipientPhone}</p>}
                 <p className="text-sm ml-2">{order.shippingLine1}</p>
@@ -143,8 +145,8 @@ export default function OrderCard({ order }: OrderCardProps) {
               </div>
               <div className="flex flex-col justify-between">
                 <div>
-                  <h4 className="text-base font-bold mb-1 italic">TRACKING</h4>
-                  <p className="text-sm ml-2">{order.trackingCode || 'Not available yet'}</p>
+                  <h4 className="text-base font-bold mb-1 italic">{t('tracking')}</h4>
+                  <p className="text-sm ml-2">{order.trackingCode || t('trackingNotAvailable')}</p>
                 </div>
               </div>
             </div>
@@ -153,7 +155,7 @@ export default function OrderCard({ order }: OrderCardProps) {
             {order.status === 'PROCESSING' && (
               <div className="flex justify-center">
                 <button className="bg-gray-700 text-white px-8 py-3 text-sm hover:bg-gray-800 transition-colors">
-                  Cancel the order
+                  {t('cancelOrder')}
                 </button>
               </div>
             )}

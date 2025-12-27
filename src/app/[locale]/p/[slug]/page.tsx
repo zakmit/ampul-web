@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import ProductImageGallery from '@/components/ProductImageGallery';
 import ExpandableSections from '@/components/ExpandableSections';
 import Breadcrumb from '@/components/ui/Breadcrumb';
@@ -16,6 +17,8 @@ interface ProductDetailPageProps {
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
   const { locale, slug } = await params;
+  const t = await getTranslations({ locale, namespace: 'ProductDetail' });
+  const tBreadcrumb = await getTranslations({ locale, namespace: 'Breadcrumb' });
 
   // Fetch product data from Prisma
   const productData = await getProductBySlug(slug, locale);
@@ -50,18 +53,18 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const infoSections = [
     {
       id: 'delivery',
-      title: 'Delivery',
-      content: 'All orders are delivered within 7 business days with free shipping.'
+      title: t('infoSections.delivery.title'),
+      content: t('infoSections.delivery.content')
     },
     {
       id: 'returns',
-      title: 'Free Returns',
-      content: 'Not quite the right scent? Return within 30 days for a full refund or exchange.'
+      title: t('infoSections.returns.title'),
+      content: t('infoSections.returns.content')
     },
     {
       id: 'refill',
-      title: 'Refill Bottle',
-      content: 'Preserve your bottle and refill at selected locations.'
+      title: t('infoSections.refill.title'),
+      content: t('infoSections.refill.content')
     },
   ];
 
@@ -98,22 +101,22 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </p>
 
             {/* Quote - Mobile: center, Desktop: right-aligned */}
-            <h3 className="text-center lg:text-left italic font-light mb-2 lg:mb-6 leading-relaxed lg:text-lg">
+            <h3 className="text-center lg:text-left italic font-light mb-4 lg:mb-8 leading-relaxed lg:text-lg">
               {product.quote}
             </h3>
 
             {/* Volume and Add to Bag - Mobile: center, Desktop: right-aligned */}
-            <div className="flex items-center justify-center gap-8 mb-8 lg:mb-8">
+            <div className="flex items-center font-context justify-center gap-8 mb-8 lg:mb-8">
               <span className="text-gray-700">{product.volume}</span>
-              <button className="bg-gray-600 hover:bg-gray-900 text-gray-100 font-semibold px-5 lg:px-6 py-3 transition-colors">
-                Add to bag · {product.price} $
+              <button className="bg-gray-700 hover:bg-gray-900 text-gray-100 font-semibold px-5 lg:px-6 py-3 transition-colors cursor-pointer">
+                {t('addToBag')} · {product.price} $
               </button>
             </div>
 
             {/* Sensations */}
             <div className="mb-8 lg:mb-8 -mx-6 lg:mx-0 px-6 lg:px-0 py-6 lg:py-6 inset-shadow-[0_4px_4px_0] inset-shadow-gray-900/20 lg:inset-shadow-none bg-gray-100 ">
               <h2 className="text-2xl lg:text-3xl italic font-bold text-center mb-1 lg:mb-2 mx-auto">
-                Sensations
+                {t('sensations')}
               </h2>
               <p className="text-center italic text-sm lg:text-base lg:px-4 text-gray-700 mx-auto">
                 {product.sensations}
@@ -125,7 +128,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
             {/* Free Sample Note */}
             <p className="text-sm text-gray-500 mt-6 lg:mt-8 italic">
-              *A free sample of your choice with every order
+              {t('freeSample')}
             </p>
           </div>
         </div>
@@ -135,7 +138,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       <div className="bg-gray-100 inset-shadow-[0_4px_4px_0] inset-shadow-gray-900/20 lg:inset-shadow-none">
         <div className="max-w-md lg:max-w-7xl mx-auto px-6 lg:px-12 pt-6 lg:pt-16 lg:pb-16">
           <h2 className="text-3xl lg:text-4xl italic font-bold text-center mb-8 lg:mb-12">
-            Explore the Collection
+            {t('exploreCollection')}
           </h2>
 
           {/* Mobile: Horizontal scroll */}
@@ -195,8 +198,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       {/* Breadcrumb Navigation */}
       <Breadcrumb
         items={[
-          { href: `/${locale}`, label: 'Home' },
-          { href: `/${locale}/p`, label: 'Fragrances' },
+          { href: `/${locale}`, label: tBreadcrumb('home') },
+          { href: `/${locale}/p`, label: tBreadcrumb('fragrances') },
           { href: `/${locale}/c/${productData.collection.slug}`, label: productData.collection.name },
           { label: product.name },
         ]}

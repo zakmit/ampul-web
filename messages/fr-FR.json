@@ -2,6 +2,10 @@
   "HomePage": {
     "title": "Bonjour le monde!"
   },
+  "Breadcrumb": {
+    "home": "Accueil",
+    "fragrances": "Parfums"
+  },
   "NavBar": {
     "banner": "Entrez dans le monde de la mythologie",
     "menu": {
@@ -43,5 +47,100 @@
         "cookies": "Politique des cookies"
       }
     }
+  },
+  "ProductDetail": {
+    "addToBag": "Ajouter au panier",
+    "sensations": "Sensations",
+    "freeSample": "*Un échantillon gratuit de votre choix avec chaque commande",
+    "exploreCollection": "Explorez la collection",
+    "infoSections": {
+      "delivery": {
+        "title": "Livraison",
+        "content": "Toutes les commandes sont livrées dans les 7 jours ouvrés avec livraison gratuite."
+      },
+      "returns": {
+        "title": "Retours gratuits",
+        "content": "Pas tout à fait le bon parfum? Retournez dans les 30 jours pour un remboursement complet ou un échange."
+      },
+      "refill": {
+        "title": "Bouteille rechargeable",
+        "content": "Conservez votre bouteille et rechargez dans les points de vente sélectionnés."
+      }
+    }
+  },
+  "ProductsPage": {
+    "title": "Parfum",
+    "description": "Inspiré par des fins mémorables — qu'est-ce qui a conduit à leur destin inévitable? Quel a été le moment décisif de leur vie?"
+  },
+  "ProductOverview": {
+    "filters": "Filtres",
+    "samples": "échantillons",
+    "sort": {
+      "title": "Trier par",
+      "default": "Par défaut",
+      "nameAsc": "Nom A-Z",
+      "nameDesc": "Nom Z-A",
+      "priceAsc": "Prix croissant",
+      "priceDesc": "Prix décroissant"
+    },
+    "filterSections": {
+      "volume": "Volume",
+      "collection": "Collection",
+      "fragranceNotes": "Notes de parfum"
+    }
+  },
+  "OrdersPage": {
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant"
+    }
+  },
+  "OrderCard": {
+    "total": "TOTAL",
+    "orderId": "Commande ID",
+    "shipTo": "EXPÉDIER À",
+    "tracking": "SUIVI",
+    "trackingNotAvailable": "Pas encore disponible",
+    "cancelOrder": "Annuler la commande",
+    "status": {
+      "PENDING": "EN ATTENTE",
+      "PAID": "PAYÉ",
+      "PROCESSING": "EN TRAITEMENT",
+      "SHIPPED": "EXPÉDIÉ",
+      "DELIVERED": "LIVRÉ",
+      "CANCELLED": "ANNULÉ",
+      "REFUNDED": "REMBOURSÉ"
+    }
+  },
+  "UserLayout": {
+    "myInformation": "MES INFORMATIONS",
+    "myOrders": "MES COMMANDES"
+  },
+  "ProfilePage": {
+    "fields": {
+      "name": "Nom",
+      "birthday": "Date de naissance",
+      "emailAddress": "Adresse e-mail",
+      "phoneNumber": "Numéro de téléphone",
+      "address": "Adresse",
+      "addressLine1": "Ligne d'adresse 1",
+      "addressLine2": "Ligne d'adresse 2 (optionnel)",
+      "city": "Ville",
+      "region": "Région (optionnel)",
+      "postalCode": "Code postal",
+      "country": "Pays"
+    },
+    "placeholders": {
+      "name": "Entrez votre nom complet",
+      "birthday": "JJ/MM/AAAA",
+      "phone": "Entrez le numéro",
+      "addressLine1": "Numéro et nom de rue, bâtiment, étage",
+      "addressLine2": "Appartement, suite, numéro d'unité (optionnel)",
+      "city": "Nom de la ville",
+      "region": "Région ou département (optionnel)",
+      "postalCode": "Code postal",
+      "country": "Nom du pays"
+    },
+    "save": "ENREGISTRER"
   }
 }

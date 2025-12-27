@@ -198,14 +198,14 @@ export default function NavBar({ showBanner = true,
                   />
                   </a>
               </div>
-              <div className={`hidden lg:flex-1 lg:flex lg:mr-4 font-title`}>
+              <div className={`hidden lg:flex-1 lg:flex lg:mr-4`}>
                 {menuItems.map((item) => (
                   <div
                     key={item.id}
                     className="hidden lg:flex h-14"
                     onMouseEnter={() => handleMouseEnter(item.id) }
                   >
-                    <button className={`w-49 text-xl transition-colors duration-200 ${isDropdownVisible && (activeDropdown === item.id) ? "text-gray-500 underline": "text-gray-900 no-underline"}`}>
+                    <button className={`w-49 text-xl transition-colors font-title duration-200 ${isDropdownVisible && (activeDropdown === item.id) ? "text-gray-500 underline": "text-gray-900 no-underline"}`}>
                       {item.label}
                       
                     </button>
@@ -272,7 +272,7 @@ export default function NavBar({ showBanner = true,
                   : `top-14 max-h-0`
               }`}
             >
-              <div className="max-w-[1440px] mx-8">
+              <div className="max-w-360 mx-8">
                 {activeDropdown && (
                   <div className="py-8">
                     {menuItems.find(item => item.id === activeDropdown)?.content}

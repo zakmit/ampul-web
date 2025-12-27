@@ -10,6 +10,7 @@ const aSLibre = Averia_Serif_Libre({
   subsets: ["latin"],
   variable: "--font-title",
 })
+
 const ziliaSlab = Zilla_Slab({
   weight: ["300","400","500","600","700"],
   style: ["normal", "italic"],

@@ -15,12 +15,12 @@ type ActionResult<T = unknown> = {
 }
 
 // Helper to convert Decimal to number for client serialization
-function serializeProduct(product: any) {
+function serializeProduct<T extends { volumes?: Array<{ price: number | string | { toNumber?: () => number } }> }>(product: T) {
   return {
     ...product,
-    volumes: product.volumes?.map((v: any) => ({
+    volumes: product.volumes?.map((v) => ({
       ...v,
-      price: Number(v.price),
+      price: typeof v.price === 'object' && v.price && 'toNumber' in v.price && v.price.toNumber ? v.price.toNumber() : Number(v.price),
     })) || [],
   }
 }

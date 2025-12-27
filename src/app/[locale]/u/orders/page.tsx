@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import OrderCard from '@/components/ui/OrderCard';
 
 // Dummy product images - using actual product images
@@ -305,6 +306,7 @@ const generateDummyOrders = (): Order[] => {
 const ORDERS_PER_PAGE = 10;
 
 export default function OrdersPage() {
+  const t = useTranslations('OrdersPage');
   const allOrders = generateDummyOrders();
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -336,7 +338,7 @@ export default function OrdersPage() {
             disabled={currentPage === 1}
             className="px-4 py-2 text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:underline"
           >
-            Previous
+            {t('pagination.previous')}
           </button>
 
           <div className="flex gap-1">
@@ -360,7 +362,7 @@ export default function OrdersPage() {
             disabled={currentPage === totalPages}
             className="px-4 py-2 text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:underline"
           >
-            Next
+            {t('pagination.next')}
           </button>
         </div>
       )}
