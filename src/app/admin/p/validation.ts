@@ -128,8 +128,8 @@ export const CreateProductSchema = z.object({
     .number()
     .int('Collection ID must be an integer')
     .positive('Collection is required'),
-  coverImageDesktop: ImageUrlSchema,
-  coverImageMobile: ImageUrlSchema,
+  coverImage1x1: ImageUrlSchema,
+  coverImage16x9: ImageUrlSchema,
   productImage: ImageUrlSchema,
   boxImage: ImageUrlSchema,
   galleryImages: z

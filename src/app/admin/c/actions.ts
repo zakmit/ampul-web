@@ -69,8 +69,8 @@ export async function createCollection(data: unknown) {
     const collection = await prisma.collection.create({
       data: {
         slug: validated.slug,
-        coverImageDesktop: validated.coverImageDesktop,
-        coverImageMobile: validated.coverImageMobile,
+        coverImage1x1: validated.coverImage1x1,
+        coverImage16x9: validated.coverImage16x9,
         translations: {
           create: validated.translations,
         },
@@ -117,8 +117,8 @@ export async function updateCollection(id: number, data: unknown, oldImages?: { 
       where: { id },
       data: {
         slug: validated.slug,
-        coverImageDesktop: validated.coverImageDesktop,
-        coverImageMobile: validated.coverImageMobile,
+        coverImage1x1: validated.coverImage1x1,
+        coverImage16x9: validated.coverImage16x9,
         translations: {
           create: validated.translations,
         },
@@ -130,10 +130,10 @@ export async function updateCollection(id: number, data: unknown, oldImages?: { 
 
     // Delete old images if they were replaced
     if (oldImages) {
-      if (oldImages.desktop !== validated.coverImageDesktop) {
+      if (oldImages.desktop !== validated.coverImage1x1) {
         await deleteImageFile(oldImages.desktop)
       }
-      if (oldImages.mobile !== validated.coverImageMobile) {
+      if (oldImages.mobile !== validated.coverImage16x9) {
         await deleteImageFile(oldImages.mobile)
       }
     }
@@ -155,8 +155,8 @@ export async function deleteCollection(id: number) {
     const collection = await prisma.collection.findUnique({
       where: { id },
       select: {
-        coverImageDesktop: true,
-        coverImageMobile: true,
+        coverImage1x1: true,
+        coverImage16x9: true,
       },
     })
 
@@ -170,8 +170,8 @@ export async function deleteCollection(id: number) {
     })
 
     // Delete associated images
-    await deleteImageFile(collection.coverImageDesktop)
-    await deleteImageFile(collection.coverImageMobile)
+    await deleteImageFile(collection.coverImage1x1)
+    await deleteImageFile(collection.coverImage16x9)
 
     revalidatePath('/admin/c')
     return { success: true }

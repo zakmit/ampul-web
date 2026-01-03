@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslations, useLocale } from 'next-intl';
+import AddToBagButton from '@/components/AddToBagButton';
 
 export interface Product {
   id: string;
@@ -9,6 +10,7 @@ export interface Product {
   price: number;
   volume: string; // Display name (translated, e.g., "50 ml")
   volumeValue?: string; // Raw value for filtering (e.g., "50ml")
+  volumeId: number; // Volume ID for shopping bag
   image: string;
   slug: string;
   collectionId?: number;
@@ -52,9 +54,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             <span className="text-sm text-gray-900">{product.volume} · {product.price} $</span>
           </div>
 
-          <button className="w-full text-sm bg-gray-700 hover:bg-gray-900 text-white shadow-sm font-semibold py-2 transition-colors">
-            {t('addToBag')}
-          </button>
+          <AddToBagButton
+            productId={product.id}
+            volumeId={product.volumeId}
+            label={t('addToBag')}
+            className="w-full text-sm bg-gray-700 hover:bg-gray-900 text-white shadow-sm font-semibold py-2 transition-colors"
+          />
         </div>
       </div>
     </div>

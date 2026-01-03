@@ -1,6 +1,18 @@
 {
   "HomePage": {
-    "title": "Hello world!"
+    "heroTitle": "Explore the Greek Mythology Collection",
+    "heroDescription": "Melted wax sinking into the sea, billowing smoke rising from burning Troy, narcissus blooms on an ethereal reflection, the faded scent of rust lingers in the barren land.",
+    "conceptTitle": "The Concept of AMPUL",
+    "conceptDescription": "Inspired by the traditional concept of ampoules—a small vessel preserving what remains of a life. What was the decisive moment in their story? What flashed before their eyes? What was the scent of that moment? From mythology's greatest tragedies to literature's most touching deaths.",
+    "bottleTitle": "The Bottle",
+    "bottleDescription": "Inspired by the shape of an ampoule, the cap evokes a candle flame. Each fragrance is a sample to their lives.",
+    "exploreFragrances": "Explore the Fragrances",
+    "characters": {
+      "icare": "To escape from Crete, he flew with artificial wings. A beautiful impulse—the fierce wind and the warmth of the sun, filled him with ecstasy. He flew too close; the feathers and dripping wax fell with his life.",
+      "cassandre": "Born as the princess of Troy, she came into this world bearing both her gift and her curse. She foresaw the fall of Troy, yet Apollo's punishment made her unable to convince others of the coming tragedy.",
+      "narcisse": "His destiny was foretold at birth: he would lose his life to an unfulfillable love—his own reflection, a beautiful illusion. Only the fragrance of narcissus remains by the lakeside.",
+      "antigone": "Born into a house stained with curses, she watched her brothers slay each other. She held fast to what she believed was right, and buried the fallen with her own hands—even at the cost of her own life."
+    }
   },
   "Breadcrumb": {
     "home": "Home",
@@ -141,6 +153,56 @@
       "postalCode": "Postal / ZIP code",
       "country": "Country name"
     },
-    "save": "SAVE"
+    "errors": {
+      "nameRequired": "Name is required",
+      "nameTooLong": "Name is too long (max 100 characters)",
+      "addressLine1Required": "Address line 1 is required",
+      "addressLine1TooLong": "Address line 1 is too long (max 200 characters)",
+      "addressLine2TooLong": "Address line 2 is too long (max 200 characters)",
+      "cityRequired": "City is required",
+      "cityTooLong": "City is too long (max 100 characters)",
+      "regionTooLong": "Region is too long (max 100 characters)",
+      "postalCodeRequired": "Postal code is required",
+      "postalCodeTooLong": "Postal code is too long (max 20 characters)",
+      "countryRequired": "Country is required",
+      "countryTooLong": "Country is too long (max 100 characters)"
+    },
+    "save": "SAVE",
+    "saving": "Saving...",
+    "successMessage": "Profile updated successfully!",
+    "errorMessage": "Failed to update profile. Please check the form for errors."
+  },
+  "GreekMythology": {
+    "title": "Explore the Greek Mythology Collection",
+    "description": "Melted wax sinking into the sea, billowing smoke rising from burning Troy, narcissus blooms on an ethereal reflection, the faded scent of rust lingers in the barren land.",
+    "checkDetail": "Check Detail",
+    "addToBag": "Add to bag",
+    "exploreCollection": "Explore the Collection",
+    "sideNotes": {
+      "antigone": "Rust, Dust, Myrrh, Incense",
+      "narcisse": "Narcisse, Reeds, Plane tree",
+      "icare": "Seaweed and salt, Cloves and amber, Melting wax",
+      "cassandre": "Floral, Laurel and incense, Charred wood and leather"
+    }
+  },
+  "SignInModal": {
+    "signIn": "Sign In",
+    "signInWithGoogle": "Sign in with Google",
+    "welcome": "Welcome",
+    "myOrder": "MY ORDER",
+    "myInformation": "MY INFORMATION",
+    "signOut": "Sign out"
+  },
+  "ShoppingBag": {
+    "title": "Shopping Bag",
+    "emptyMessage": "There's nothing in your shopping bag.",
+    "freeSample": "Free Sample",
+    "subtotal": "Subtotal",
+    "checkout": "CONTINUE TO CHECKOUT"
+  },
+  "AddedToBag": {
+    "title": "ADDED TO BAG",
+    "maxQuantityTitle": "Maximum Quantity Exceeded",
+    "maxQuantityMessage": "You cannot add more than 10 of the same item to your order."
   }
 }

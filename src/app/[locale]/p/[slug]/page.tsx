@@ -5,6 +5,7 @@ import { getTranslations } from 'next-intl/server';
 import ProductImageGallery from '@/components/ProductImageGallery';
 import ExpandableSections from '@/components/ExpandableSections';
 import Breadcrumb from '@/components/ui/Breadcrumb';
+import AddToBagButton from '@/components/AddToBagButton';
 import { getProductBySlug, getCollectionProducts, getAllProductSlugs } from './data';
 import type { Locale } from '@/i18n/config';
 
@@ -27,9 +28,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     notFound();
   }
 
-  // Image order: [coverImageDesktop, productImage, boxImage, ...galleryImages]
+  // Image order: [coverImage1x1, productImage, boxImage, ...galleryImages]
   const productImages = [
-    productData.images.coverImageDesktop,
+    productData.images.coverImage1x1,
     productData.images.productImage,
     productData.images.boxImage,
     ...productData.images.galleryImages,
@@ -108,9 +109,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             {/* Volume and Add to Bag - Mobile: center, Desktop: right-aligned */}
             <div className="flex items-center font-context justify-center gap-8 mb-8 lg:mb-8">
               <span className="text-gray-700">{product.volume}</span>
-              <button className="bg-gray-700 hover:bg-gray-900 text-gray-100 font-semibold px-5 lg:px-6 py-3 transition-colors cursor-pointer">
-                {t('addToBag')} · {product.price} $
-              </button>
+              <AddToBagButton
+                productId={productData.id}
+                volumeId={firstVolume?.volumeId || 0}
+                label={`${t('addToBag')} · ${product.price} $`}
+                className="bg-gray-700 hover:bg-gray-900 text-gray-100 font-semibold px-5 lg:px-6 py-3 transition-colors cursor-pointer"
+              />
             </div>
 
             {/* Sensations */}

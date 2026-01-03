@@ -25,7 +25,7 @@ export type ProductDetailData = {
   concept: string
   sensations: string
   images: {
-    coverImageDesktop: string
+    coverImage1x1: string
     productImage: string
     boxImage: string
     galleryImages: string[]
@@ -160,7 +160,7 @@ export async function getProductBySlug(slug: string, locale: Locale = 'us'): Pro
       concept: currentTranslation?.concept || fallbackTranslation?.concept || '',
       sensations: currentTranslation?.sensations || fallbackTranslation?.sensations || '',
       images: {
-        coverImageDesktop: product.coverImageDesktop,
+        coverImage1x1: product.coverImage1x1,
         productImage: product.productImage,
         boxImage: product.boxImage,
         galleryImages: product.galleryImages,

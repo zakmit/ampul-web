@@ -160,8 +160,8 @@ export type Product = {
   slug: string;
   categoryId: number;
   collectionId: number;
-  coverImageDesktop: string;
-  coverImageMobile: string;
+  coverImage1x1: string;
+  coverImage16x9: string;
   productImage: string;
   boxImage: string;
   galleryImages: string[];
@@ -204,8 +204,8 @@ export function ProductEditForm({
   // Set default to first category/collection if available, otherwise 0
   const [categoryId, setCategoryId] = useState(product?.categoryId || (categories.length > 0 ? categories[0].id : 0));
   const [collectionId, setCollectionId] = useState(product?.collectionId || (collections.length > 0 ? collections[0].id : 0));
-  const [coverImageDesktop, setCoverImageDesktop] = useState(product?.coverImageDesktop || '');
-  const [coverImageMobile, setCoverImageMobile] = useState(product?.coverImageMobile || '');
+  const [coverImage1x1, setCoverImageDesktop] = useState(product?.coverImage1x1 || '');
+  const [coverImage16x9, setCoverImageMobile] = useState(product?.coverImage16x9 || '');
   const [productImage, setProductImage] = useState(product?.productImage || '');
   const [boxImage, setBoxImage] = useState(product?.boxImage || '');
   const [galleryImages, setGalleryImages] = useState<string[]>(product?.galleryImages || []);
@@ -234,8 +234,8 @@ export function ProductEditForm({
     name: false,
     concept: false,
     sensations: false,
-    coverImageDesktop: false,
-    coverImageMobile: false,
+    coverImage1x1: false,
+    coverImage16x9: false,
     productImage: false,
     boxImage: false,
     volumes: false,
@@ -259,13 +259,13 @@ export function ProductEditForm({
       if (url) {
         if (imageType === 'desktop') {
           setCoverImageDesktop(url);
-          if (validationErrors.coverImageDesktop) {
-            setValidationErrors({ ...validationErrors, coverImageDesktop: false });
+          if (validationErrors.coverImage1x1) {
+            setValidationErrors({ ...validationErrors, coverImage1x1: false });
           }
         } else if (imageType === 'mobile') {
           setCoverImageMobile(url);
-          if (validationErrors.coverImageMobile) {
-            setValidationErrors({ ...validationErrors, coverImageMobile: false });
+          if (validationErrors.coverImage16x9) {
+            setValidationErrors({ ...validationErrors, coverImage16x9: false });
           }
         } else if (imageType === 'product') {
           setProductImage(url);
@@ -335,8 +335,8 @@ export function ProductEditForm({
       name: !translations['en-US'].name.trim(),
       concept: !translations['en-US'].concept.trim(),
       sensations: !translations['en-US'].sensations.trim(),
-      coverImageDesktop: !coverImageDesktop.trim(),
-      coverImageMobile: !coverImageMobile.trim(),
+      coverImage1x1: !coverImage1x1.trim(),
+      coverImage16x9: !coverImage16x9.trim(),
       productImage: !productImage.trim(),
       boxImage: !boxImage.trim(),
       volumes: selectedVolumes.length === 0,
@@ -352,8 +352,8 @@ export function ProductEditForm({
       slug,
       categoryId,
       collectionId,
-      coverImageDesktop,
-      coverImageMobile,
+      coverImage1x1,
+      coverImage16x9,
       productImage,
       boxImage,
       galleryImages,
@@ -393,18 +393,18 @@ export function ProductEditForm({
           <div
             onClick={() => !isUploading && mobileInputRef.current?.click()}
             className={`relative bg-gray-200 hover:bg-gray-500 shadow-md/30 transition-colors cursor-pointer group overflow-hidden ${
-              validationErrors.coverImageMobile ? 'bg-red-700' : ''
+              validationErrors.coverImage16x9 ? 'bg-red-700' : ''
             }`}
             style={{ width: '302px', height: '170px' }}
           >
-            {coverImageMobile && (
-              <Image src={coverImageMobile} alt="16:9 Promotional" fill className="object-cover" />
+            {coverImage16x9 && (
+              <Image src={coverImage16x9} alt="16:9 Promotional" fill className="object-cover" />
             )}
-            {coverImageMobile && (
+            {coverImage16x9 && (
               <div className="absolute inset-0 bg-gray-700/20 group-hover:bg-gray-900/20 transition-colors" />
             )}
             <div className={`absolute w-full h-full flex items-center justify-center text-sm font-medium transition group-hover:-top-1/6 ${
-              coverImageMobile ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
+              coverImage16x9 ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
             }`}>
               16:9 Promotional <span className="text-red-600">*</span>
             </div>
@@ -412,7 +412,7 @@ export function ProductEditForm({
               <button type="button" onClick={(e) => { e.stopPropagation(); mobileInputRef.current?.click(); }}
                 className="bg-gray-900 text-white px-6 py-2 text-sm hover:bg-gray-700 transition-colors disabled:opacity-50"
                 disabled={isUploading !== null}>
-                {isUploading === 'mobile' ? 'Uploading...' : (coverImageMobile ? 'Change' : 'Upload')}
+                {isUploading === 'mobile' ? 'Uploading...' : (coverImage16x9 ? 'Change' : 'Upload')}
               </button>
             </div>
           </div>
@@ -423,18 +423,18 @@ export function ProductEditForm({
           <div
             onClick={() => !isUploading && desktopInputRef.current?.click()}
             className={`relative bg-gray-200 hover:bg-gray-500 shadow-md/30 transition-colors cursor-pointer group overflow-hidden ${
-              validationErrors.coverImageDesktop ? 'bg-red-700' : ''
+              validationErrors.coverImage1x1 ? 'bg-red-700' : ''
             }`}
             style={{ width: '170px', height: '170px' }}
           >
-            {coverImageDesktop && (
-              <Image src={coverImageDesktop} alt="1:1 Promotional" fill className="object-cover" />
+            {coverImage1x1 && (
+              <Image src={coverImage1x1} alt="1:1 Promotional" fill className="object-cover" />
             )}
-            {coverImageDesktop && (
+            {coverImage1x1 && (
               <div className="absolute inset-0 bg-gray-700/20 group-hover:bg-gray-900/20 transition-colors" />
             )}
             <div className={`absolute w-full h-full flex items-center justify-center text-sm font-medium transition group-hover:-top-1/6 ${
-              coverImageDesktop ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
+              coverImage1x1 ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
             }`}>
               1:1 Promotional <span className="text-red-600">*</span>
             </div>
@@ -442,7 +442,7 @@ export function ProductEditForm({
               <button type="button" onClick={(e) => { e.stopPropagation(); desktopInputRef.current?.click(); }}
                 className="bg-gray-900 text-white px-6 py-2 text-sm hover:bg-gray-700 transition-colors disabled:opacity-50"
                 disabled={isUploading !== null}>
-                {isUploading === 'desktop' ? 'Uploading...' : (coverImageDesktop ? 'Change' : 'Upload')}
+                {isUploading === 'desktop' ? 'Uploading...' : (coverImage1x1 ? 'Change' : 'Upload')}
               </button>
             </div>
           </div>
@@ -677,22 +677,22 @@ export function ProductEditForm({
                 <label className="text-sm w-32">
                   16:9 Promotional <span className="text-red-600">*</span>
                 </label>
-                <button type="button" onClick={() => coverImageMobile && setPreviewImage(coverImageMobile)}
-                  className={`${coverImageMobile ? 'text-gray-900' : 'text-gray-500'} hover:opacity-70 transition-opacity`}
-                  disabled={!coverImageMobile}>
+                <button type="button" onClick={() => coverImage16x9 && setPreviewImage(coverImage16x9)}
+                  className={`${coverImage16x9 ? 'text-gray-900' : 'text-gray-500'} hover:opacity-70 transition-opacity`}
+                  disabled={!coverImage16x9}>
                   <Eye className="w-6 h-6" />
                 </button>
               </div>
               <button type="button" onClick={() => mobileInputRef.current?.click()}
                 className={`w-20 py-2 text-sm disabled:opacity-50 ${
-                  validationErrors.coverImageMobile
+                  validationErrors.coverImage16x9
                     ? 'bg-red-700 text-red-100 border border-red-900 hover:bg-red-900 transition-colors'
-                    : coverImageMobile
+                    : coverImage16x9
                       ? 'bg-gray-900 text-white hover:opacity-80 transition-opacity'
                       : 'bg-gray-500 text-white hover:opacity-80 transition-opacity'
                 }`}
                 disabled={isUploading !== null}>
-                {isUploading === 'mobile' ? 'Wait...' : validationErrors.coverImageMobile ? 'Required' : (coverImageMobile ? 'Change' : 'Upload')}
+                {isUploading === 'mobile' ? 'Wait...' : validationErrors.coverImage16x9 ? 'Required' : (coverImage16x9 ? 'Change' : 'Upload')}
               </button>
             </div>
           </div>
@@ -704,22 +704,22 @@ export function ProductEditForm({
                 <label className="text-sm w-32">
                   1:1 Promotional <span className="text-red-600">*</span>
                 </label>
-                <button type="button" onClick={() => coverImageDesktop && setPreviewImage(coverImageDesktop)}
-                  className={`${coverImageDesktop ? 'text-gray-900' : 'text-gray-500'} hover:opacity-70 transition-opacity`}
-                  disabled={!coverImageDesktop}>
+                <button type="button" onClick={() => coverImage1x1 && setPreviewImage(coverImage1x1)}
+                  className={`${coverImage1x1 ? 'text-gray-900' : 'text-gray-500'} hover:opacity-70 transition-opacity`}
+                  disabled={!coverImage1x1}>
                   <Eye className="w-6 h-6" />
                 </button>
               </div>
               <button type="button" onClick={() => desktopInputRef.current?.click()}
                 className={`w-20 py-2 text-sm disabled:opacity-50 ${
-                  validationErrors.coverImageDesktop
+                  validationErrors.coverImage1x1
                     ? 'bg-red-700 text-red-100 border border-red-900 hover:bg-red-900 transition-colors'
-                    : coverImageDesktop
+                    : coverImage1x1
                       ? 'bg-gray-900 text-white hover:opacity-80 transition-opacity'
                       : 'bg-gray-500 text-white hover:opacity-80 transition-opacity'
                 }`}
                 disabled={isUploading !== null}>
-                {isUploading === 'desktop' ? 'Wait...' : validationErrors.coverImageDesktop ? 'Required' : (coverImageDesktop ? 'Change' : 'Upload')}
+                {isUploading === 'desktop' ? 'Wait...' : validationErrors.coverImage1x1 ? 'Required' : (coverImage1x1 ? 'Change' : 'Upload')}
               </button>
             </div>
           </div>

@@ -97,20 +97,23 @@ model Order {
   userId        String
   user          User        @relation(fields: [userId], references: [id])
   
-  customerEmail String
-  customerName  String?
+  customerEmail   String
+  customerName    String?
   
-  recipientName  String
-  recipientPhone String?
+  recipientName   String
+  recipientPhone  String?
   
-  shippingLine1  String
-  shippingLine2  String?
-  shippingCity   String
-  shippingRegion String?
-  shippingPostal String
+  shippingLine1   String
+  shippingLine2   String?
+  shippingCity    String
+  shippingRegion  String?
+  shippingPostal  String
   shippingCountry String
-  
-  trackingCode   String?
+
+  paymentMethod   String   @default("demo")
+  lastFour        String?  @db.Char(4)
+
+  trackingCode    String?
 
   total         Decimal     @db.Decimal(10, 2)
   
@@ -161,8 +164,8 @@ enum OrderStatus {
 model Collection {
   id                Int           @id @default(autoincrement())
   slug              String        @unique
-  coverImageDesktop String
-  coverImageMobile  String
+  coverImage1x1     String
+  coverImage16x9    String
   products          Product[]
   translations      CollectionTranslation[]
 }
@@ -229,8 +232,8 @@ model Product {
   isDeleted         Boolean       @default(false)
   categoryId        Int
   collectionId      Int
-  coverImageDesktop String
-  coverImageMobile  String
+  coverImage1x1     String
+  coverImage16x9    String
   productImage      String
   boxImage          String
   galleryImages     String[]      @default([])
@@ -241,7 +244,7 @@ model Product {
   translations      ProductTranslation[]
   volumes           ProductVolume[]
   tags              ProductTag[]
-  orderItems        OrderItem[] 
+  orderItems        OrderItem[]
 }
 
 model ProductTranslation {

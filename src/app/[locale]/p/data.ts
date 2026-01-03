@@ -17,6 +17,7 @@ export type ProductListData = {
   price: number
   volume: string // Display name (translated)
   volumeValue: string // Raw value for filtering
+  volumeId: number // Volume ID for shopping bag
   collectionId: number
   collectionSlug: string
   collectionName: string
@@ -122,6 +123,7 @@ export async function getAllProducts(locale: Locale = 'us'): Promise<ProductList
         price: firstVolume ? Number(firstVolume.price) : 0,
         volume: volumeTranslation?.displayName || firstVolume?.volume.value || '',
         volumeValue: firstVolume?.volume.value || '',
+        volumeId: firstVolume?.volumeId || 0,
         collectionId: product.collection.id,
         collectionSlug: product.collection.slug,
         collectionName: currentCollectionTranslation?.name || fallbackCollectionTranslation?.name || '',

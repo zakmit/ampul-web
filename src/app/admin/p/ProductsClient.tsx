@@ -158,15 +158,15 @@ export default function ProductsClient({
       const product = products.find(p => p.id === id);
       if (product) {
         setOriginalImages({
-          desktop: product.coverImageDesktop,
-          mobile: product.coverImageMobile,
+          desktop: product.coverImage1x1,
+          mobile: product.coverImage16x9,
           product: product.productImage,
           box: product.boxImage,
           gallery: product.galleryImages,
         });
         setCurrentFormImages({
-          desktop: product.coverImageDesktop,
-          mobile: product.coverImageMobile,
+          desktop: product.coverImage1x1,
+          mobile: product.coverImage16x9,
           product: product.productImage,
           box: product.boxImage,
           gallery: product.galleryImages,
@@ -205,8 +205,8 @@ export default function ProductsClient({
         slug: newProduct.slug,
         categoryId: newProduct.categoryId,
         collectionId: newProduct.collectionId,
-        coverImageDesktop: newProduct.coverImageDesktop,
-        coverImageMobile: newProduct.coverImageMobile,
+        coverImage1x1: newProduct.coverImage1x1,
+        coverImage16x9: newProduct.coverImage16x9,
         productImage: newProduct.productImage,
         boxImage: newProduct.boxImage,
         galleryImages: newProduct.galleryImages,
@@ -249,8 +249,8 @@ export default function ProductsClient({
         slug: updatedProduct.slug,
         categoryId: updatedProduct.categoryId,
         collectionId: updatedProduct.collectionId,
-        coverImageDesktop: updatedProduct.coverImageDesktop,
-        coverImageMobile: updatedProduct.coverImageMobile,
+        coverImage1x1: updatedProduct.coverImage1x1,
+        coverImage16x9: updatedProduct.coverImage16x9,
         productImage: updatedProduct.productImage,
         boxImage: updatedProduct.boxImage,
         galleryImages: updatedProduct.galleryImages,
@@ -516,7 +516,7 @@ export default function ProductsClient({
                       className="w-full h-32 relative overflow-hidden group flex duration-500 transition-all items-center justify-between px-6"
                     >
                       <Image
-                        src={product.coverImageMobile}
+                        src={product.coverImage16x9}
                         alt={product.translations['en-US'].name}
                         fill
                         className="object-cover"
@@ -546,7 +546,7 @@ export default function ProductsClient({
                     className="w-full h-20 relative overflow-hidden group flex items-center justify-between px-6"
                   >
                     <Image
-                      src={product.coverImageMobile}
+                      src={product.coverImage16x9}
                       alt={product.translations['en-US'].name}
                       fill
                       className="object-cover"

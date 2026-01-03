@@ -34,6 +34,7 @@ export default async function CollectionPage({
     price: p.price,
     volume: p.volume,
     volumeValue: p.volumeValue,
+    volumeId: p.volumeId,
     image: p.productImage,
     slug: p.slug,
     collectionId: p.collectionId,

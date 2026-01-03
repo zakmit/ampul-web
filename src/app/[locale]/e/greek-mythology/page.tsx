@@ -1,6 +1,17 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumb from '@/components/ui/Breadcrumb';
+import AddToBagButton from '@/components/AddToBagButton';
+import { prisma } from '@/lib/prisma';
+import type { Locale } from '@/i18n/config';
+import { getTranslations } from 'next-intl/server';
+
+// Map short locale codes to database locale codes
+const localeToDbLocale: Record<Locale, string> = {
+  'us': 'en-US',
+  'fr': 'fr-FR',
+  'tw': 'zh-TW',
+};
 
 interface CollectionItem {
   title: string;
@@ -12,136 +23,149 @@ interface CollectionItem {
   imageDesktop: string;
   productSlug?: string;
   productId?: string;
+  volumeId?: number;
   price?: number;
   volume?: string;
   relatedLink?: string;
 }
 
-interface CollectionData {
-  title: string;
-  description: string;
-  type: 'Collection' | 'Event';
-  heroImageMobile: string;
-  heroImageDesktop: string;
-  items: CollectionItem[];
-  relatedProducts: {
-    title: string;
-    description: string;
-    price: number;
-    volume: string;
-    image: string;
-    slug: string;
-  }[];
-}
+// Keep CollectionData structure for future improvements when using collection type
+// interface CollectionData {
+//   title: string;
+//   description: string;
+//   type: 'Collection' | 'Event';
+//   heroImageMobile: string;
+//   heroImageDesktop: string;
+//   items: CollectionItem[];
+//   relatedProducts: {
+//     title: string;
+//     description: string;
+//     price: number;
+//     volume: string;
+//     image: string;
+//     slug: string;
+//   }[];
+// }
 
 interface CollectionPageProps {
   params: Promise<{
-    slug: string;
+    locale: Locale;
   }>;
 }
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
-  const { slug } = await params;
+  const { locale } = await params;
+  const dbLocale = localeToDbLocale[locale];
+  const fallbackDbLocale = localeToDbLocale['us'];
+  const t = await getTranslations({ locale, namespace: 'GreekMythology' });
+  const tBreadcrumb = await getTranslations({ locale, namespace: 'Breadcrumb' });
 
-  // Mock data - replace with actual data fetching based on slug
-  const collectionData: CollectionData = {
-    title: 'Greek Mythology Collection',
-    description: 'Inspired by the most famous tragedies, how did they come to this? What\'s the decisive moment in their destiny?',
-    type: 'Collection',
+  // Product slugs for Greek Mythology collection
+  const productSlugs = ['antigone', 'narcisse', 'icare', 'cassandre'];
+
+  // Fetch products from database
+  const products = await prisma.product.findMany({
+    where: {
+      slug: { in: productSlugs },
+      isDeleted: false,
+    },
+    include: {
+      translations: true,
+      volumes: {
+        include: {
+          volume: {
+            include: {
+              translations: true,
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Sort products to match the order in productSlugs
+  const sortedProducts = productSlugs
+    .map(slug => products.find(p => p.slug === slug))
+    .filter((p): p is NonNullable<typeof p> => p !== undefined);
+
+  // Transform database products to collection items
+  // Note: sideNote, textColor, alignment don't exist in DB yet - using hardcoded values for now
+  const items: CollectionItem[] = sortedProducts.map((product) => {
+    // Get translations with fallback
+    const currentTranslation = product.translations.find(t => t.locale === dbLocale);
+    const fallbackTranslation = product.translations.find(t => t.locale === fallbackDbLocale);
+
+    // Get volume for current locale with fallback
+    const productVolume = product.volumes.find(pv => pv.locale === dbLocale)
+      || product.volumes.find(pv => pv.locale === fallbackDbLocale);
+
+    const volumeTranslation = productVolume?.volume.translations.find(t => t.locale === dbLocale)
+      || productVolume?.volume.translations.find(t => t.locale === fallbackDbLocale);
+
+    // Hardcoded layout values (future: move to database)
+    const layoutConfig = {
+      antigone: { textColor: 'dark' as const, alignment: 'right' as const },
+      narcisse: { textColor: 'light' as const, alignment: 'left' as const },
+      icare: { textColor: 'light' as const, alignment: 'right' as const },
+      cassandre: { textColor: 'light' as const, alignment: 'left' as const },
+    }[product.slug] || { textColor: 'dark' as const, alignment: 'left' as const };
+
+    // Get translated side note
+    const sideNoteKey = `sideNotes.${product.slug}` as 'sideNotes.antigone' | 'sideNotes.narcisse' | 'sideNotes.icare' | 'sideNotes.cassandre';
+    const sideNote = t(sideNoteKey);
+
+    return {
+      title: currentTranslation?.name || fallbackTranslation?.name || product.slug,
+      description: currentTranslation?.concept || fallbackTranslation?.concept || '',
+      sideNote,
+      textColor: layoutConfig.textColor,
+      alignment: layoutConfig.alignment,
+      imageMobile: product.coverImage1x1,
+      imageDesktop: product.coverImage16x9,
+      productSlug: product.slug,
+      productId: product.id,
+      volumeId: productVolume?.volumeId,
+      price: productVolume ? Number(productVolume.price) : undefined,
+      volume: volumeTranslation?.displayName || productVolume?.volume.value,
+    };
+  });
+
+  // Related products - using same products with productImage
+  const relatedProducts = sortedProducts.map(product => {
+    const currentTranslation = product.translations.find(t => t.locale === dbLocale);
+    const fallbackTranslation = product.translations.find(t => t.locale === fallbackDbLocale);
+
+    const productVolume = product.volumes.find(pv => pv.locale === dbLocale)
+      || product.volumes.find(pv => pv.locale === fallbackDbLocale);
+
+    const volumeTranslation = productVolume?.volume.translations.find(t => t.locale === dbLocale)
+      || productVolume?.volume.translations.find(t => t.locale === fallbackDbLocale);
+
+    return {
+      id: product.id,
+      volumeId: productVolume?.volumeId || 0,
+      title: currentTranslation?.name || fallbackTranslation?.name || product.slug,
+      description: currentTranslation?.concept || fallbackTranslation?.concept || '',
+      price: productVolume ? Number(productVolume.price) : 0,
+      volume: volumeTranslation?.displayName || productVolume?.volume.value || '',
+      image: product.productImage,
+      slug: product.slug,
+    };
+  });
+
+  // Hardcoded collection info (future: fetch from Collection model)
+  const collectionData = {
+    title: t('title'),
+    description: t('description'),
+    type: 'Collection' as const, // Keep for future use
     heroImageMobile: '/promo/collection-gm-m.jpg',
     heroImageDesktop: '/promo/collection-gm-sq.jpg',
-    items: [
-      {
-        title: 'Antigone',
-        description: '"Her belief for justice, for everything should be done right"',
-        sideNote: 'Rust, Myrrh, Incense',
-        textColor: 'dark',
-        alignment: 'right',
-        imageMobile: '/products/antigone-cover.jpg',
-        imageDesktop: '/products/antigone-promo.jpg',
-        productSlug: 'antigone',
-        productId: 'antigone-001',
-        price: 200,
-        volume: '100ml',
-      },
-      {
-        title: 'Narcissus',
-        description: '"His love, for an ethereal illusion, makes him lose himself"',
-        sideNote: 'Narcisse, Reeds, Plane tree',
-        textColor: 'light',
-        alignment: 'left',
-        imageMobile: '/products/narcisse-cover.jpg',
-        imageDesktop: '/products/narcisse-promo.jpg',
-        productSlug: 'narcisse',
-        productId: 'narcisse-001',
-        price: 200,
-        volume: '100ml',
-      },
-      {
-        title: 'Icarus',
-        description: '"His desire for a brilliant, burning dream melts his wings of survival."',
-        sideNote: 'Seaweed and salt, Cloves and amber, Melting wax',
-        textColor: 'light',
-        alignment: 'right',
-        imageMobile: '/products/icare-cover.jpg',
-        imageDesktop: '/products/icare-promo.jpg',
-        productSlug: 'icare',
-        productId: 'icare-001',
-        price: 200,
-        volume: '100ml',
-      },
-      {
-        title: 'Cassandre',
-        description: '"For those awake among the numb, compelled to cry out"',
-        sideNote: 'Floral, Laurel and incense, Charred wood and leather',
-        textColor: 'light',
-        alignment: 'left',
-        imageMobile: '/products/cassandre-cover.jpg',
-        imageDesktop: '/products/cassandre-promo.jpg',
-        productSlug: 'cassandre',
-        productId: 'cassandre-001',
-        price: 200,
-        volume: '100ml',
-      },
-    ],
-    relatedProducts: [
-      {
-        title: 'Icarus',
-        description: '"His desire for a brilliant, burning dream melts his wings of survival."',
-        price: 200,
-        volume: '100ml',
-        image: '/products/icare-bottle.jpg',
-        slug: 'icare',
-      },
-      {
-        title: 'Narcissus',
-        description: '"His love, to a beautiful illusion which never exist, makes him lost his mind"',
-        price: 200,
-        volume: '100ml',
-        image: '/products/narcisse-bottle.jpg',
-        slug: 'narcisse',
-      },
-      {
-        title: 'Cassandre',
-        description: '"For those awake among the numb, compelled to cry out"',
-        price: 200,
-        volume: '100ml',
-        image: '/products/cassandre-bottle.jpg',
-        slug: 'cassandre',
-      },
-      {
-        title: 'Antigone',
-        description: '"Her belief for justice, for everything should be done right"',
-        price: 200,
-        volume: '100ml',
-        image: '/products/antigone-bottle.jpg',
-        slug: 'antigone',
-      },
-    ],
+    items,
+    relatedProducts,
   };
 
   const relatedSectionTitle = collectionData.type === 'Collection'
-    ? 'Explore the Collection'
+    ? t('exploreCollection')
     : 'Related Products';
 
   return (
@@ -166,7 +190,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           </p>
       </div>
       {/* Hero Section - Desktop */}
-      <div className="hidden lg:block relative w-full h-[810px] bg-gray-200">
+      <div className="hidden lg:block relative w-full h-202.5 bg-gray-200">
         <Image
           src={collectionData.heroImageDesktop}
           alt={collectionData.title}
@@ -216,16 +240,19 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                       <div className="flex flex-col gap-2 px-2 mx-auto max-w-60">
                         {(item.productSlug || item.relatedLink) && (
                           <Link
-                            href={item.productSlug ? `/p/${item.productSlug}` : item.relatedLink!}
+                            href={item.productSlug ? `/${locale}/p/${item.productSlug}` : item.relatedLink!}
                             className="inline-block border border-gray-900  hover:bg-gray-800 hover:text-gray-100 px-4 py-1.5 text-xs transition-colors text-center"
                           >
-                            Check Detail
+                            {t('checkDetail')}
                           </Link>
                         )}
-                        {item.price && (
-                          <button className="bg-gray-500 text-gray-100 px-4 py-1.5 text-xs hover:bg-gray-800 transition-colors">
-                            Add to bag
-                          </button>
+                        {item.price && item.productId && item.volumeId && (
+                          <AddToBagButton
+                            productId={item.productId}
+                            volumeId={item.volumeId}
+                            label={t('addToBag')}
+                            className="bg-gray-500 text-gray-100 px-4 py-1.5 text-xs hover:bg-gray-800 transition-colors"
+                          />
                         )}
                       </div>
                     </div>
@@ -245,16 +272,19 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                       <div className="flex flex-col gap-2 px-2 mx-auto max-w-60">
                         {(item.productSlug || item.relatedLink) && (
                           <Link
-                            href={item.productSlug ? `/p/${item.productSlug}` : item.relatedLink!}
+                            href={item.productSlug ? `/${locale}/p/${item.productSlug}` : item.relatedLink!}
                             className="inline-block border border-gray-900  hover:bg-gray-800 hover:text-gray-100 px-4 py-1.5 text-xs transition-colors text-center"
                           >
-                            Check Detail
+                            {t('checkDetail')}
                           </Link>
                         )}
-                        {item.price && (
-                          <button className="bg-gray-500 text-gray-100 px-4 py-1.5 text-xs hover:bg-gray-800 transition-colors">
-                            Add to bag
-                          </button>
+                        {item.price && item.productId && item.volumeId && (
+                          <AddToBagButton
+                            productId={item.productId}
+                            volumeId={item.volumeId}
+                            label={t('addToBag')}
+                            className="bg-gray-500 text-gray-100 px-4 py-1.5 text-xs hover:bg-gray-800 transition-colors"
+                          />
                         )}
                       </div>
                     </div>
@@ -274,7 +304,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           </div>
 
           {/* Desktop Layout */}
-          <div className="hidden lg:block relative h-[810px]">
+          <div className="hidden lg:block relative h-202.5">
             <Image
               src={item.imageDesktop}
               alt={item.title}
@@ -298,26 +328,27 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                 <div className="flex flex-col gap-3">
                   {(item.productSlug || item.relatedLink) && (
                     <Link
-                      href={item.productSlug ? `/p/${item.productSlug}` : item.relatedLink!}
+                      href={item.productSlug ? `/${locale}/p/${item.productSlug}` : item.relatedLink!}
                       className={`inline-block border px-6 py-2 text-sm text-center bg-gray-100/30 backdrop-blur-sm transition-colors hover:bg-gray-700 hover:text-gray-100 hover:border-gray-700 ${
                         item.textColor === 'light'
                           ? 'border-gray-100 text-gray-100 '
                           : 'border-gray-900 text-gray-900 '
                       }`}
                     >
-                      Check Detail
+                      {t('checkDetail')}
                     </Link>
                   )}
-                  {item.price && (
-                    <button
+                  {item.price && item.productId && item.volumeId && (
+                    <AddToBagButton
+                      productId={item.productId}
+                      volumeId={item.volumeId}
+                      label={t('addToBag')}
                       className={`px-6 py-2 text-sm transition-colors hover:bg-gray-700 ${
                         item.textColor === 'light'
                           ? 'bg-gray-100 text-gray-900 hover:text-gray-100'
                           : 'bg-gray-900 text-gray-100'
                       }`}
-                    >
-                      Add to bag
-                    </button>
+                    />
                   )}
                 </div>
               </div>
@@ -337,7 +368,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           <div className="grid grid-cols-2 gap-4 lg:hidden text-center">
             {collectionData.relatedProducts.map((product) => (
               <div key={product.slug} className="flex flex-col">
-                <Link href={`/p/${product.slug}`} className="block">
+                <Link href={`/${locale}/p/${product.slug}`} className="block">
                   <div className="aspect-square relative mb-3">
                     <Image
                       src={product.image}
@@ -348,13 +379,16 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                   </div>
                 </Link>
                 <h3 className="font-bold text-base mb-1">{product.title}</h3>
-                <p className="content-center text-xs px-2 h-12 italic mb-2 line-clamp-3">
+                <p className="content-center text-xs px-2 h-12 italic mb-2 line-clamp-3 ">
                   {product.description}
                 </p>
                 <p className="text-xs mb-3">{product.volume} · {product.price} $</p>
-                <button className="bg-gray-500 text-white px-4 py-2 mx-8 text-xs hover:bg-gray-700 transition-colors">
-                  Add to bag
-                </button>
+                <AddToBagButton
+                  productId={product.id}
+                  volumeId={product.volumeId}
+                  label={t('addToBag')}
+                  className="bg-gray-700 text-white px-4 py-2 mx-8 text-xs hover:bg-gray-900 transition-colors"
+                />
               </div>
             ))}
           </div>
@@ -363,7 +397,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           <div className="hidden lg:grid lg:grid-cols-4 gap-8 text-center">
             {collectionData.relatedProducts.map((product) => (
               <div key={product.slug} className="flex flex-col">
-                <Link href={`/p/${product.slug}`} className="block">
+                <Link href={`/${locale}/p/${product.slug}`} className="block">
                   <div className="aspect-square relative mb-4 overflow-hidden group">
                     <Image
                       src={product.image}
@@ -373,15 +407,18 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                     />
                   </div>
                 <h3 className="font-bold  text-xl mb-2">{product.title}</h3>
-                <p className="text-sm italic text-gray-700 mb-3 line-clamp-2">
+                <p className="text-sm italic text-gray-700 mb-3 h-10 line-clamp-2">
                   {product.description}
                 </p>
                 </Link>
 
                 <p className="text-sm mb-4">{product.volume} · {product.price} $</p>
-                <button className="bg-gray-500 text-white px-6 py-2 mx-10 text-sm hover:bg-gray-700 transition-colors">
-                  Add to bag
-                </button>
+                <AddToBagButton
+                  productId={product.id}
+                  volumeId={product.volumeId}
+                  label={t('addToBag')}
+                  className="bg-gray-700 text-white px-6 py-2 mx-10 text-sm hover:bg-gray-900 transition-colors"
+                />
               </div>
             ))}
           </div>
@@ -390,8 +427,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
       {/* Breadcrumb Navigation */}
       <Breadcrumb
         items={[
-          { href: '/', label: 'Home' },
-          { href: '/c', label: 'Collections & Events' },
+          { href: `/${locale}`, label: tBreadcrumb('home') },
           { label: collectionData.title },
         ]}
       />

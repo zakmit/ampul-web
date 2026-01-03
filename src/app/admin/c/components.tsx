@@ -16,8 +16,8 @@ export const DELETE_BUTTON = "max-w-30 bg-red-700 text-red-100 px-3 py-2 text-ba
 export type Collection = {
   id: number;
   slug: string;
-  coverImageDesktop: string;
-  coverImageMobile: string;
+  coverImage1x1: string;
+  coverImage16x9: string;
   translations: Record<Locale, { name: string; description: string }>;
 };
 
@@ -40,8 +40,8 @@ export function CollectionEditForm({
   const isNew = collection === null;
   const [selectedLocale, setSelectedLocale] = useState<Locale>('en-US');
   const [slug, setSlug] = useState(collection?.slug || '');
-  const [coverImageDesktop, setCoverImageDesktop] = useState(collection?.coverImageDesktop || '');
-  const [coverImageMobile, setCoverImageMobile] = useState(collection?.coverImageMobile || '');
+  const [coverImage1x1, setCoverImageDesktop] = useState(collection?.coverImage1x1 || '');
+  const [coverImage16x9, setCoverImageMobile] = useState(collection?.coverImage16x9 || '');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [translations, setTranslations] = useState<Collection['translations']>(
     collection?.translations || {
@@ -54,8 +54,8 @@ export function CollectionEditForm({
     slug: false,
     name: false,
     description: false,
-    coverImageDesktop: false,
-    coverImageMobile: false,
+    coverImage1x1: false,
+    coverImage16x9: false,
   });
   const [isUploading, setIsUploading] = useState<'desktop' | 'mobile' | null>(null);
 
@@ -73,13 +73,13 @@ export function CollectionEditForm({
       if (url) {
         if (imageType === 'desktop') {
           setCoverImageDesktop(url);
-          if (validationErrors.coverImageDesktop) {
-            setValidationErrors({ ...validationErrors, coverImageDesktop: false });
+          if (validationErrors.coverImage1x1) {
+            setValidationErrors({ ...validationErrors, coverImage1x1: false });
           }
         } else {
           setCoverImageMobile(url);
-          if (validationErrors.coverImageMobile) {
-            setValidationErrors({ ...validationErrors, coverImageMobile: false });
+          if (validationErrors.coverImage16x9) {
+            setValidationErrors({ ...validationErrors, coverImage16x9: false });
           }
         }
       }
@@ -96,8 +96,8 @@ export function CollectionEditForm({
       slug: !slug.trim(),
       name: !translations['en-US'].name.trim(),
       description: !translations['en-US'].description.trim(),
-      coverImageDesktop: !coverImageDesktop.trim(),
-      coverImageMobile: !coverImageMobile.trim(),
+      coverImage1x1: !coverImage1x1.trim(),
+      coverImage16x9: !coverImage16x9.trim(),
     };
 
     setValidationErrors(errors);
@@ -109,8 +109,8 @@ export function CollectionEditForm({
 
     onSubmit({
       slug,
-      coverImageDesktop,
-      coverImageMobile,
+      coverImage1x1,
+      coverImage16x9,
       translations,
     });
   };
@@ -128,12 +128,12 @@ export function CollectionEditForm({
           <div
             onClick={() => !isUploading && mobileInputRef.current?.click()}
             className={`relative h-40 bg-gray-200 hover:bg-gray-500 transition-colors cursor-pointer group overflow-hidden ${
-              validationErrors.coverImageMobile ? ' bg-red-700' : ''
+              validationErrors.coverImage16x9 ? ' bg-red-700' : ''
             }`}
           >
-            {coverImageMobile && (
+            {coverImage16x9 && (
               <Image
-                src={coverImageMobile}
+                src={coverImage16x9}
                 alt="16:9 Promotional"
                 fill
                 className="object-cover"
@@ -141,13 +141,13 @@ export function CollectionEditForm({
             )}
 
             {/* Overlay */}
-            {coverImageMobile && (
+            {coverImage16x9 && (
               <div className="absolute inset-0 bg-gray-700/20 group-hover:bg-gray-900/20 transition-colors" />
             )}
 
             {/* Description */}
             <div className={`absolute w-full h-full text-center content-center text-sm font-medium transition group-hover:-top-1/6 ${
-              coverImageMobile ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
+              coverImage16x9 ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
             }`}>
               16:9 Promotional <span className="text-red-600">*</span>
             </div>
@@ -163,7 +163,7 @@ export function CollectionEditForm({
                 className="bg-gray-900 text-white px-6 py-2 text-sm hover:bg-gray-700 transition-colors disabled:opacity-50"
                 disabled={isUploading !== null}
               >
-                {isUploading === 'mobile' ? 'Uploading...' : (coverImageMobile ? 'Change' : 'Upload')}
+                {isUploading === 'mobile' ? 'Uploading...' : (coverImage16x9 ? 'Change' : 'Upload')}
               </button>
             </div>
           </div>
@@ -181,12 +181,12 @@ export function CollectionEditForm({
           <div
             onClick={() => !isUploading && desktopInputRef.current?.click()}
             className={`relative h-40 bg-gray-200 hover:bg-gray-500 transition-colors cursor-pointer group overflow-hidden ${
-              validationErrors.coverImageDesktop ? ' bg-red-700' : ''
+              validationErrors.coverImage1x1 ? ' bg-red-700' : ''
             }`}
           >
-            {coverImageDesktop && (
+            {coverImage1x1 && (
               <Image
-                src={coverImageDesktop}
+                src={coverImage1x1}
                 alt="1:1 Promotional"
                 fill
                 className="object-cover"
@@ -194,13 +194,13 @@ export function CollectionEditForm({
             )}
 
             {/* Overlay */}
-            {coverImageDesktop && (
+            {coverImage1x1 && (
               <div className="absolute inset-0 bg-gray-700/20 group-hover:bg-gray-900/20 transition-colors" />
             )}
 
             {/* Description */}
             <div className={`absolute w-full h-full text-center content-center text-sm font-medium transition group-hover:-top-1/6 ${
-              coverImageDesktop ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
+              coverImage1x1 ? 'text-gray-100' : 'text-gray-900 group-hover:text-gray-700'
             }`}>
               1:1 Promotional <span className="text-red-600">*</span>
             </div>
@@ -216,7 +216,7 @@ export function CollectionEditForm({
                 className="bg-gray-900 text-white px-6 py-2 text-sm hover:bg-gray-700 transition-colors disabled:opacity-50"
                 disabled={isUploading !== null}
               >
-                {isUploading === 'desktop' ? 'Uploading...' : (coverImageDesktop ? 'Change' : 'Upload')}
+                {isUploading === 'desktop' ? 'Uploading...' : (coverImage1x1 ? 'Change' : 'Upload')}
               </button>
             </div>
           </div>
@@ -264,9 +264,9 @@ export function CollectionEditForm({
                 </label>
                 <button
                   type="button"
-                  onClick={() => coverImageMobile && setPreviewImage(coverImageMobile)}
-                  className={`${coverImageMobile ? 'text-gray-900' : 'text-gray-500'} hover:opacity-70 transition-opacity`}
-                  disabled={!coverImageMobile}
+                  onClick={() => coverImage16x9 && setPreviewImage(coverImage16x9)}
+                  className={`${coverImage16x9 ? 'text-gray-900' : 'text-gray-500'} hover:opacity-70 transition-opacity`}
+                  disabled={!coverImage16x9}
                 >
                   <Eye className="w-6 h-6" />
                 </button>
@@ -275,15 +275,15 @@ export function CollectionEditForm({
                 type="button"
                 onClick={() => mobileInputRef.current?.click()}
                 className={`w-20 py-2 text-sm disabled:opacity-50 ${
-                  validationErrors.coverImageMobile
+                  validationErrors.coverImage16x9
                     ? 'bg-red-700 text-red-100 border border-red-900 hover:bg-red-900 transition-colors'
-                    : coverImageMobile
+                    : coverImage16x9
                       ? 'bg-gray-900 text-white hover:opacity-80 transition-opacity'
                       : 'bg-gray-500 text-white hover:opacity-80 transition-opacity'
                 }`}
                 disabled={isUploading !== null}
               >
-                {isUploading === 'mobile' ? 'Wait...' : validationErrors.coverImageMobile ? 'Required' : (coverImageMobile ? 'Change' : 'Upload')}
+                {isUploading === 'mobile' ? 'Wait...' : validationErrors.coverImage16x9 ? 'Required' : (coverImage16x9 ? 'Change' : 'Upload')}
               </button>
             </div>
             <input
@@ -304,9 +304,9 @@ export function CollectionEditForm({
                 </label>
                 <button
                   type="button"
-                  onClick={() => coverImageDesktop && setPreviewImage(coverImageDesktop)}
-                  className={`${coverImageDesktop ? 'text-gray-900' : 'text-gray-500'} hover:opacity-70 transition-opacity`}
-                  disabled={!coverImageDesktop}
+                  onClick={() => coverImage1x1 && setPreviewImage(coverImage1x1)}
+                  className={`${coverImage1x1 ? 'text-gray-900' : 'text-gray-500'} hover:opacity-70 transition-opacity`}
+                  disabled={!coverImage1x1}
                 >
                   <Eye className="w-6 h-6" />
                 </button>
@@ -315,15 +315,15 @@ export function CollectionEditForm({
                 type="button"
                 onClick={() => desktopInputRef.current?.click()}
                 className={`w-20 py-2 text-sm disabled:opacity-50 ${
-                  validationErrors.coverImageDesktop
+                  validationErrors.coverImage1x1
                     ? 'bg-red-700 text-red-100 border border-red-900 hover:bg-red-900 transition-colors'
-                    : coverImageDesktop
+                    : coverImage1x1
                       ? 'bg-gray-900 text-white hover:opacity-80 transition-opacity'
                       : 'bg-gray-500 text-white hover:opacity-80 transition-opacity'
                 }`}
                 disabled={isUploading !== null}
               >
-                {isUploading === 'desktop' ? 'Wait...' : validationErrors.coverImageDesktop ? 'Required' : (coverImageDesktop ? 'Change' : 'Upload')}
+                {isUploading === 'desktop' ? 'Wait...' : validationErrors.coverImage1x1 ? 'Required' : (coverImage1x1 ? 'Change' : 'Upload')}
               </button>
             </div>
             <input

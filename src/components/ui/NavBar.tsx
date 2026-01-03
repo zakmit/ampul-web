@@ -4,11 +4,14 @@ import { MenuList, MenuCard } from "@/components/ui";
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import SignInModal from './SignInModal';
+import ShoppingBagModalWrapper from './ShoppingBagModalWrapper';
+import AddedToBagModalWrapper from './AddedToBagModalWrapper';
+import { useShoppingBag } from '@/components/providers/ShoppingBagProvider';
 interface NavbarProps {
   showBanner?: boolean;
   bannerHeight?: number;
 }
-const desPlaceHolder = "“How does it feel like when Icarus falls into the ground?”, experience for our sensational feast, with the most iconic one in our selections."
+const desPlaceHolder = `"How does it feel like when Icarus falls into the ground?", experience for our sensational feast, with the most iconic one in our selections.`
 const newItems = [
   { label: "Gift for Chrismas", href: "#" },
   { label: "Greek Mythology", href: "#" }
@@ -30,18 +33,27 @@ export default function NavBar({ showBanner = true,
     bannerHeight = 6 // h-6
     }: NavbarProps) {
   const t = useTranslations('NavBar');
+  const { totalItems, forceNavVisible } = useShoppingBag();
   const [isNavVisible, setIsNavVisible] = useState(true)
   const [isDropdownVisible, setIsDropdownVisible] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
   const [isAtTop, setIsAtTop] = useState(true)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
+  const [isShoppingBagOpen, setIsShoppingBagOpen] = useState(false);
 
   const currentBannerState = useRef(showBanner)
-  
+
   useEffect(() => {
     currentBannerState.current = showBanner
   }, [showBanner])
+
+  // Immediately show navbar when forceNavVisible becomes true
+  useEffect(() => {
+    if (forceNavVisible) {
+      setIsNavVisible(true)
+    }
+  }, [forceNavVisible])
 
   useEffect(() => {
     const controlNavbar = () => {
@@ -49,6 +61,12 @@ export default function NavBar({ showBanner = true,
       const isCurrentlyAtTop = currentScrollY <= 10
 
       setIsAtTop(isCurrentlyAtTop)
+
+      // If forceNavVisible is true, always show navbar
+      if (forceNavVisible) {
+        setIsNavVisible(true)
+        return
+      }
 
       if (isCurrentlyAtTop) {
         setIsNavVisible(true)
@@ -68,7 +86,7 @@ export default function NavBar({ showBanner = true,
 
     window.addEventListener('scroll', controlNavbar)
     return () => window.removeEventListener('scroll', controlNavbar)
-  }, [lastScrollY])
+  }, [lastScrollY, forceNavVisible])
 
     const getNavPosition = () => {
         if (!isNavVisible) {  // hide -> translate up
@@ -246,13 +264,20 @@ export default function NavBar({ showBanner = true,
                   </button>
                   <button
                   type="button"
-                  className="inline-flex items-center justify-center rounded-md p-1 lg:p-2 text-gray-900"
+                  onClick={() => setIsShoppingBagOpen(true)}
+                  onMouseEnter={() => setIsDropdownVisible(false)}
+                  className="inline-flex items-center justify-center rounded-md p-1 lg:p-2 text-gray-900 relative"
                   >
                   <span className="sr-only">ShoppingBag</span>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'square', strokeMiterlimit: 1.5 }}>
                       <path d="M19.2,7.195l0,10.047c0,1.849 -1.501,3.35 -3.349,3.35l-7.702,-0c-1.848,-0 -3.349,-1.501 -3.349,-3.35l0,-10.047l14.4,0Z" style={{fill: 'none', strokeWidth: '1px' }}/>
                       <path d="M8,11.2c0.001,-9.598 8.004,-9.598 8,0" style={{fill: 'none', strokeWidth: '1px', strokeLinecap: 'round'}} />
                   </svg>
+                  {totalItems > 0 && (
+                    <span className="absolute top-4.5 right-3.5 lg:top-[21px] lg:right-4.5 bg-gray-900 text-white text-xs font-semibold rounded-full w-3 h-3 flex items-end justify-center">
+                      {totalItems}
+                    </span>
+                  )}
                   </button>
               </div>
               </nav>
@@ -285,8 +310,25 @@ export default function NavBar({ showBanner = true,
           {/* Sign In Modal */}
           <SignInModal
             isOpen={isSignInModalOpen}
-            showBanner={isAtTop}
+            showBanner={showBanner}
+            isAtTop={isAtTop}
+            isNavVisible={isNavVisible}
             onClose={() => setIsSignInModalOpen(false)}
+          />
+
+          {/* Shopping Bag Modal */}
+          <ShoppingBagModalWrapper
+            isOpen={isShoppingBagOpen}
+            showBanner={showBanner}
+            isAtTop={isAtTop}
+            isNavVisible={isNavVisible}
+            onClose={() => setIsShoppingBagOpen(false)}
+          />
+
+          {/* Added to Bag Modal */}
+          <AddedToBagModalWrapper
+            showBanner={showBanner}
+            isAtTop={isAtTop}
           />
         </div>
     )

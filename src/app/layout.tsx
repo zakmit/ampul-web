@@ -3,6 +3,9 @@ import { Geist_Mono } from 'next/font/google';
 import { Averia_Serif_Libre } from 'next/font/google';
 import { Zilla_Slab } from 'next/font/google';
 import './globals.css';
+import SessionProvider from '@/components/providers/SessionProvider';
+import { ShoppingBagProvider } from '@/components/providers/ShoppingBagProvider';
+import { auth } from '@/auth';
 
 const aSLibre = Averia_Serif_Libre({
   weight: ["300","400","700"],
@@ -29,17 +32,23 @@ export const metadata: Metadata = {
 };
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
   return (
     <html lang="en">
       <body
         className={`${aSLibre.variable} ${ziliaSlab.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <SessionProvider session={session}>
+          <ShoppingBagProvider>
+            {children}
+          </ShoppingBagProvider>
+        </SessionProvider>
       </body>
     </html>
   );

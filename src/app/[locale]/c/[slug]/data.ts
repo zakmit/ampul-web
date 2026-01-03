@@ -13,8 +13,8 @@ export type CollectionData = {
   slug: string
   name: string
   description: string
-  coverImageDesktop: string
-  coverImageMobile: string
+  coverImage1x1: string
+  coverImage16x9: string
 }
 
 export type ProductListData = {
@@ -26,6 +26,7 @@ export type ProductListData = {
   price: number
   volume: string // Display name (translated)
   volumeValue: string // Raw value for filtering
+  volumeId: number // Volume ID for shopping bag
   collectionId: number
   collectionSlug: string
   collectionName: string
@@ -73,8 +74,8 @@ export async function getCollectionBySlug(slug: string, locale: Locale = 'us'): 
       slug: collection.slug,
       name: currentTranslation?.name || fallbackTranslation?.name || '',
       description: currentTranslation?.description || fallbackTranslation?.description || '',
-      coverImageDesktop: collection.coverImageDesktop,
-      coverImageMobile: collection.coverImageMobile,
+      coverImage1x1: collection.coverImage1x1,
+      coverImage16x9: collection.coverImage16x9,
     }
   } catch (error) {
     console.error('Error fetching collection by slug:', error)
@@ -176,6 +177,7 @@ export async function getProductsByCollectionSlug(collectionSlug: string, locale
         price: firstVolume ? Number(firstVolume.price) : 0,
         volume: volumeTranslation?.displayName || firstVolume?.volume.value || '',
         volumeValue: firstVolume?.volume.value || '',
+        volumeId: firstVolume?.volumeId || 0,
         collectionId: product.collection.id,
         collectionSlug: product.collection.slug,
         collectionName: currentCollectionTranslation?.name || fallbackCollectionTranslation?.name || '',

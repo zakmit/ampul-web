@@ -1,6 +1,18 @@
 {
   "HomePage": {
-    "title": "Bonjour le monde!"
+    "heroTitle": "Explorez la Collection Mythologie Grecque",
+    "heroDescription": "Gouttes de cire fondue coulant dans la mer, fumée ardente s'échappant de Troie en flammes, narcisse s'épanouissant sur le reflet éthéré, rouille fanée errant dans les terres sauvages.",
+    "conceptTitle": "Le Concept d'AMPUL",
+    "conceptDescription": "Inspiré par le concept traditionnel d'ampoules—un petit récipient préservant ce qui reste d'une vie. Quel a été le moment décisif de leur histoire? Qu'est-ce qui a brillé devant leurs yeux? Quelle était l'odeur de ce moment? Des plus grandes tragédies de la mythologie aux morts les plus touchantes de la littérature.",
+    "bottleTitle": "La Bouteille",
+    "bottleDescription": "Inspiré par la forme d'une ampoule, le bouchon évoque une flamme de bougie. Chaque parfum est un hommage à leur vie.",
+    "exploreFragrances": "Explorez les Parfums",
+    "characters": {
+      "icare": "Pour s'échapper de Crète, il a volé avec des ailes artificielles. Une belle impulsion—le vent féroce et la chaleur du soleil l'ont rempli d'extase. Il a volé trop près; les plumes et la cire fondue sont tombées avec sa vie.",
+      "cassandre": "Née princesse de Troie, elle est venue au monde portant à la fois son don et sa malédiction. Elle a prévu la chute de Troie, mais la punition d'Apollon l'a empêchée de convaincre les autres de la tragédie à venir.",
+      "narcisse": "Son destin a été prédit à sa naissance: il perdrait la vie pour un amour impossible—son propre reflet, une belle illusion. Seul le parfum du narcisse reste au bord du lac.",
+      "antigone": "Née dans une maison souillée de malédictions, elle a vu ses frères s'entre-tuer. Elle s'est accrochée à ce qu'elle croyait juste et a enterré les morts de ses propres mains—même au prix de sa propre vie."
+    }
   },
   "Breadcrumb": {
     "home": "Accueil",
@@ -141,6 +153,56 @@
       "postalCode": "Code postal",
       "country": "Nom du pays"
     },
-    "save": "ENREGISTRER"
+    "errors": {
+      "nameRequired": "Le nom est requis",
+      "nameTooLong": "Le nom est trop long (max 100 caractères)",
+      "addressLine1Required": "La ligne d'adresse 1 est requise",
+      "addressLine1TooLong": "La ligne d'adresse 1 est trop longue (max 200 caractères)",
+      "addressLine2TooLong": "La ligne d'adresse 2 est trop longue (max 200 caractères)",
+      "cityRequired": "La ville est requise",
+      "cityTooLong": "Le nom de la ville est trop long (max 100 caractères)",
+      "regionTooLong": "La région est trop longue (max 100 caractères)",
+      "postalCodeRequired": "Le code postal est requis",
+      "postalCodeTooLong": "Le code postal est trop long (max 20 caractères)",
+      "countryRequired": "Le pays est requis",
+      "countryTooLong": "Le nom du pays est trop long (max 100 caractères)"
+    },
+    "save": "ENREGISTRER",
+    "saving": "Enregistrement...",
+    "successMessage": "Profil mis à jour avec succès !",
+    "errorMessage": "Échec de la mise à jour du profil. Veuillez vérifier le formulaire pour les erreurs."
+  },
+  "GreekMythology": {
+    "title": "Explorez la Collection Mythologie Grecque",
+    "description": "Gouttes de cire fondue coulant dans la mer, fumée ardente s'échappant de Troie en flammes, narcisse s'épanouissant sur le reflet éthéré, rouille fanée errant dans les terres sauvages.",
+    "checkDetail": "Voir les détails",
+    "addToBag": "Ajouter au panier",
+    "exploreCollection": "Explorez la collection",
+    "sideNotes": {
+      "antigone": "Poussière et rouille, Myrrhe, Encens",
+      "narcisse": "Narcisse, Roseaux, Platane",
+      "icare": "Algues et sel, Clous de girofle et ambre, Cire fondue",
+      "cassandre": "Floral, Laurier et encens, Bois calciné et cuir"
+    }
+  },
+  "SignInModal": {
+    "signIn": "Se connecter",
+    "signInWithGoogle": "Se connecter avec Google",
+    "welcome": "Bienvenue",
+    "myOrder": "MES COMMANDES",
+    "myInformation": "MES INFORMATIONS",
+    "signOut": "Se déconnecter"
+  },
+  "ShoppingBag": {
+    "title": "Panier",
+    "emptyMessage": "Votre panier est vide.",
+    "freeSample": "Échantillon gratuit",
+    "subtotal": "Sous-total",
+    "checkout": "PASSER À LA CAISSE"
+  },
+  "AddedToBag": {
+    "title": "AJOUTÉ AU PANIER",
+    "maxQuantityTitle": "Quantité maximale dépassée",
+    "maxQuantityMessage": "Vous ne pouvez pas ajouter plus de 10 articles identiques à votre commande."
   }
 }

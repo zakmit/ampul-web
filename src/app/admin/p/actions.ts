@@ -89,8 +89,8 @@ export async function createProduct(
     slug: string
     categoryId: number
     collectionId: number
-    coverImageDesktop: string
-    coverImageMobile: string
+    coverImage1x1: string
+    coverImage16x9: string
     productImage: string
     boxImage: string
     galleryImages: string[]
@@ -109,8 +109,8 @@ export async function createProduct(
         slug: validatedData.slug,
         categoryId: validatedData.categoryId,
         collectionId: validatedData.collectionId,
-        coverImageDesktop: validatedData.coverImageDesktop,
-        coverImageMobile: validatedData.coverImageMobile,
+        coverImage1x1: validatedData.coverImage1x1,
+        coverImage16x9: validatedData.coverImage16x9,
         productImage: validatedData.productImage,
         boxImage: validatedData.boxImage,
         galleryImages: validatedData.galleryImages,
@@ -179,8 +179,8 @@ export async function updateProduct(
     slug?: string
     categoryId?: number
     collectionId?: number
-    coverImageDesktop?: string
-    coverImageMobile?: string
+    coverImage1x1?: string
+    coverImage16x9?: string
     productImage?: string
     boxImage?: string
     galleryImages?: string[]
@@ -204,10 +204,10 @@ export async function updateProduct(
     const imagesToDelete: string[] = []
 
     if (originalImages) {
-      if (validatedData.coverImageDesktop && validatedData.coverImageDesktop !== originalImages.desktop && originalImages.desktop.startsWith('/uploads/products/')) {
+      if (validatedData.coverImage1x1 && validatedData.coverImage1x1 !== originalImages.desktop && originalImages.desktop.startsWith('/uploads/products/')) {
         imagesToDelete.push(originalImages.desktop)
       }
-      if (validatedData.coverImageMobile && validatedData.coverImageMobile !== originalImages.mobile && originalImages.mobile.startsWith('/uploads/products/')) {
+      if (validatedData.coverImage16x9 && validatedData.coverImage16x9 !== originalImages.mobile && originalImages.mobile.startsWith('/uploads/products/')) {
         imagesToDelete.push(originalImages.mobile)
       }
       if (validatedData.productImage && validatedData.productImage !== originalImages.product && originalImages.product.startsWith('/uploads/products/')) {
@@ -231,8 +231,8 @@ export async function updateProduct(
     if (validatedData.slug !== undefined) updateData.slug = validatedData.slug
     if (validatedData.categoryId !== undefined) updateData.categoryId = validatedData.categoryId
     if (validatedData.collectionId !== undefined) updateData.collectionId = validatedData.collectionId
-    if (validatedData.coverImageDesktop !== undefined) updateData.coverImageDesktop = validatedData.coverImageDesktop
-    if (validatedData.coverImageMobile !== undefined) updateData.coverImageMobile = validatedData.coverImageMobile
+    if (validatedData.coverImage1x1 !== undefined) updateData.coverImage1x1 = validatedData.coverImage1x1
+    if (validatedData.coverImage16x9 !== undefined) updateData.coverImage16x9 = validatedData.coverImage16x9
     if (validatedData.productImage !== undefined) updateData.productImage = validatedData.productImage
     if (validatedData.boxImage !== undefined) updateData.boxImage = validatedData.boxImage
     if (validatedData.galleryImages !== undefined) updateData.galleryImages = validatedData.galleryImages
@@ -322,8 +322,8 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
     const product = await prisma.product.findUnique({
       where: { id },
       select: {
-        coverImageDesktop: true,
-        coverImageMobile: true,
+        coverImage1x1: true,
+        coverImage16x9: true,
         productImage: true,
         boxImage: true,
         galleryImages: true,
@@ -341,8 +341,8 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
 
     // Delete images
     const imagesToDelete = [
-      product.coverImageDesktop,
-      product.coverImageMobile,
+      product.coverImage1x1,
+      product.coverImage16x9,
       product.productImage,
       product.boxImage,
       ...product.galleryImages,

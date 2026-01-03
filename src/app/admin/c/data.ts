@@ -4,8 +4,8 @@ import { prisma } from '@/lib/prisma'
 export type CollectionWithTranslations = {
   id: number
   slug: string
-  coverImageDesktop: string
-  coverImageMobile: string
+  coverImage1x1: string
+  coverImage16x9: string
   translations: {
     collectionId: number
     locale: string

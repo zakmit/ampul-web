@@ -1,16 +1,28 @@
 {
   "HomePage": {
-    "title": "你好世界！"
+    "heroTitle": "探索希臘神話系列",
+    "heroDescription": "融化的蠟滴沉入大海中、黑煙自燃燒中的特洛伊飄出、水仙花香倒影在湖面、不得安息的鐵鏽味遊蕩在荒野中",
+    "conceptTitle": "AMPUL 的概念",
+    "conceptDescription": "發想自安瓿的初始概念——一個保存生命殘留的容器。什麼是他們人生的決定性瞬間？什麼走馬燈在他們眼前閃過？那一刻有著什麼氣味？從神話中的悲劇到文學中最動人的死亡。",
+    "bottleTitle": "香水瓶",
+    "bottleDescription": "採集自安瓿的形狀，瓶蓋如同燭火，每種氣味都取樣自他們的生命。",
+    "exploreFragrances": "探索氣味",
+    "characters": {
+      "icare": "為了逃離克里特島，他搧動著人造的翅膀。一個美麗的衝動，強勁的風和太陽的溫暖使他狂喜。他飛得太近，飄落的羽毛與蠟滴同他的生命一起墜落。",
+      "cassandre": "生為特洛伊的公主，他生而帶著他的能力、以及詛咒。他預見了特洛伊的覆滅，但阿波羅的懲罰使他無法說服他人悲劇即將發生。",
+      "narcisse": "他在出生時便被預言了他的結局，他終將死於一場無法實現的愛，他自己的幻影，一個美麗的投射。只留下水仙花香停留在湖畔。",
+      "antigone": "生在被詛咒的家庭中，他的兄弟互相殘殺。他堅持著他確信的正確，親手完成了敗者被禁止的下葬——即使代價是他自身的生命。"
+    }
   },
   "Breadcrumb": {
     "home": "首頁",
-    "fragrances": "香氛"
+    "fragrances": "氣味"
   },
   "NavBar": {
     "banner": "進入神話世界",
     "menu": {
       "new": "新品",
-      "fragrance": "香氛",
+      "fragrance": "氣味",
       "about": "關於"
     },
     "search": "搜尋",
@@ -69,8 +81,8 @@
     }
   },
   "ProductsPage": {
-    "title": "香氛",
-    "description": "發想自令人難忘的終幕——是什麼導致了他們不可避免的命運？什麼是他們生命中的決定性時刻？"
+    "title": "氣味",
+    "description": "那些令人難忘的謝幕——是什麼導向了他們不可避免的結局？他們生命中的決定性瞬間是什麼？"
   },
   "ProductOverview": {
     "filters": "篩選",
@@ -125,8 +137,8 @@
       "address": "地址",
       "addressLine1": "地址行 1",
       "addressLine2": "地址行 2（選填）",
-      "city": "縣市",
-      "region": "區域（選填）",
+      "city": "區域（選填）",
+      "region": "縣市",
       "postalCode": "郵遞區號",
       "country": "國家"
     },
@@ -135,12 +147,62 @@
       "birthday": "年/月/日",
       "phone": "請輸入電話號碼",
       "addressLine1": "街道地址、大樓名稱、樓層",
-      "addressLine2": "室、號、單位（選填）",
-      "city": "縣市名稱",
-      "region": "鄉鎮市區（選填）",
+      "addressLine2": "室、單位（選填）",
+      "city": "鄉鎮市區",
+      "region": "縣市",
       "postalCode": "郵遞區號",
       "country": "國家名稱"
     },
-    "save": "儲存"
+    "errors": {
+      "nameRequired": "姓名為必填欄位",
+      "nameTooLong": "姓名過長（最多 100 字元）",
+      "addressLine1Required": "地址行 1 為必填欄位",
+      "addressLine1TooLong": "地址行 1 過長（最多 200 字元）",
+      "addressLine2TooLong": "地址行 2 過長（最多 200 字元）",
+      "cityRequired": "城市為必填欄位",
+      "cityTooLong": "城市名稱過長（最多 100 字元）",
+      "regionTooLong": "區域過長（最多 100 字元）",
+      "postalCodeRequired": "郵遞區號為必填欄位",
+      "postalCodeTooLong": "郵遞區號過長（最多 20 字元）",
+      "countryRequired": "國家為必填欄位",
+      "countryTooLong": "國家名稱過長（最多 100 字元）"
+    },
+    "save": "儲存",
+    "saving": "儲存中...",
+    "successMessage": "個人資料更新成功！",
+    "errorMessage": "個人資料更新失敗，請檢查表單錯誤。"
+  },
+  "GreekMythology": {
+    "title": "探索希臘神話系列",
+    "description": "融化的蠟滴沉入大海中、黑煙自燃燒中的特洛伊飄出、水仙花香倒影在湖面、不得安息的鐵鏽味遊蕩在荒野中",
+    "checkDetail": "查看詳情",
+    "addToBag": "加入購物袋",
+    "exploreCollection": "探索系列",
+    "sideNotes": {
+      "antigone": "塵土與鐵鏽、沒藥、沉香",
+      "narcisse": "水仙、蘆葦、懸鈴木",
+      "icare": "海藻與鹽、丁香與琥珀、融化的蠟",
+      "cassandre": "花香、月桂與乳香、燻木與皮革"
+    }
+  },
+  "SignInModal": {
+    "signIn": "登入",
+    "signInWithGoogle": "使用 Google 登入",
+    "welcome": "歡迎",
+    "myOrder": "我的訂單",
+    "myInformation": "我的資料",
+    "signOut": "登出"
+  },
+  "ShoppingBag": {
+    "title": "購物袋",
+    "emptyMessage": "您的購物袋是空的。",
+    "freeSample": "免費樣品",
+    "subtotal": "小計",
+    "checkout": "前往結帳"
+  },
+  "AddedToBag": {
+    "title": "已加入購物袋",
+    "maxQuantityTitle": "超過最大數量",
+    "maxQuantityMessage": "同一商品最多只能加入10件至您的訂單。"
   }
 }

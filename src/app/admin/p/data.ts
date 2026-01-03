@@ -9,8 +9,8 @@ export type ProductWithRelations = {
   slug: string
   categoryId: number
   collectionId: number
-  coverImageDesktop: string
-  coverImageMobile: string
+  coverImage1x1: string
+  coverImage16x9: string
   productImage: string
   boxImage: string
   galleryImages: string[]
@@ -300,8 +300,8 @@ export function transformProducts(prismaProducts: ProductWithFullRelations[]): P
       slug: product.slug,
       categoryId: product.categoryId,
       collectionId: product.collectionId,
-      coverImageDesktop: product.coverImageDesktop,
-      coverImageMobile: product.coverImageMobile,
+      coverImage1x1: product.coverImage1x1,
+      coverImage16x9: product.coverImage16x9,
       productImage: product.productImage,
       boxImage: product.boxImage,
       galleryImages: product.galleryImages,

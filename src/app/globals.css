@@ -6,6 +6,8 @@
   font-family: var(--font-context);
 }
 @theme {
+  --color-gold: oklch(0.8693 0.0153 94.22);
+
   --color-gray-100: oklch(0.9572 0.0034 247.86);
   --color-gray-200: oklch(0.882 0.0101 267.35);
   --color-gray-300: oklch(0.7979 0.0134 266.68);
@@ -15,6 +17,17 @@
   --color-gray-700: oklch(0.3169 0.0209 265.92);
   --color-gray-800: oklch(0.2175 0.0278 262.43);
   --color-gray-900: oklch(0.1213 0.0248 256.33);
+
+  --color-blue-100: oklch(0.9693 0.0144 264.5);
+  --color-blue-200: oklch(0.8991 0.0456 264.92);
+  --color-blue-300: oklch(0.8249 0.0741 264.5);
+  --color-blue-400: oklch(0.7268 0.1295 263.5);
+  --color-blue-500: oklch(0.6388 0.1676 261.09);
+  --color-blue-600: oklch(0.5733 0.215 261.91);
+  --color-blue-700: oklch(0.437 0.1879 263.82);
+  --color-blue-800: oklch(0.3602 0.1685 265.82);
+  --color-blue-900: oklch(0.2271 0.1135 268.03);
+
 
   --color-olive-100: oklch(0.98 0.0034 145.55);
   --color-olive-200: oklch(0.9049 0.0193 140.5);
@@ -83,7 +96,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-title);
 }
 
-p, body, span, div, input {
+p, body, div, input {
   font-family: var(--font-context);
 }
 

@@ -58,7 +58,7 @@ export default function ProductImageGallery({ images, productName }: ProductImag
         className="absolute right-4 top-1/2 -translate-y-1/2 z-10 hidden lg:flex items-center justify-center w-12 h-12 rounded-full bg-gray-100/10 hover:bg-gray-100/60 shadow-lg transition-all"
         aria-label="Next image"
       >
-        <ChevronRight strokeWidth="1.5" className="w-8 h-8 mx-auto text-gray-900" />
+        <ChevronRight strokeWidth="1" className="w-8 h-8 mx-auto text-gray-900" />
       </button>
 
       {/* Product Image with Swipe Support */}

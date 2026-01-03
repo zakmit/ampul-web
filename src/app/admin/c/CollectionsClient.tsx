@@ -26,8 +26,8 @@ function transformCollections(collections: CollectionWithTranslations[]): Collec
   return collections.map((col) => ({
     id: col.id,
     slug: col.slug,
-    coverImageDesktop: col.coverImageDesktop,
-    coverImageMobile: col.coverImageMobile,
+    coverImage1x1: col.coverImage1x1,
+    coverImage16x9: col.coverImage16x9,
     translations: col.translations.reduce((acc, t) => {
       acc[t.locale as Locale] = { name: t.name, description: t.description };
       return acc;
@@ -106,12 +106,12 @@ export default function CollectionsClient({
       const collection = collections.find(c => c.id === id);
       if (collection) {
         setOriginalImages({
-          desktop: collection.coverImageDesktop,
-          mobile: collection.coverImageMobile,
+          desktop: collection.coverImage1x1,
+          mobile: collection.coverImage16x9,
         });
         setCurrentFormImages({
-          desktop: collection.coverImageDesktop,
-          mobile: collection.coverImageMobile,
+          desktop: collection.coverImage1x1,
+          mobile: collection.coverImage16x9,
         });
       }
     }
@@ -135,8 +135,8 @@ export default function CollectionsClient({
 
       const result = await createCollection({
         slug: newCollection.slug,
-        coverImageDesktop: newCollection.coverImageDesktop,
-        coverImageMobile: newCollection.coverImageMobile,
+        coverImage1x1: newCollection.coverImage1x1,
+        coverImage16x9: newCollection.coverImage16x9,
         translations,
       });
 
@@ -162,8 +162,8 @@ export default function CollectionsClient({
 
       const result = await updateCollection(id, {
         slug: updatedCollection.slug,
-        coverImageDesktop: updatedCollection.coverImageDesktop,
-        coverImageMobile: updatedCollection.coverImageMobile,
+        coverImage1x1: updatedCollection.coverImage1x1,
+        coverImage16x9: updatedCollection.coverImage16x9,
         translations,
       }, originalImages || undefined);
 
@@ -391,7 +391,7 @@ export default function CollectionsClient({
                       }`}
                     >
                       <Image
-                        src={collection.coverImageMobile}
+                        src={collection.coverImage16x9}
                         alt={collection.translations['en-US'].name}
                         fill
                         className="object-cover"
@@ -425,7 +425,7 @@ export default function CollectionsClient({
                     }`}
                   >
                     <Image
-                      src={collection.coverImageMobile}
+                      src={collection.coverImage16x9}
                       alt={collection.translations['en-US'].name}
                       fill
                       className="object-cover"

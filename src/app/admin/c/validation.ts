@@ -50,8 +50,8 @@ const collectionTranslationSchema = z.object({
 
 export const createCollectionSchema = z.object({
   slug: slugSchema,
-  coverImageDesktop: imageUrlSchema,
-  coverImageMobile: imageUrlSchema,
+  coverImage1x1: imageUrlSchema,
+  coverImage16x9: imageUrlSchema,
   translations: z.array(collectionTranslationSchema)
     .min(1, 'At least one translation is required')
     .max(3, 'Maximum 3 translations allowed')
