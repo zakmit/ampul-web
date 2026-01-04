@@ -20,6 +20,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const { locale, slug } = await params;
   const t = await getTranslations({ locale, namespace: 'ProductDetail' });
   const tBreadcrumb = await getTranslations({ locale, namespace: 'Breadcrumb' });
+  const tCommon = await getTranslations({ locale, namespace: 'Common' });
 
   // Fetch product data from Prisma
   const productData = await getProductBySlug(slug, locale);
@@ -112,7 +113,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <AddToBagButton
                 productId={productData.id}
                 volumeId={firstVolume?.volumeId || 0}
-                label={`${t('addToBag')} · ${product.price} $`}
+                label={`${t('addToBag')} · ${product.price} ${tCommon('currency')}`}
                 className="bg-gray-700 hover:bg-gray-900 text-gray-100 font-semibold px-5 lg:px-6 py-3 transition-colors cursor-pointer"
               />
             </div>

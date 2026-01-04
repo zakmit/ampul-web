@@ -1,4 +1,7 @@
 {
+  "Common": {
+    "currency": "€"
+  },
   "HomePage": {
     "heroTitle": "Explorez la Collection Mythologie Grecque",
     "heroDescription": "Gouttes de cire fondue coulant dans la mer, fumée ardente s'échappant de Troie en flammes, narcisse s'épanouissant sur le reflet éthéré, rouille fanée errant dans les terres sauvages.",
@@ -114,6 +117,7 @@
     "tracking": "SUIVI",
     "trackingNotAvailable": "Pas encore disponible",
     "cancelOrder": "Annuler la commande",
+    "freeSample": "Échantillon gratuit",
     "status": {
       "PENDING": "EN ATTENTE",
       "PAID": "PAYÉ",
@@ -126,7 +130,8 @@
   },
   "UserLayout": {
     "myInformation": "MES INFORMATIONS",
-    "myOrders": "MES COMMANDES"
+    "myOrders": "MES COMMANDES",
+    "signInPrompt": "Connectez-vous pour voir vos informations"
   },
   "ProfilePage": {
     "fields": {
@@ -143,7 +148,7 @@
       "country": "Pays"
     },
     "placeholders": {
-      "name": "Entrez votre nom complet",
+      "name": "Entrez le nom complet",
       "birthday": "JJ/MM/AAAA",
       "phone": "Entrez le numéro",
       "addressLine1": "Numéro et nom de rue, bâtiment, étage",
@@ -204,5 +209,41 @@
     "title": "AJOUTÉ AU PANIER",
     "maxQuantityTitle": "Quantité maximale dépassée",
     "maxQuantityMessage": "Vous ne pouvez pas ajouter plus de 10 articles identiques à votre commande."
+  },
+  "Checkout": {
+    "title": "Paiement",
+    "loading": "Chargement...",
+    "step1": "1. CONNEXION",
+    "step2": "2. ADRESSE DE LIVRAISON",
+    "step3": "3. VÉRIFICATION ET PAIEMENT",
+    "useProfileAddress": "Utiliser l'adresse dans mes informations",
+    "recipientName": "Nom du destinataire",
+    "phoneNumber": "Numéro de téléphone",
+    "address": "Adresse",
+    "next": "SUIVANT",
+    "back": "Retour",
+    "placeOrder": "PASSER LA COMMANDE",
+    "processing": "Traitement...",
+    "freeSample": "Échantillon gratuit",
+    "noSample": "Aucun",
+    "subtotal": "Sous-total",
+    "shipTo": "EXPÉDIER À",
+    "payment": "PAIEMENT",
+    "demoNotice": "*à des fins de démonstration",
+    "errors": {
+      "recipientNameRequired": "Le nom du destinataire est requis",
+      "addressLine1Required": "L'adresse est requise",
+      "cityRequired": "La ville est requise",
+      "postalCodeRequired": "Le code postal est requis",
+      "countryRequired": "Le pays est requis",
+      "addressValidation": "Veuillez vérifier votre adresse de livraison et corriger les erreurs.",
+      "emptyBag": "Votre panier est vide"
+    }
+  },
+  "CheckoutSuccess": {
+    "title": "Commande passée avec succès",
+    "orderNumber": "Numéro de commande",
+    "viewOrders": "Voir mes commandes",
+    "signInPrompt": "Connectez-vous pour voir votre commande"
   }
 }

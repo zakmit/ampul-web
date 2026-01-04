@@ -23,12 +23,6 @@ export default function SignInForm() {
 
   return (
     <div className="flex-1 flex flex-col justify-center lg:justify-start">
-      <h2 className="text-xl font-bold text-center mb-4 font-title">
-        {t('signIn')}
-      </h2>
-
-      <div className="border-t border-gray-500 mb-6 mx-2"></div>
-
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded">
           {error}

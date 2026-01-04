@@ -13,6 +13,7 @@ type OrderItem = {
   productVolume: string;
   quantity: number;
   price: number;
+  isFreeSample?: boolean;
 };
 
 type OrderStatus = 'PENDING' | 'PAID' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
@@ -30,6 +31,7 @@ type Order = {
   shippingCountry: string;
   trackingCode: string | null;
   total: number;
+  currency: string;
   status: OrderStatus;
   items: OrderItem[];
   createdAt: string;
@@ -43,6 +45,10 @@ export default function OrderCard({ order }: OrderCardProps) {
   const t = useTranslations('OrderCard');
   const [isExpanded, setIsExpanded] = useState(false);
   const [formattedDate, setFormattedDate] = useState('');
+
+  // Separate regular items from free samples
+  const regularItems = order.items.filter(item => !item.isFreeSample);
+  const freeSample = order.items.find(item => item.isFreeSample);
 
   useEffect(() => {
     setFormattedDate(new Date(order.createdAt).toLocaleDateString());
@@ -61,7 +67,7 @@ export default function OrderCard({ order }: OrderCardProps) {
           <h3 className="italic font-bold text-base">{formattedDate}</h3>
           <div className="flex items-center gap-4 lg:gap-8">
             <h3 className={`hidden font-bold italic text-base  ${isExpanded ? "": "lg:inline"}`}>
-              {t('total')}: {order.total}$
+              {t('total')}: {order.total}{order.currency}
             </h3>
             <div className="flex items-center gap-2">
               <h4 className="text-sm italic lg:text-base text-end w-30 lg:w-34">
@@ -72,11 +78,11 @@ export default function OrderCard({ order }: OrderCardProps) {
           </div>
         </div>
 
-        {/* Product thumbnails in collapsed state */}
+        {/* Product thumbnails in collapsed state - only show regular items, not free samples */}
         {!isExpanded && (
           <div className="px-4 lg:px-8 pb-4">
             <div className="flex gap-3 overflow-x-auto pb-2">
-              {order.items.map((item) => (
+              {regularItems.map((item) => (
                 <div key={item.id} className="shrink-0">
                   <div className="w-28 h-28 lg:w-32 lg:h-32 bg-gray-300 relative">
                     <Image
@@ -90,7 +96,7 @@ export default function OrderCard({ order }: OrderCardProps) {
               ))}
             </div>
             <div className="text-right mt-2 lg:hidden">
-              <span className="text-sm italic">{t('total')}: {order.total}$</span>
+              <span className="text-sm italic">{t('total')}: {order.total}{order.currency}</span>
             </div>
           </div>
         )}
@@ -103,7 +109,7 @@ export default function OrderCard({ order }: OrderCardProps) {
             {/* Product List */}
             <h3 className="text-base lg:text-xl font-bold italic mb-4">{t('orderId')}: {order.orderNumber}</h3>
             <div className="space-y-4 mb-8">
-              {order.items.map((item) => (
+              {regularItems.map((item) => (
                 <div key={item.id} className="flex gap-4 items-start">
                   <div className="w-28 h-28 lg:w-32 lg:h-32 bg-gray-300 relative shrink-0">
                     <Image
@@ -120,15 +126,25 @@ export default function OrderCard({ order }: OrderCardProps) {
                       <p className="text-sm max-w-24 lg:max-w-full">{item.productVolume}</p>
                     </div>
                     <p className="text-sm lg:text-lg text-right">x{item.quantity}</p>
-                    <p className="text-sm lg:text-lg text-right">{item.price}$</p>
+                    <p className="text-sm lg:text-lg text-right">{item.price}{order.currency}</p>
                   </div>
                 </div>
               ))}
             </div>
 
+            {/* Free Sample */}
+            {freeSample && (
+              <div className="mb-6 mx-1 lg:mb-10">
+                <div className="flex justify-between items-center text-sm italic">
+                  <span>{t('freeSample')}</span>
+                  <span>{freeSample.productName}</span>
+                </div>
+              </div>
+            )}
+
             {/* Total */}
             <div className="text-right mb-8">
-              <h3 className="text-base lg:text-lg italic font-bold">{t('total')}: {order.total}$</h3>
+              <h3 className="text-base lg:text-lg italic font-bold">{t('total')}: {order.total}{order.currency}</h3>
             </div>
           </div>
           <div className='lg:col-span-1'>

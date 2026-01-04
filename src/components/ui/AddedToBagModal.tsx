@@ -31,6 +31,7 @@ export default function AddedToBagModal({
   isMaxQuantityExceeded = false,
 }: AddedToBagModalProps) {
   const t = useTranslations('AddedToBag')
+  const tCommon = useTranslations('Common')
 
   // Auto-dismiss after 3 seconds
   useEffect(() => {
@@ -138,7 +139,7 @@ export default function AddedToBagModal({
                         <p className="text-sm">{productSubtitle}</p>
                         <p className="text-sm">{volumeDisplay}</p>
                       </div>
-                      <p className="text-lg font-semibold">{price}$</p>
+                      <p className="text-lg font-semibold">{price}{tCommon('currency')}</p>
                     </div>
                   </div>
                 )}

@@ -28,6 +28,7 @@ export default async function HomePage({ params }: HomePageProps) {
   const fallbackDbLocale = localeToDbLocale['us'];
   const t = await getTranslations({ locale, namespace: 'HomePage' });
   const tGM = await getTranslations({ locale, namespace: 'GreekMythology' });
+  const tCommon = await getTranslations({ locale, namespace: 'Common' });
 
   // Product slugs in the order: Cassandre, Narcisse, Icarus, Antigone
   const productSlugs = ['cassandre', 'narcisse', 'icare', 'antigone'];
@@ -302,13 +303,13 @@ export default async function HomePage({ params }: HomePageProps) {
                       className="object-cover"
                     />
                   </div>
+                  <h3 className="font-bold text-base mb-1">{character.title}</h3>
+                  <p className="content-start text-xs px-2 h-12 italic mb-2 line-clamp-3">
+                    {character.quote}
+                  </p>
                 </Link>
-                <h3 className="font-bold text-base mb-1">{character.title}</h3>
-                <p className="content-start text-xs px-2 h-12 italic mb-2 line-clamp-3">
-                  {character.quote}
-                </p>
                 {character.price && character.volume && (
-                  <p className="text-xs mb-3">{character.volume} · {character.price} $</p>
+                  <p className="text-xs mb-3">{character.volume} · {character.price} {tCommon('currency')}</p>
                 )}
                 <AddToBagButton
                   productId={character.id}
@@ -339,7 +340,7 @@ export default async function HomePage({ params }: HomePageProps) {
                   </p>
                 </Link>
                 {character.price && character.volume && (
-                  <p className="text-sm mb-4">{character.volume} · {character.price} $</p>
+                  <p className="text-sm mb-4">{character.volume} · {character.price} {tCommon('currency')}</p>
                 )}
                 <AddToBagButton
                   productId={character.id}

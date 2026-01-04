@@ -1,5 +1,6 @@
 'use client'
 import { useTranslations } from 'next-intl'
+import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
 import type { ShoppingBagItemDetails } from '@/app/actions/shoppingBag'
 
@@ -35,6 +36,9 @@ export default function ShoppingBagModal({
   onSampleChange,
 }: ShoppingBagModalProps) {
   const t = useTranslations('ShoppingBag')
+  const tCommon = useTranslations('Common')
+  const router = useRouter()
+  const params = useParams()
 
   if (!isOpen) return null
 
@@ -48,6 +52,11 @@ export default function ShoppingBagModal({
 
   const handleClose = () => {
     onClose()
+  }
+
+  const handleCheckout = () => {
+    onClose()
+    router.push(`/${params.locale}/checkout`)
   }
 
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
@@ -182,7 +191,7 @@ export default function ShoppingBagModal({
                             </div>
 
                             {/* Price */}
-                            <p className="text-xl font-semibold">{item.price}$</p>
+                            <p className="text-xl font-semibold">{item.price}{tCommon('currency')}</p>
                           </div>
                         </div>
                       </div>
@@ -226,17 +235,18 @@ export default function ShoppingBagModal({
                 <div className="space-y-4 mb-8">
                   <div className="flex justify-between text-base">
                     <span>{t('subtotal')}</span>
-                    <span className="">{subtotal}$</span>
+                    <span className="">{subtotal}{tCommon('currency')}</span>
                   </div>
                   <div className="flex justify-between text-base italic">
                     <span className='font-title'>TOTAL</span>
-                    <span className="font-semibold">{total}$</span>
+                    <span className="font-semibold">{total}{tCommon('currency')}</span>
                   </div>
                 </div>
               </div>
 
               <div className='px-8'>
                 <button
+                  onClick={handleCheckout}
                   disabled={!hasItems}
                   className={`w-full py-4 px-6 transition-colors text-base font-medium ${
                     hasItems
@@ -330,7 +340,7 @@ export default function ShoppingBagModal({
                             </div>
 
                             {/* Price */}
-                            <p className="text-base font-semibold">{item.price}$</p>
+                            <p className="text-base font-semibold">{item.price}{tCommon('currency')}</p>
                           </div>
 
                         </div>
@@ -375,19 +385,20 @@ export default function ShoppingBagModal({
                   <div className="space-y-3 mb-6">
                     <div className="flex justify-between text-base">
                       <span>{t('subtotal')}</span>
-                      <span className="">{subtotal}$</span>
+                      <span className="">{subtotal}{tCommon('currency')}</span>
                     </div>
                     <div className="flex justify-between text-base italic">
                       <span className="font-title">TOTAL</span>
-                      <span className="font-semibold">{total}$</span>
+                      <span className="font-semibold">{total}{tCommon('currency')}</span>
                     </div>
                   </div>
                 </>
               )}
-              <div className='px-8'>
+              <div className='flex content-center mb-4'>
                 <button
+                  onClick={handleCheckout}
                   disabled={!hasItems}
-                  className={`w-full py-4 px-6 transition-colors text-base font-medium ${
+                  className={`w-70 mx-auto py-4 px-6 transition-colors text-base font-medium ${
                     hasItems
                       ? 'bg-gray-700 hover:bg-gray-900 cursor-pointer text-white'
                       : 'bg-white border border-gray-700 text-gray-700 cursor-not-allowed'

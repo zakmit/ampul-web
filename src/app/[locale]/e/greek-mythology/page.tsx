@@ -59,6 +59,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   const fallbackDbLocale = localeToDbLocale['us'];
   const t = await getTranslations({ locale, namespace: 'GreekMythology' });
   const tBreadcrumb = await getTranslations({ locale, namespace: 'Breadcrumb' });
+  const tCommon = await getTranslations({ locale, namespace: 'Common' });
 
   // Product slugs for Greek Mythology collection
   const productSlugs = ['antigone', 'narcisse', 'icare', 'cassandre'];
@@ -181,11 +182,11 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           priority
         />
       </div>
-      <div className="lg:hidden w-full h-40 inset-0 flex flex-col text-center px-6">
+      <div className="lg:hidden w-full inset-0 flex flex-col text-center px-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2 mt-4">
             {collectionData.title}
           </h1>
-          <p className="text-sm italic text-gray-700 mx-6">
+          <p className="text-sm italic text-gray-700 mx-6 mb-6">
             {collectionData.description}
           </p>
       </div>
@@ -235,13 +236,13 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                       <p className="italic text-sm mb-4 text-balance">{item.description}</p>
                       <p className="italic font-light text-xs text-right mb-3">{item.sideNote}</p>
                       {item.price && item.volume && (
-                        <p className="text-xs text-center mb-3">{item.volume} · {item.price} $</p>
+                        <p className="text-xs text-center mb-3">{item.volume} · {item.price} {tCommon('currency')}</p>
                       )}
                       <div className="flex flex-col gap-2 px-2 mx-auto max-w-60">
                         {(item.productSlug || item.relatedLink) && (
                           <Link
                             href={item.productSlug ? `/${locale}/p/${item.productSlug}` : item.relatedLink!}
-                            className="inline-block border border-gray-900  hover:bg-gray-800 hover:text-gray-100 px-4 py-1.5 text-xs transition-colors text-center"
+                            className="inline-block border border-gray-900  hover:bg-gray-700 hover:text-gray-100 px-4 py-1.5 text-xs transition-colors text-center"
                           >
                             {t('checkDetail')}
                           </Link>
@@ -251,7 +252,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                             productId={item.productId}
                             volumeId={item.volumeId}
                             label={t('addToBag')}
-                            className="bg-gray-500 text-gray-100 px-4 py-1.5 text-xs hover:bg-gray-800 transition-colors"
+                            className="bg-gray-700 text-gray-100 px-4 py-1.5 text-xs hover:bg-gray-900 transition-colors"
                           />
                         )}
                       </div>
@@ -267,13 +268,13 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                       <p className="italic text-sm mb-4 text-balance">{item.description}</p>
                       <p className="italic font-light text-xs text-right mb-3">{item.sideNote}</p>
                       {item.price && item.volume && (
-                        <p className="text-xs text-center mb-3">{item.volume} · {item.price} $</p>
+                        <p className="text-xs text-center mb-3">{item.volume} · {item.price} {tCommon('currency')}</p>
                       )}
                       <div className="flex flex-col gap-2 px-2 mx-auto max-w-60">
                         {(item.productSlug || item.relatedLink) && (
                           <Link
                             href={item.productSlug ? `/${locale}/p/${item.productSlug}` : item.relatedLink!}
-                            className="inline-block border border-gray-900  hover:bg-gray-800 hover:text-gray-100 px-4 py-1.5 text-xs transition-colors text-center"
+                            className="inline-block border border-gray-900  hover:bg-gray-700 hover:text-gray-100 px-4 py-1.5 text-xs transition-colors text-center"
                           >
                             {t('checkDetail')}
                           </Link>
@@ -283,7 +284,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                             productId={item.productId}
                             volumeId={item.volumeId}
                             label={t('addToBag')}
-                            className="bg-gray-500 text-gray-100 px-4 py-1.5 text-xs hover:bg-gray-800 transition-colors"
+                            className="bg-gray-700 text-gray-100 px-4 py-1.5 text-xs hover:bg-gray-900 transition-colors"
                           />
                         )}
                       </div>
@@ -323,7 +324,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                 <p className="italic text-xl mb-4 leading-relaxed">{item.description}</p>
                 <p className="italic font-light text-sm mb-6">{item.sideNote}</p>
                 {item.price && item.volume && (
-                  <p className="text-sm text-center mb-6">{item.volume} · {item.price} $</p>
+                  <p className="text-sm text-center mb-6">{item.volume} · {item.price} {tCommon('currency')}</p>
                 )}
                 <div className="flex flex-col gap-3">
                   {(item.productSlug || item.relatedLink) && (
@@ -364,10 +365,10 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
             {relatedSectionTitle}
           </h2>
 
-          {/* Mobile: 2-column grid */}
-          <div className="grid grid-cols-2 gap-4 lg:hidden text-center">
+          {/* Mobile: horizontal scroll */}
+          <div className="flex gap-4 overflow-x-auto lg:hidden text-center pb-4 -mx-4 px-4">
             {collectionData.relatedProducts.map((product) => (
-              <div key={product.slug} className="flex flex-col">
+              <div key={product.slug} className="flex flex-col shrink-0 w-[calc(50vw-24px)]">
                 <Link href={`/${locale}/p/${product.slug}`} className="block">
                   <div className="aspect-square relative mb-3">
                     <Image
@@ -377,12 +378,13 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                       className="object-cover"
                     />
                   </div>
+
+                  <h3 className="font-bold text-base mb-1">{product.title}</h3>
+                  <p className="content-start text-xs px-2 h-12 italic mb-2 line-clamp-3">
+                    {product.description}
+                  </p>
                 </Link>
-                <h3 className="font-bold text-base mb-1">{product.title}</h3>
-                <p className="content-center text-xs px-2 h-12 italic mb-2 line-clamp-3 ">
-                  {product.description}
-                </p>
-                <p className="text-xs mb-3">{product.volume} · {product.price} $</p>
+                <p className="text-xs mb-3">{product.volume} · {product.price} {tCommon('currency')}</p>
                 <AddToBagButton
                   productId={product.id}
                   volumeId={product.volumeId}
@@ -412,7 +414,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                 </p>
                 </Link>
 
-                <p className="text-sm mb-4">{product.volume} · {product.price} $</p>
+                <p className="text-sm mb-4">{product.volume} · {product.price} {tCommon('currency')}</p>
                 <AddToBagButton
                   productId={product.id}
                   volumeId={product.volumeId}

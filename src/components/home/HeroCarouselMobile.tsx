@@ -49,43 +49,40 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
 
   return (
     <div className="relative w-full border-b border-gray-900">
-      {/* Image Section */}
-      <div className="relative w-dvw h-[56.25dvw]">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="absolute inset-0"
-          >
-            <Image
-              src={slides[currentSlide].image}
-              alt={slides[currentSlide].alt}
-              fill
-              className="object-cover object-center"
-              priority={currentSlide === 0}
-            />
-          </motion.div>
-        </AnimatePresence>
-      </div>
+      {slides[currentSlide].link ? (
+        <Link href={slides[currentSlide].link!} className="block ">
+          {/* Image Section */}
+          <div className="relative w-dvw h-[56.25dvw]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={slides[currentSlide].image}
+                  alt={slides[currentSlide].alt}
+                  fill
+                  className="object-cover object-center"
+                  priority={currentSlide === 0}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
-      {/* Text Content Section */}
-      <div className="bg-white px-6 pt-4 pb-2 relative">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
-            className="text-center"
-          >
-            {slides[currentSlide].link ? (
-              <Link
-                href={slides[currentSlide].link!}
-                className={"block text-gray-900"}
+          {/* Text Content Section */}
+          <div className="bg-white px-6 pt-4 pb-6 h-37">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="text-center text-gray-900"
               >
                 {slides[currentSlide].title && (
                   <h1 className="text-xl font-bold mb-2 mx-4">
@@ -97,9 +94,45 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
                     {slides[currentSlide].description}
                   </p>
                 )}
-              </Link>
-            ) : (
-              <div className='text-gray-900'>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </Link>
+      ) : (
+        <>
+          {/* Image Section */}
+          <div className="relative w-dvw h-[56.25dvw]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={slides[currentSlide].image}
+                  alt={slides[currentSlide].alt}
+                  fill
+                  className="object-cover object-center"
+                  priority={currentSlide === 0}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Text Content Section */}
+          <div className="bg-white px-6 pt-4 pb-2">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="text-center text-gray-900"
+              >
                 {slides[currentSlide].title && (
                   <h1 className="text-xl font-bold mb-2 mx-4">
                     {slides[currentSlide].title}
@@ -110,28 +143,30 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
                     {slides[currentSlide].description}
                   </p>
                 )}
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </>
+      )}
 
-        {/* Navigation Arrows - Integrated into text area */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-full  hover:bg-gray-100/60  transition-all"
-          aria-label="Previous slide"
-        >
-          <ChevronLeft strokeWidth="1" className="w-8 h-8 mx-auto text-gray-900" />
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-full  hover:bg-gray-100/60  transition-all"
-          aria-label="Next slide"
-        >
-          <ChevronRight strokeWidth="1.5" className="w-8 h-8 mx-auto text-gray-900" />
-        </button>
+      {/* Navigation Arrows - Centered in text section */}
+      <button
+        onClick={prevSlide}
+        className="absolute left-0 bottom-0 top-[56.25dvw] translate-y-15 flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100/60 transition-all z-10"
+        aria-label="Previous slide"
+      >
+        <ChevronLeft strokeWidth="1" className="w-8 h-8 mx-auto text-gray-900" />
+      </button>
+      <button
+        onClick={nextSlide}
+        className="absolute right-0 bottom-0 top-[56.25dvw] translate-y-15 flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100/60 transition-all z-10"
+        aria-label="Next slide"
+      >
+        <ChevronRight strokeWidth="1.5" className="w-8 h-8 mx-auto text-gray-900" />
+      </button>
 
-        {/* Dots Indicator */}
+      {/* Dots Indicator - At the bottom */}
+      <div className="absolute bottom-0 left-0 right-0 pb-2">
         <div className="flex gap-2 justify-center mt-6">
           {slides.map((_, index) => (
             <button

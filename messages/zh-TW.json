@@ -1,4 +1,7 @@
 {
+  "Common": {
+    "currency": "NT$"
+  },
   "HomePage": {
     "heroTitle": "探索希臘神話系列",
     "heroDescription": "融化的蠟滴沉入大海中、黑煙自燃燒中的特洛伊飄出、水仙花香倒影在湖面、不得安息的鐵鏽味遊蕩在荒野中",
@@ -114,6 +117,7 @@
     "tracking": "追蹤號碼",
     "trackingNotAvailable": "處理中",
     "cancelOrder": "取消訂單",
+    "freeSample": "免費樣品",
     "status": {
       "PENDING": "待處理",
       "PAID": "已付款",
@@ -126,7 +130,8 @@
   },
   "UserLayout": {
     "myInformation": "我的資料",
-    "myOrders": "我的訂單"
+    "myOrders": "我的訂單",
+    "signInPrompt": "登入以查看您的資料"
   },
   "ProfilePage": {
     "fields": {
@@ -143,7 +148,7 @@
       "country": "國家"
     },
     "placeholders": {
-      "name": "請輸入您的全名",
+      "name": "請輸入全名",
       "birthday": "年/月/日",
       "phone": "請輸入電話號碼",
       "addressLine1": "街道地址、大樓名稱、樓層",
@@ -151,7 +156,7 @@
       "city": "鄉鎮市區",
       "region": "縣市",
       "postalCode": "郵遞區號",
-      "country": "國家名稱"
+      "country": "國家"
     },
     "errors": {
       "nameRequired": "姓名為必填欄位",
@@ -182,7 +187,7 @@
       "antigone": "塵土與鐵鏽、沒藥、沉香",
       "narcisse": "水仙、蘆葦、懸鈴木",
       "icare": "海藻與鹽、丁香與琥珀、融化的蠟",
-      "cassandre": "花香、月桂與乳香、燻木與皮革"
+      "cassandre": "花香、月桂與沉香、燻木與皮革"
     }
   },
   "SignInModal": {
@@ -204,5 +209,41 @@
     "title": "已加入購物袋",
     "maxQuantityTitle": "超過最大數量",
     "maxQuantityMessage": "同一商品最多只能加入10件至您的訂單。"
+  },
+  "Checkout": {
+    "title": "結帳",
+    "loading": "載入中...",
+    "step1": "1. 登入",
+    "step2": "2. 配送地址",
+    "step3": "3. 確認訂單與付款",
+    "useProfileAddress": "使用我的資料中的地址",
+    "recipientName": "收件人姓名",
+    "phoneNumber": "電話號碼",
+    "address": "地址",
+    "next": "下一步",
+    "back": "返回",
+    "placeOrder": "送出訂單",
+    "processing": "處理中...",
+    "freeSample": "免費樣品",
+    "noSample": "無",
+    "subtotal": "小計",
+    "shipTo": "收件地址",
+    "payment": "付款方式",
+    "demoNotice": "*僅供展示",
+    "errors": {
+      "recipientNameRequired": "收件人姓名為必填欄位",
+      "addressLine1Required": "街道地址為必填欄位",
+      "cityRequired": "城市為必填欄位",
+      "postalCodeRequired": "郵遞區號為必填欄位",
+      "countryRequired": "國家為必填欄位",
+      "addressValidation": "請檢查您的配送地址並修正錯誤。",
+      "emptyBag": "您的購物袋是空的"
+    }
+  },
+  "CheckoutSuccess": {
+    "title": "訂單已成功送出",
+    "orderNumber": "訂單編號",
+    "viewOrders": "查看我的訂單",
+    "signInPrompt": "登入以查看您的訂單"
   }
 }

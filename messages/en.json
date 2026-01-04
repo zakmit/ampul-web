@@ -1,4 +1,7 @@
 {
+  "Common": {
+    "currency": "$"
+  },
   "HomePage": {
     "heroTitle": "Explore the Greek Mythology Collection",
     "heroDescription": "Melted wax sinking into the sea, billowing smoke rising from burning Troy, narcissus blooms on an ethereal reflection, the faded scent of rust lingers in the barren land.",
@@ -114,6 +117,7 @@
     "tracking": "TRACKING",
     "trackingNotAvailable": "Processing",
     "cancelOrder": "Cancel the order",
+    "freeSample": "Free Sample",
     "status": {
       "PENDING": "PENDING",
       "PAID": "PAID",
@@ -126,7 +130,8 @@
   },
   "UserLayout": {
     "myInformation": "MY INFORMATION",
-    "myOrders": "MY ORDERS"
+    "myOrders": "MY ORDERS",
+    "signInPrompt": "Sign in to view your information"
   },
   "ProfilePage": {
     "fields": {
@@ -143,15 +148,15 @@
       "country": "Country"
     },
     "placeholders": {
-      "name": "Enter your full name",
+      "name": "Enter full name",
       "birthday": "MM/DD/YYYY",
       "phone": "Enter phone number",
       "addressLine1": "Street address, building name, floor",
       "addressLine2": "Apartment, suite, unit number (optional)",
-      "city": "City name",
+      "city": "City",
       "region": "State or region (optional)",
       "postalCode": "Postal / ZIP code",
-      "country": "Country name"
+      "country": "Country"
     },
     "errors": {
       "nameRequired": "Name is required",
@@ -204,5 +209,41 @@
     "title": "ADDED TO BAG",
     "maxQuantityTitle": "Maximum Quantity Exceeded",
     "maxQuantityMessage": "You cannot add more than 10 of the same item to your order."
+  },
+  "Checkout": {
+    "title": "Checkout",
+    "loading": "Loading...",
+    "step1": "1. LOG IN",
+    "step2": "2. SHIPPING ADDRESS",
+    "step3": "3. REVIEW & PAYMENT",
+    "useProfileAddress": "Use the address in my information",
+    "recipientName": "Recipient Name",
+    "phoneNumber": "Phone Number",
+    "address": "Address",
+    "next": "NEXT",
+    "back": "Back",
+    "placeOrder": "PLACE MY ORDER",
+    "processing": "Processing...",
+    "freeSample": "Free Sample",
+    "noSample": "None",
+    "subtotal": "Subtotal",
+    "shipTo": "SHIP TO",
+    "payment": "PAYMENT",
+    "demoNotice": "*for demo purpose",
+    "errors": {
+      "recipientNameRequired": "Recipient name is required",
+      "addressLine1Required": "Street address is required",
+      "cityRequired": "City is required",
+      "postalCodeRequired": "Postal code is required",
+      "countryRequired": "Country is required",
+      "addressValidation": "Please check your shipping address and fix any errors.",
+      "emptyBag": "Your shopping bag is empty"
+    }
+  },
+  "CheckoutSuccess": {
+    "title": "Order Placed Successfully",
+    "orderNumber": "Order Number",
+    "viewOrders": "View My Orders",
+    "signInPrompt": "Sign in to view your order"
   }
 }

@@ -25,6 +25,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const t = useTranslations('ProductDetail');
+  const tCommon = useTranslations('Common');
   const locale = useLocale();
 
   return (
@@ -51,7 +52,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <div className="mt-auto mx-6 lg:mx-0 lg:grid lg:grid-cols-2">
           <div className="flex items-center justify-center mb-3 lg:my-auto">
-            <span className="text-sm text-gray-900">{product.volume} · {product.price} $</span>
+            <span className="text-sm text-gray-900">{product.volume} · {product.price} {tCommon('currency')}</span>
           </div>
 
           <AddToBagButton

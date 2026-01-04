@@ -49,42 +49,39 @@ export default function HeroCarousel({ slides, autoPlayInterval = 10000 }: HeroC
 
   return (
     <div className="relative w-full h-full">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentSlide}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-          className="absolute inset-0"
-        >
-          <Image
-            src={slides[currentSlide].image}
-            alt={slides[currentSlide].alt}
-            fill
-            className="object-cover object-center"
-            priority={currentSlide === 0}
-          />
-        </motion.div>
-      </AnimatePresence>
+      {slides[currentSlide].link ? (
+        <Link href={slides[currentSlide].link!} className="block absolute inset-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={slides[currentSlide].image}
+                alt={slides[currentSlide].alt}
+                fill
+                className="object-cover object-center"
+                priority={currentSlide === 0}
+              />
+            </motion.div>
+          </AnimatePresence>
 
-      {/* Text Content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-end text-center px-6 pointer-events-none">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide}
-            className="mb-8 items-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
-          >
-            {slides[currentSlide].link ? (
-              <Link
-                href={slides[currentSlide].link!}
-                className={`block pointer-events-auto ${
+          {/* Text Content */}
+          <div className="absolute inset-0 flex flex-col items-center justify-end text-center px-6">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                className={`mb-8 items-center ${
                   slides[currentSlide].textColor === 'light' ? 'text-gray-100' : 'text-gray-900'
                 }`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
               >
                 {slides[currentSlide].title && (
                   <h1 className="text-5xl font-bold mb-4">
@@ -96,9 +93,44 @@ export default function HeroCarousel({ slides, autoPlayInterval = 10000 }: HeroC
                     {slides[currentSlide].description}
                   </p>
                 )}
-              </Link>
-            ) : (
-              <div className={slides[currentSlide].textColor === 'light' ? 'text-gray-100' : 'text-gray-900'}>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </Link>
+      ) : (
+        <>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={slides[currentSlide].image}
+                alt={slides[currentSlide].alt}
+                fill
+                className="object-cover object-center"
+                priority={currentSlide === 0}
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Text Content */}
+          <div className="absolute inset-0 flex flex-col items-center justify-end text-center px-6 pointer-events-none">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                className={`mb-8 items-center ${
+                  slides[currentSlide].textColor === 'light' ? 'text-gray-100' : 'text-gray-900'
+                }`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+              >
                 {slides[currentSlide].title && (
                   <h1 className="text-5xl font-bold mb-4">
                     {slides[currentSlide].title}
@@ -109,11 +141,11 @@ export default function HeroCarousel({ slides, autoPlayInterval = 10000 }: HeroC
                     {slides[currentSlide].description}
                   </p>
                 )}
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </>
+      )}
 
       {/* Navigation Arrows */}
       <button

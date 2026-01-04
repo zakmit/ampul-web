@@ -111,25 +111,26 @@ export async function getProductBySlug(slug: string, locale: Locale = 'us'): Pro
     const fallbackCollectionTranslation = product.collection.translations.find(t => t.locale === fallbackDbLocale)
 
     // Transform volumes data
-    const volumes = product.volumes
-      .filter(pv => pv.locale === dbLocale || pv.locale === fallbackDbLocale)
-      .map(pv => {
-        const volumeTranslation = pv.volume.translations.find(t => t.locale === dbLocale)
-          || pv.volume.translations.find(t => t.locale === fallbackDbLocale)
-          || pv.volume.translations[0]
+    // First, get volumes for current locale, then fallback to en-US if needed
+    const currentLocaleVolumes = product.volumes.filter(pv => pv.locale === dbLocale)
+    const fallbackLocaleVolumes = product.volumes.filter(pv => pv.locale === fallbackDbLocale)
 
-        return {
-          volumeId: pv.volumeId,
-          value: pv.volume.value,
-          displayName: volumeTranslation?.displayName || pv.volume.value,
-          price: Number(pv.price),
-          stock: pv.stock,
-        }
-      })
-      // Remove duplicates by volumeId (prefer current locale)
-      .filter((volume, index, self) =>
-        index === self.findIndex(v => v.volumeId === volume.volumeId)
-      )
+    // Combine with current locale taking priority
+    const volumesToUse = currentLocaleVolumes.length > 0 ? currentLocaleVolumes : fallbackLocaleVolumes
+
+    const volumes = volumesToUse.map(pv => {
+      const volumeTranslation = pv.volume.translations.find(t => t.locale === dbLocale)
+        || pv.volume.translations.find(t => t.locale === fallbackDbLocale)
+        || pv.volume.translations[0]
+
+      return {
+        volumeId: pv.volumeId,
+        value: pv.volume.value,
+        displayName: volumeTranslation?.displayName || pv.volume.value,
+        price: Number(pv.price),
+        stock: pv.stock,
+      }
+    })
 
     // Transform tags with field-level fallback
     const tags = product.tags.map(pt => {
@@ -206,8 +207,9 @@ export async function getCollectionProducts(collectionId: number, currentProduct
       const currentTranslation = product.translations.find(t => t.locale === dbLocale)
       const fallbackTranslation = product.translations.find(t => t.locale === fallbackDbLocale)
 
-      // Get first available volume for price and display
-      const firstVolume = product.volumes.find(pv => pv.locale === dbLocale || pv.locale === fallbackDbLocale)
+      // Get first volume for current locale, fallback to en-US if not found
+      const firstVolume = product.volumes.find(pv => pv.locale === dbLocale)
+        || product.volumes.find(pv => pv.locale === fallbackDbLocale)
 
       return {
         id: product.id,
