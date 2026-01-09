@@ -6,16 +6,17 @@ import Pagination from '@/components/ui/Pagination'
 const ORDERS_PER_PAGE = 10
 
 interface OrdersPageProps {
-  params: {
+  params: Promise<{
     locale: string
-  }
-  searchParams: {
+  }>
+  searchParams: Promise<{
     page?: string
-  }
+  }>
 }
 
 export default async function OrdersPage({ params, searchParams }: OrdersPageProps) {
-  const { locale } = params
+  const { locale } = await params
+  const searchParamsData = await searchParams
   const session = await auth()
 
   // Authentication is handled by the layout, so session will always exist here
@@ -25,7 +26,7 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
 
   const userEmail = session.user.email
 
-  const currentPage = parseInt(searchParams.page || '1', 10)
+  const currentPage = parseInt(searchParamsData.page || '1', 10)
   const skip = (currentPage - 1) * ORDERS_PER_PAGE
 
   // Get total count for pagination

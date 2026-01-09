@@ -124,7 +124,9 @@
       "PROCESSING": "處理中",
       "SHIPPED": "已出貨",
       "DELIVERED": "已送達",
+      "CANCELLING": "取消中",
       "CANCELLED": "已取消",
+      "REQUESTED": "已申請",
       "REFUNDED": "已退款"
     }
   },

@@ -280,6 +280,12 @@ export async function createOrder(
       },
     })
 
+    // Update user's lastOrderAt timestamp
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastOrderAt: new Date() }
+    })
+
     return { success: true, orderId: order.id, orderNumber: order.orderNumber }
   } catch (error) {
     console.error('Error creating order:', error)

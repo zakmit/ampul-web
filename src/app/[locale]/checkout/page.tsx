@@ -219,7 +219,7 @@ export default function CheckoutPage() {
   return (
     <div className="lg:flex lg:justify-center">
       {/* Desktop Layout: 7:3 Grid */}
-      <div className="hidden lg:grid lg:grid-cols-10 max-w-400">
+      <div className="hidden lg:grid lg:grid-cols-10 w-full max-w-400">
         {/* Left Section - Checkout Form (70%) */}
         <div className="col-span-7 px-8 py-12">
           <h1 className="text-4xl font-bold font-title mb-12">{t('title')}</h1>
@@ -471,24 +471,45 @@ export default function CheckoutPage() {
                         <div className="text-sm space-y-0.5">
                           <p>{address.recipientName}</p>
                           {address.recipientPhone && <p>{address.recipientPhone}</p>}
-                          <p>{address.addressLine1}</p>
-                          {address.addressLine2 && <p>{address.addressLine2}</p>}
-                          {locale === 'tw' ? (
-                            <>
-                              <p>
-                                {address.postalCode} {address.region && `${address.region} `} {address.city}
-                              </p>
-                              <p>{address.country}</p>
-                            </>
-                          ) : (
-                            <>
-                              <p>
-                                {address.city}
-                                {address.region && `, ${address.region}`} {address.postalCode}
-                              </p>
-                              <p>{address.country}</p>
-                            </>
-                          )}
+                          {(() => {
+                            switch (locale) {
+                              case 'tw':
+                                return (
+                                  <>
+                                    <p>
+                                      {address.postalCode} {address.region && `${address.region} `} {address.city}
+                                    </p>
+                                    <p>{address.addressLine1}</p>
+                                    {address.addressLine2 && <p>{address.addressLine2}</p>}
+                                    <p>{address.country}</p>
+                                  </>
+                                )
+                              case 'fr':
+                                return (
+                                  <>
+                                    <p>{address.addressLine1}</p>
+                                    {address.addressLine2 && <p>{address.addressLine2}</p>}
+                                    <p>
+                                      {address.postalCode} {address.city}
+                                    </p>
+                                    {address.region && <p>{address.region}</p>}
+                                    <p>{address.country}</p>
+                                  </>
+                                )
+                              default:
+                                return (
+                                  <>
+                                    <p>{address.addressLine1}</p>
+                                    {address.addressLine2 && <p>{address.addressLine2}</p>}
+                                    <p>
+                                      {address.city}
+                                      {address.region && `, ${address.region}`} {address.postalCode}
+                                    </p>
+                                    <p>{address.country}</p>
+                                  </>
+                                )
+                            }
+                          })()}
                         </div>
                       </div>
 
@@ -840,24 +861,45 @@ export default function CheckoutPage() {
                     <div className="text-sm space-y-0.5">
                       <p>{address.recipientName}</p>
                       {address.recipientPhone && <p>{address.recipientPhone}</p>}
-                      <p>{address.addressLine1}</p>
-                      {address.addressLine2 && <p>{address.addressLine2}</p>}
-                        {locale === 'tw' ? (
-                          <>
-                            <p>
-                              {address.postalCode} {address.region && `${address.region} `} {address.city}
-                            </p>
-                            <p>{address.country}</p>
-                          </>
-                        ) : (
-                        <>
-                          <p>
-                            {address.city}
-                            {address.region && `, ${address.region}`} {address.postalCode}
-                          </p>
-                          <p>{address.country}</p>
-                        </>
-                      )}
+                      {(() => {
+                        switch (locale) {
+                          case 'tw':
+                            return (
+                              <>
+                                <p>
+                                  {address.postalCode} {address.region && `${address.region} `} {address.city}
+                                </p>
+                                <p>{address.addressLine1}</p>
+                                {address.addressLine2 && <p>{address.addressLine2}</p>}
+                                <p>{address.country}</p>
+                              </>
+                            )
+                          case 'fr':
+                            return (
+                              <>
+                                <p>{address.addressLine1}</p>
+                                {address.addressLine2 && <p>{address.addressLine2}</p>}
+                                <p>
+                                  {address.postalCode} {address.city}
+                                </p>
+                                {address.region && <p>{address.region}</p>}
+                                <p>{address.country}</p>
+                              </>
+                            )
+                          default:
+                            return (
+                              <>
+                                <p>{address.addressLine1}</p>
+                                {address.addressLine2 && <p>{address.addressLine2}</p>}
+                                <p>
+                                  {address.city}
+                                  {address.region && `, ${address.region}`} {address.postalCode}
+                                </p>
+                                <p>{address.country}</p>
+                              </>
+                            )
+                        }
+                      })()}
                     </div>
                   </div>
 

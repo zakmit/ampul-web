@@ -6,16 +6,17 @@ import OrderCard from '@/components/ui/OrderCard'
 import SignInForm from '@/components/ui/SignInForm'
 
 interface SuccessPageProps {
-  params: {
+  params: Promise<{
     locale: string
-  }
-  searchParams: {
+  }>
+  searchParams: Promise<{
     orderId?: string
-  }
+  }>
 }
 
 export default async function CheckoutSuccessPage({ params, searchParams }: SuccessPageProps) {
-  const { locale } = params
+  const { locale } = await params
+  const searchParamsData = await searchParams
   const session = await auth()
   const t = await getTranslations({ locale, namespace: 'CheckoutSuccess' })
 
@@ -32,13 +33,13 @@ export default async function CheckoutSuccessPage({ params, searchParams }: Succ
     )
   }
 
-  if (!searchParams.orderId) {
+  if (!searchParamsData.orderId) {
     redirect(`/${locale}/checkout`)
   }
 
   const order = await prisma.order.findUnique({
     where: {
-      id: searchParams.orderId,
+      id: searchParamsData.orderId,
     },
     include: {
       items: true,

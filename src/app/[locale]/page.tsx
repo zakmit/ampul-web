@@ -128,7 +128,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <HeroCarouselMobile slides={heroSlides} />
       </section>
       {/* Desktop */}
-      <section className="hidden lg:block relative lg:w-dvw lg:h-[56.25dvw]">
+      <section className="hidden lg:block relative lg:w-dvw lg:h-[42.86dvw] max-w-400 max-h-171.5">
         <HeroCarousel slides={heroSlides} />
       </section>
 
@@ -293,7 +293,7 @@ export default async function HomePage({ params }: HomePageProps) {
           {/* Mobile: horizontal scroll */}
           <div className="flex gap-4 overflow-x-auto lg:hidden text-center pb-4 -mx-4 px-4">
             {characters.map((character) => (
-              <div key={character.slug} className="flex flex-col shrink-0 w-[calc(50vw-24px)]">
+              <div key={character.slug} className="flex flex-col shrink-0 w-[calc(50vw-24px)] max-w-60">
                 <Link href={`/${locale}/p/${character.slug}`} className="block">
                   <div className="aspect-square relative mb-3">
                     <Image
@@ -315,7 +315,7 @@ export default async function HomePage({ params }: HomePageProps) {
                   productId={character.id}
                   volumeId={character.volumeId}
                   label={tGM('addToBag')}
-                  className="bg-gray-700 text-white px-4 py-2 mx-8 text-xs hover:bg-gray-900 transition-colors"
+                  className="bg-gray-700 text-white py-2 mx-6 text-xs hover:bg-gray-900 transition-colors"
                 />
               </div>
             ))}

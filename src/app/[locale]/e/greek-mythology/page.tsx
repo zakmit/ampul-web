@@ -230,7 +230,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                     />
                   </div>
                   {/* Content second (right) */}
-                  <div className="relative w-full h-full flex items-center justify-center px-8">
+                  <div className="relative w-full h-full flex items-center justify-center px-6">
                     <div className="text-left">
                       <h2 className="text-xl font-bold mb-2">{item.title}</h2>
                       <p className="italic text-sm mb-4 text-balance">{item.description}</p>
@@ -242,7 +242,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                         {(item.productSlug || item.relatedLink) && (
                           <Link
                             href={item.productSlug ? `/${locale}/p/${item.productSlug}` : item.relatedLink!}
-                            className="inline-block border border-gray-900  hover:bg-gray-700 hover:text-gray-100 px-4 py-1.5 text-xs transition-colors text-center"
+                            className="inline-block border border-gray-900  hover:bg-gray-700 hover:text-gray-100 py-1.5 text-xs transition-colors text-center"
                           >
                             {t('checkDetail')}
                           </Link>
@@ -252,7 +252,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                             productId={item.productId}
                             volumeId={item.volumeId}
                             label={t('addToBag')}
-                            className="bg-gray-700 text-gray-100 px-4 py-1.5 text-xs hover:bg-gray-900 transition-colors"
+                            className="bg-gray-700 text-gray-100 py-1.5 text-xs hover:bg-gray-900 transition-colors"
                           />
                         )}
                       </div>
@@ -274,7 +274,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                         {(item.productSlug || item.relatedLink) && (
                           <Link
                             href={item.productSlug ? `/${locale}/p/${item.productSlug}` : item.relatedLink!}
-                            className="inline-block border border-gray-900  hover:bg-gray-700 hover:text-gray-100 px-4 py-1.5 text-xs transition-colors text-center"
+                            className="inline-block border border-gray-900  hover:bg-gray-700 hover:text-gray-100 py-1.5 text-xs transition-colors text-center"
                           >
                             {t('checkDetail')}
                           </Link>
@@ -284,7 +284,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                             productId={item.productId}
                             volumeId={item.volumeId}
                             label={t('addToBag')}
-                            className="bg-gray-700 text-gray-100 px-4 py-1.5 text-xs hover:bg-gray-900 transition-colors"
+                            className="bg-gray-700 text-gray-100 py-1.5 text-xs hover:bg-gray-900 transition-colors"
                           />
                         )}
                       </div>
@@ -368,7 +368,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           {/* Mobile: horizontal scroll */}
           <div className="flex gap-4 overflow-x-auto lg:hidden text-center pb-4 -mx-4 px-4">
             {collectionData.relatedProducts.map((product) => (
-              <div key={product.slug} className="flex flex-col shrink-0 w-[calc(50vw-24px)]">
+              <div key={product.slug} className="flex flex-col shrink-0 w-[calc(50vw-24px)] max-w-60">
                 <Link href={`/${locale}/p/${product.slug}`} className="block">
                   <div className="aspect-square relative mb-3">
                     <Image
@@ -389,7 +389,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                   productId={product.id}
                   volumeId={product.volumeId}
                   label={t('addToBag')}
-                  className="bg-gray-700 text-white px-4 py-2 mx-8 text-xs hover:bg-gray-900 transition-colors"
+                  className="bg-gray-700 text-white py-2 mx-4 text-xs hover:bg-gray-900 transition-colors"
                 />
               </div>
             ))}

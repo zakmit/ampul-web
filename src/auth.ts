@@ -27,6 +27,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, user }) {
       const adminEmails = process.env.ADMIN_EMAILS?.split(',') || []
 
+      // Update lastLoginAt timestamp
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() }
+      })
+
       // Check if user should be admin and update if needed
       if (adminEmails.includes(user.email!) && user.role !== 'admin') {
         await prisma.user.update({

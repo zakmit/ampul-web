@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
+import type { Locale } from '@/i18n/config';
 
 type OrderItem = {
   id: string;
@@ -16,7 +18,7 @@ type OrderItem = {
   isFreeSample?: boolean;
 };
 
-type OrderStatus = 'PENDING' | 'PAID' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
+type OrderStatus = 'PENDING' | 'PAID' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLING' | 'CANCELLED' | 'REQUESTED' | 'REFUNDED';
 
 type Order = {
   id: string;
@@ -43,6 +45,8 @@ type OrderCardProps = {
 
 export default function OrderCard({ order }: OrderCardProps) {
   const t = useTranslations('OrderCard');
+  const params = useParams();
+  const locale = params.locale as Locale;
   const [isExpanded, setIsExpanded] = useState(false);
   const [formattedDate, setFormattedDate] = useState('');
 
@@ -152,12 +156,49 @@ export default function OrderCard({ order }: OrderCardProps) {
             <div className="grid grid-flow-col gap-8 mb-8 mx-2 lg:mr-0 lg:ml-4">
               <div>
                 <h4 className="text-base font-bold mb-2 italic">{t('shipTo')}</h4>
-                <p className="text-sm ml-2">{order.recipientName}</p>
-                {order.recipientPhone && <p className="text-sm ml-2">{order.recipientPhone}</p>}
-                <p className="text-sm ml-2">{order.shippingLine1}</p>
-                {order.shippingLine2 && <p className="text-sm ml-2">{order.shippingLine2}</p>}
-                <p className="text-sm ml-2">{order.shippingCity}{order.shippingRegion ? `, ${order.shippingRegion}` : ''} {order.shippingPostal}</p>
-                <p className="text-sm ml-2">{order.shippingCountry}</p>
+                <div className='text-sm ml-2'>
+                  <p>{order.recipientName}</p>
+                  {order.recipientPhone && <p>{order.recipientPhone}</p>}
+                  {(() => {
+                    switch (locale) {
+                      case 'tw':
+                        return (
+                          <>
+                            <p>
+                              {order.shippingPostal} {order.shippingRegion && `${order.shippingRegion} `} {order.shippingCity}
+                            </p>
+                            <p>{order.shippingLine1}</p>
+                            {order.shippingLine2 && <p>{order.shippingLine2}</p>}
+                            <p>{order.shippingCountry}</p>
+                          </>
+                        )
+                      case 'fr':
+                        return (
+                          <>
+                            <p>{order.shippingLine1}</p>
+                            {order.shippingLine2 && <p>{order.shippingLine2}</p>}
+                            <p>
+                              {order.shippingPostal} {order.shippingCity}
+                            </p>
+                            {order.shippingRegion && <p>{order.shippingRegion}</p>}
+                            <p>{order.shippingCountry}</p>
+                          </>
+                        )
+                      default:
+                        return (
+                          <>
+                            <p>{order.shippingLine1}</p>
+                            {order.shippingLine2 && <p>{order.shippingLine2}</p>}
+                            <p>
+                              {order.shippingCity}
+                              {order.shippingRegion && `, ${order.shippingRegion}`} {order.shippingPostal}
+                            </p>
+                            <p>{order.shippingCountry}</p>
+                          </>
+                        )
+                    }
+                  })()}
+                </div>
               </div>
               <div className="flex flex-col justify-between">
                 <div>

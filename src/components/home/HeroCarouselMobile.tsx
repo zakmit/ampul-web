@@ -74,7 +74,7 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
           </div>
 
           {/* Text Content Section */}
-          <div className="bg-white px-6 pt-4 pb-6 h-37">
+          <div className="bg-white px-0 pt-4 pb-6 h-40">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}
@@ -85,12 +85,12 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
                 className="text-center text-gray-900"
               >
                 {slides[currentSlide].title && (
-                  <h1 className="text-xl font-bold mb-2 mx-4">
+                  <h1 className="text-lg font-bold mb-2">
                     {slides[currentSlide].title}
                   </h1>
                 )}
                 {slides[currentSlide].description && (
-                  <p className="text-sm italic mx-1 leading-relaxed">
+                  <p className="text-sm italic mx-5 leading-relaxed">
                     {slides[currentSlide].description}
                   </p>
                 )}
@@ -152,14 +152,14 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
       {/* Navigation Arrows - Centered in text section */}
       <button
         onClick={prevSlide}
-        className="absolute left-0 bottom-0 top-[56.25dvw] translate-y-15 flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100/60 transition-all z-10"
+        className="absolute left-0 bottom-0 top-[56.25dvw] translate-y-16 flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100/60 transition-all z-10"
         aria-label="Previous slide"
       >
         <ChevronLeft strokeWidth="1" className="w-8 h-8 mx-auto text-gray-900" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-0 bottom-0 top-[56.25dvw] translate-y-15 flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100/60 transition-all z-10"
+        className="absolute right-0 bottom-0 top-[56.25dvw] translate-y-16 flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100/60 transition-all z-10"
         aria-label="Next slide"
       >
         <ChevronRight strokeWidth="1.5" className="w-8 h-8 mx-auto text-gray-900" />

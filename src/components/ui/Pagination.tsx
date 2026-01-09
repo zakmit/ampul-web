@@ -37,8 +37,8 @@ export default function Pagination({ currentPage, totalPages, locale, basePath }
             onClick={() => goToPage(page)}
             className={`px-3 py-1 text-sm ${
               currentPage === page
-                ? 'bg-gray-700 text-white'
-                : 'hover:bg-gray-100'
+                ? 'bg-gray-700 text-gray-100'
+                : 'hover:bg-gray-300'
             }`}
           >
             {page}

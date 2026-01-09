@@ -124,7 +124,9 @@
       "PROCESSING": "EN TRAITEMENT",
       "SHIPPED": "EXPÉDIÉ",
       "DELIVERED": "LIVRÉ",
+      "CANCELLING": "ANNULATION",
       "CANCELLED": "ANNULÉ",
+      "REQUESTED": "DEMANDÉ",
       "REFUNDED": "REMBOURSÉ"
     }
   },

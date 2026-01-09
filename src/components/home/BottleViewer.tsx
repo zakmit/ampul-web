@@ -34,14 +34,12 @@ export default function BottleViewer({ isMobile = false }: BottleViewerProps) {
   return (
     <div
       style={{
-        width,
-        height,
         backgroundImage: 'url(/models/backdrop.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
       }}
-      className="mx-auto"
+      className={`mx-auto ${isMobile ? "w-dvw h-[61.8dvw]":"w-[50dvw] h-[30.9dvw] max-h-123.5"}`}
     >
       <Canvas
         camera={{ position: [0, 0, 3], fov: 45 }}
@@ -64,7 +62,7 @@ export default function BottleViewer({ isMobile = false }: BottleViewerProps) {
             maxPolarAngle={Math.PI / 1.5}
             target={[0, 0, 0]}
           />
-          <Environment preset="city" environmentIntensity={0.6} />
+          <Environment preset="city" environmentIntensity={2} />
         </Suspense>
       </Canvas>
     </div>

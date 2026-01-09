@@ -28,9 +28,14 @@ model User {
   birthday      DateTime?
   phone         String?
   address       Address?
- 
+  lastLoginAt   DateTime?
+  lastOrderAt   DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([lastLoginAt])
+  @@index([lastOrderAt])
 }
 
 model Account {
@@ -126,7 +131,8 @@ model Order {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   
-  @@index([userId])
+  @@index([createdAt])
+  @@index([customerEmail])
   @@index([orderNumber])
   @@index([status])
 }
@@ -160,7 +166,9 @@ enum OrderStatus {
   PROCESSING
   SHIPPED
   DELIVERED
+  CANCELLING
   CANCELLED
+  REQUESTED
   REFUNDED
 }
 

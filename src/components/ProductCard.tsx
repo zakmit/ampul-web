@@ -43,14 +43,14 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       <div className="flex flex-col flex-1">
         <Link href={`/${locale}/p/${product.slug}`}>
-          <h3 className="text-center text-2xl font-bold mb-1 hover:underline">{product.name}</h3>
+          <h3 className="text-center text-xl font-bold mb-1 hover:underline">{product.name}</h3>
         </Link>
 
         <p className="text-sm italic text-center text-gray-900 mb-2">
           {product.quote}
         </p>
 
-        <div className="mt-auto mx-6 lg:mx-0 lg:grid lg:grid-cols-2">
+        <div className="mt-auto mx-4 lg:mx-0 lg:grid lg:grid-cols-2">
           <div className="flex items-center justify-center mb-3 lg:my-auto">
             <span className="text-sm text-gray-900">{product.volume} · {product.price} {tCommon('currency')}</span>
           </div>

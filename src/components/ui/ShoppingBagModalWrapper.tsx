@@ -39,6 +39,11 @@ export default function ShoppingBagModalWrapper({
         .then(([bagItems, products]) => {
           setBagItemDetails(bagItems)
           setAvailableProducts(products)
+
+          // Set default sample to first product if none selected
+          if (!selectedSample && products.length > 0) {
+            setSelectedSample(products[0].value)
+          }
         })
         .catch((error) => {
           console.error('Failed to fetch shopping bag data:', error)
@@ -47,6 +52,7 @@ export default function ShoppingBagModalWrapper({
           setIsLoading(false)
         })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, items, locale])
 
   const handleQuantityChange = (productId: string, volumeId: number, delta: number) => {

@@ -8,10 +8,11 @@ export default async function UserLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
   const session = await auth();
-  const t = await getTranslations({ locale: params.locale, namespace: 'UserLayout' });
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'UserLayout' });
 
   // If not authenticated, show sign-in form centered
   if (!session?.user) {
