@@ -2,13 +2,18 @@
 
 import { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/shadcn/table';
-import { ChevronLeft, ChevronRight, Plus, Minus, MoreHorizontal, X } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/shadcn/dropdown-menu';
+import { ChevronLeft, ChevronRight, Plus, Minus, MoreHorizontal, X, MoveDown, MoveUp } from 'lucide-react';
+import { formatOrderDate } from '@/lib/formatters';
+import { EditUserModal, type UserInfoData } from '@/components/ui/EditUserModal';
+import { UserOrdersModal } from '@/components/ui/UserOrdersModal';
+import { type OrderTableItem } from '@/components/ui/OrderTable';
 
-const INPUT_STYLE = "w-29 lg:w-full max-w-40 text-sm px-2 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
+const INPUT_STYLE = "w-full max-w-40 sm:max-w-80 lg:max-w-42 text-sm px-2 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
 
 interface AddressCondition {
   id: string;
-  type: 'region' | 'city';
+  type: 'line1' | 'line2' | 'city' | 'region' | 'postal' | 'country';
   value: string;
 }
 
@@ -31,8 +36,16 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
   const [searchColumn, setSearchColumn] = useState('E-mail');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchInput, setSearchInput] = useState(''); // Temporary input value before Enter
-  const [visibleColumns] = useState(['E-mail', 'Name', 'Last Log In', 'Last Order', 'Order Count']);
+  const [visibleColumns] = useState(['E-mail', 'Name', 'Last Log In', 'Last Order']);
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortColumn, setSortColumn] = useState<'Last Log In' | 'Last Order' | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
+  // Modal states
+  const [editUserModalOpen, setEditUserModalOpen] = useState(false);
+  const [userOrdersModalOpen, setUserOrdersModalOpen] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [currentUserData, setCurrentUserData] = useState<UserInfoData | null>(null);
 
   // Handle Enter key to trigger search
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -50,21 +63,15 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
   const [lastOrderFrom, setLastOrderFrom] = useState('');
   const [lastOrderTo, setLastOrderTo] = useState('');
 
-  // Order Count filter (temporary values before apply)
-  const [orderCountMax, setOrderCountMax] = useState('');
-  const [orderCountMin, setOrderCountMin] = useState('');
-
   // Applied filter values (used for actual filtering)
   const [appliedLastLogInFrom, setAppliedLastLogInFrom] = useState('');
   const [appliedLastLogInTo, setAppliedLastLogInTo] = useState('');
   const [appliedLastOrderFrom, setAppliedLastOrderFrom] = useState('');
   const [appliedLastOrderTo, setAppliedLastOrderTo] = useState('');
-  const [appliedOrderCountMax, setAppliedOrderCountMax] = useState('');
-  const [appliedOrderCountMin, setAppliedOrderCountMin] = useState('');
 
   // Address filters (can have multiple) - temporary before apply
   const [addressConditions, setAddressConditions] = useState<AddressCondition[]>([
-    { id: '1', type: 'region', value: '' }
+    { id: '1', type: 'line1', value: '' }
   ]);
 
   // Address condition handlers
@@ -86,8 +93,6 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
     setAppliedLastLogInTo(lastLogInTo);
     setAppliedLastOrderFrom(lastOrderFrom);
     setAppliedLastOrderTo(lastOrderTo);
-    setAppliedOrderCountMax(orderCountMax);
-    setAppliedOrderCountMin(orderCountMin);
 
     // Reset to first page when applying filters
     setCurrentPage(1);
@@ -103,17 +108,13 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
     setLastLogInTo('');
     setLastOrderFrom('');
     setLastOrderTo('');
-    setOrderCountMax('');
-    setOrderCountMin('');
-    setAddressConditions([{ id: '1', type: 'region', value: '' }]);
+    setAddressConditions([{ id: '1', type: 'line1', value: '' }]);
 
     // Clear applied filter values
     setAppliedLastLogInFrom('');
     setAppliedLastLogInTo('');
     setAppliedLastOrderFrom('');
     setAppliedLastOrderTo('');
-    setAppliedOrderCountMax('');
-    setAppliedOrderCountMin('');
 
     // Reset to first page
     setCurrentPage(1);
@@ -140,14 +141,6 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
       return false;
     }
 
-    // Order Count filter
-    if (appliedOrderCountMin && user.orderCount < parseInt(appliedOrderCountMin)) {
-      return false;
-    }
-    if (appliedOrderCountMax && user.orderCount > parseInt(appliedOrderCountMax)) {
-      return false;
-    }
-
     return true;
   });
 
@@ -170,7 +163,88 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
     return true;
   });
 
-  const filteredUsers = searchFilteredUsers;
+  // Sort handler
+  const handleSort = (column: 'Last Log In' | 'Last Order') => {
+    if (sortColumn === column) {
+      // Toggle direction if clicking the same column
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new column with default direction
+      setSortColumn(column);
+      setSortDirection('desc'); // Default to desc (new to old)
+    }
+  };
+
+  // Sort users
+  const sortedUsers = sortColumn ? [...searchFilteredUsers].sort((a, b) => {
+    if (sortColumn === 'Last Log In') {
+      const dateA = new Date(a.lastLogIn).getTime();
+      const dateB = new Date(b.lastLogIn).getTime();
+      return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
+    } else {
+      // Last Order sorting
+      const dateA = new Date(a.lastOrder).getTime();
+      const dateB = new Date(b.lastOrder).getTime();
+      return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
+    }
+  }) : searchFilteredUsers;
+
+  const filteredUsers = sortedUsers;
+
+  // Handler functions for modals
+  const handleShowAllOrders = (userId: string) => {
+    setCurrentUserId(userId);
+    setUserOrdersModalOpen(true);
+  };
+
+  const handleEditInformation = (userId: string) => {
+    const user = initialUsers.find(u => u.id === userId);
+    if (user) {
+      setCurrentUserId(userId);
+      setCurrentUserData({
+        name: user.name,
+        email: user.email,
+        birthday: null,
+        phone: null,
+        addressLine1: '',
+        addressLine2: null,
+        city: '',
+        region: null,
+        postalCode: '',
+        country: '',
+      });
+      setEditUserModalOpen(true);
+    }
+  };
+
+  const handleSaveUserInfo = () => {
+    // In real app, this would save to server
+    setEditUserModalOpen(false);
+  };
+
+  const handleUpdateUserInfo = (updates: Partial<UserInfoData>) => {
+    setCurrentUserData(prev => prev ? { ...prev, ...updates } : null);
+  };
+
+  // Generate mock orders for a user
+  const generateMockOrders = (userId: string): OrderTableItem[] => {
+    const user = initialUsers.find(u => u.id === userId);
+    if (!user) return [];
+
+    // Generate 15 mock orders for demo
+    const statuses: Array<'PENDING' | 'REQUESTED' | 'CANCELLING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED'> =
+      ['PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED', 'REQUESTED', 'CANCELLING'];
+
+    return Array.from({ length: 15 }, (_, i) => ({
+      id: `${userId}-order-${i + 1}`,
+      orderNumber: `ORD-${Math.floor(Math.random() * 90000) + 10000}`,
+      createdAt: new Date(Date.now() - Math.floor(Math.random() * 90) * 24 * 60 * 60 * 1000),
+      customerName: user.name,
+      status: statuses[i % statuses.length],
+      total: Math.floor(Math.random() * 500) + 50,
+      currency: ['$', '€', 'NT$'][Math.floor(Math.random() * 3)],
+    }));
+  };
 
   // Pagination constants
   const ITEMS_PER_PAGE = 20;
@@ -186,15 +260,6 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'right 0.75rem center',
     backgroundSize: '1em 1em',
-  };
-
-  const formatDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}/${month}/${day} ${hours}:${minutes}`;
   };
 
   // Generate page numbers to display in pagination
@@ -242,7 +307,7 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
           <div className="my-6">
             <h1 className="ml-6 text-4xl font-bold">Users</h1>
           </div>
-          <div className="lg:w-full bg-white border-r border-gray-900 py-6 my-8 overflow-x-clip">
+          <div className="w-full bg-white border-r border-gray-900 py-6 my-8 overflow-x-clip">
             <div className="ml-6 flex items-center w-full gap-2 mb-6">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'round', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
                 <path d="M5,8l14,0" fill="none" strokeWidth="1.04px"/>
@@ -251,13 +316,16 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                 <path d="M16.5,15.648l0,0.704c0,0.194 -0.158,0.351 -0.352,0.351l-1.296,0c-0.194,0 -0.352,-0.157 -0.352,-0.351l0,-0.704c0,-0.194 0.158,-0.351 0.352,-0.351l1.296,-0c0.194,-0 0.352,0.157 0.352,0.351Z" fill="none" strokeWidth="1.04px" style={{strokeMiterlimit:2}} />
               </svg>
               <h3 className="text-lg font-bold">Filter</h3>
+              <div className="flex items-start">
+                <span className="text-[10px] text-gray-500 italic">*Address and Product filters unavailable for mock data</span>
+              </div>
             </div>
             <div className="w-full flex justify-center items-center flex-col">
-              <div className="space-y-6 px-1 py-1 min-w-75 items-center overflow-y-auto max-h-200">
+              <div className="space-y-6 px-1 py-1 min-w-75 w-full max-w-90 items-center">
                 {/* Last Log In Section */}
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Last Log In</h3>
-                  <div className="w-full flex gap-2">
+                  <div className="w-full flex justify-between">
                     <input
                       type="date"
                       placeholder="MM-DD-YYYY"
@@ -279,7 +347,7 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                 {/* Last Order Section */}
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Last Order</h3>
-                  <div className="w-full flex gap-2">
+                  <div className="w-full flex justify-between">
                     <input
                       type="date"
                       placeholder="MM-DD-YYYY"
@@ -287,7 +355,7 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                       onChange={(e) => setLastOrderFrom(e.target.value)}
                       className={INPUT_STYLE}
                     />
-                    <span className="flex items-center text-gray-400">-</span>
+                    <span className="flex items-center text-gray-500">-</span>
                     <input
                       type="date"
                       placeholder="MM-DD-YYYY"
@@ -298,58 +366,35 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                   </div>
                 </div>
 
-                {/* Order Count Section */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Order Count</h3>
-                  <div className="flex gap-2 w-full">
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="Maximum"
-                      value={orderCountMax}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value === '' || /^\d+$/.test(value)) {
-                          setOrderCountMax(value);
-                        }
-                      }}
-                      className={INPUT_STYLE + " text-end"}
-                    />
-                    <span className="flex items-center text-gray-400">-</span>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="Minimum"
-                      value={orderCountMin}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value === '' || /^\d+$/.test(value)) {
-                          setOrderCountMin(value);
-                        }
-                      }}
-                      className={INPUT_STYLE + " text-end"}
-                    />
-                  </div>
-                </div>
-
                 {/* Address Section */}
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Address</h3>
-                  <div className="space-y-3">
+                  <div className="space-y-3 overflow-y-auto -mx-1 px-1 -my-1 py-1 max-h-60">
                     {addressConditions.map((condition, index) => (
                       <div key={condition.id} className="flex items-center justify-between">
                         <select
                           value={condition.type}
-                          onChange={(e) => updateAddressCondition(condition.id, { type: e.target.value as 'region' | 'city' })}
+                          onChange={(e) => updateAddressCondition(condition.id, { type: e.target.value as AddressCondition['type'] })}
                           style={selectStyle}
                           className="w-29 px-3 py-2 pr-8 bg-gray-100 border-none appearance-none text-sm cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-900"
                         >
-                          <option value="region">Region</option>
+                          <option value="line1">Address 1</option>
+                          <option value="line2">Address 2</option>
                           <option value="city">City</option>
+                          <option value="region">Region</option>
+                          <option value="postal">Postal</option>
+                          <option value="country">Country</option>
                         </select>
                         <input
                           type="text"
-                          placeholder={condition.type === 'city' ? 'City' : 'Region'}
+                          placeholder={
+                            condition.type === 'line1' ? 'Address 1' :
+                            condition.type === 'line2' ? 'Address 2' :
+                            condition.type === 'city' ? 'City' :
+                            condition.type === 'region' ? 'Region' :
+                            condition.type === 'postal' ? 'Postal' :
+                            'Country'
+                          }
                           value={condition.value}
                           onChange={(e) => updateAddressCondition(condition.id, { value: e.target.value })}
                           className={INPUT_STYLE}
@@ -404,6 +449,9 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                     <path d="M16.5,15.648l0,0.704c0,0.194 -0.158,0.351 -0.352,0.351l-1.296,0c-0.194,0 -0.352,-0.157 -0.352,-0.351l0,-0.704c0,-0.194 0.158,-0.351 0.352,-0.351l1.296,-0c0.194,-0 0.352,0.157 0.352,0.351Z" fill="none" strokeWidth="1.04px" style={{strokeMiterlimit:2}} />
                   </svg>
                   <span>Filter</span>
+                  <div className="flex items-start">
+                    <span className="text-[10px] text-gray-500 italic">*Address and Product filters unavailable for mock data</span>
+                  </div>
                 </button>
                 {isFilterOpen && (
                   <button onClick={() => setIsFilterOpen(false)} className="text-gray-600 hover:text-gray-900">
@@ -421,13 +469,13 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                           {/* Last Log In Section */}
                           <div className="flex flex-row justify-between items-center">
                             <span className="text-base font-semibold">Last Log In</span>
-                            <div className="flex justify-between w-62">
+                            <div className="flex gap-2 w-64 sm:w-100">
                               <input
                                 type="date"
                                 placeholder="MM-DD-YYYY"
                                 value={lastLogInFrom}
                                 onChange={(e) => setLastLogInFrom(e.target.value)}
-                                className={INPUT_STYLE}
+                                className="w-full text-sm px-0 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
                               />
                               <span className="flex items-center text-gray-400">-</span>
                               <input
@@ -435,7 +483,7 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                                 placeholder="MM-DD-YYYY"
                                 value={lastLogInTo}
                                 onChange={(e) => setLastLogInTo(e.target.value)}
-                                className={INPUT_STYLE}
+                                className="w-full text-sm px-0 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
                               />
                             </div>
                           </div>
@@ -443,13 +491,13 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                           {/* Last Order Section */}
                           <div className="flex flex-row justify-between items-center">
                             <span className="text-base font-semibold">Last Order</span>
-                            <div className="flex justify-between w-62">
+                            <div className="flex gap-2 w-64 sm:w-100">
                               <input
                                 type="date"
                                 placeholder="MM-DD-YYYY"
                                 value={lastOrderFrom}
                                 onChange={(e) => setLastOrderFrom(e.target.value)}
-                                className={INPUT_STYLE}
+                                className="w-full text-sm px-0 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
                               />
                               <span className="flex items-center text-gray-400">-</span>
                               <input
@@ -457,41 +505,7 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                                 placeholder="MM-DD-YYYY"
                                 value={lastOrderTo}
                                 onChange={(e) => setLastOrderTo(e.target.value)}
-                                className={INPUT_STYLE}
-                              />
-                            </div>
-                          </div>
-
-                          {/* Order Count Section */}
-                          <div className="flex flex-row justify-between items-center">
-                            <span className="text-base font-semibold">Order Count</span>
-                            <div className="flex justify-between w-62">
-                              <input
-                                type="text"
-                                inputMode="numeric"
-                                placeholder="Maximum"
-                                value={orderCountMax}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === '' || /^\d+$/.test(value)) {
-                                    setOrderCountMax(value);
-                                  }
-                                }}
-                                className={INPUT_STYLE + " text-end"}
-                              />
-                              <span className="flex items-center text-gray-400">-</span>
-                              <input
-                                type="text"
-                                inputMode="numeric"
-                                placeholder="Minimum"
-                                value={orderCountMin}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === '' || /^\d+$/.test(value)) {
-                                    setOrderCountMin(value);
-                                  }
-                                }}
-                                className={INPUT_STYLE + " text-end"}
+                                className="w-full text-sm px-0 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
                               />
                             </div>
                           </div>
@@ -499,21 +513,32 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                           {/* Address Section */}
                           <div className="flex flex-row justify-between items-start">
                             <span className="text-base font-semibold">Address</span>
-                            <div className="space-y-3 w-62">
+                            <div className="space-y-3 w-64 sm:w-100">
                               {addressConditions.map((condition, index) => (
-                                <div key={condition.id} className="flex items-center justify-between">
+                                <div key={condition.id} className="flex items-center gap-1 sm:justify-between">
                                   <select
                                     value={condition.type}
-                                    onChange={(e) => updateAddressCondition(condition.id, { type: e.target.value as 'region' | 'city' })}
+                                    onChange={(e) => updateAddressCondition(condition.id, { type: e.target.value as AddressCondition['type'] })}
                                     style={selectStyle}
                                     className="w-26 px-3 py-2 pr-8 bg-gray-100 border-none appearance-none text-sm cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-900"
                                   >
-                                    <option value="region">Region</option>
+                                    <option value="line1">Address 1</option>
+                                    <option value="line2">Address 2</option>
                                     <option value="city">City</option>
+                                    <option value="region">Region</option>
+                                    <option value="postal">Postal</option>
+                                    <option value="country">Country</option>
                                   </select>
                                   <input
                                     type="text"
-                                    placeholder={condition.type === 'city' ? 'City' : 'Region'}
+                                    placeholder={
+                                      condition.type === 'line1' ? 'Address 1' :
+                                      condition.type === 'line2' ? 'Address 2' :
+                                      condition.type === 'city' ? 'City' :
+                                      condition.type === 'region' ? 'Region' :
+                                      condition.type === 'postal' ? 'Postal' :
+                                      'Country'
+                                    }
                                     value={condition.value}
                                     onChange={(e) => updateAddressCondition(condition.id, { value: e.target.value })}
                                     className={INPUT_STYLE}
@@ -555,14 +580,8 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
           </div>
 
           {/* Search and Controls */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-1">
-            <div className="text-sm mb-2">
-              {filteredUsers.length > 1 ? `${filteredUsers.length} users` : `${filteredUsers.length} user`}
-              <span className="text-gray-500 italic ml-2">
-                (Page {currentPage} of {totalPages})
-              </span>
-            </div>
-            <div className='flex flex-col gap-2'>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 mb-2">
+            <div className='flex flex-col gap-2 lg:order-1 lg:w-140'>
               {/* Search */}
               <div className="flex w-full gap-2 lg:px-3 py-1.5 lg:border border-gray-500 rounded-md">
                 <select
@@ -602,16 +621,19 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                 </div>
               </div>
             </div>
+            <div className="text-sm">
+              {filteredUsers.length > 1 ? `${filteredUsers.length} users` : `${filteredUsers.length} user`}
+              <span className="text-gray-500 italic ml-2">
+                (Page {currentPage} of {totalPages})
+              </span>
+            </div>
           </div>
 
           {/* Table - Desktop */}
-          <div className="hidden lg:block border border-gray-300">
+          <div className="border border-gray-300">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-gray-100">
-                  <TableHead className="w-12">
-                    <input type="checkbox" className="w-4 h-4 cursor-pointer" />
-                  </TableHead>
                   {visibleColumns.includes('E-mail') && (
                     <TableHead className="font-semibold">E-mail</TableHead>
                   )}
@@ -619,13 +641,30 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                     <TableHead className="font-semibold">Name</TableHead>
                   )}
                   {visibleColumns.includes('Last Log In') && (
-                    <TableHead className="font-semibold">Last Log In</TableHead>
+                    <TableHead
+                      className="font-semibold cursor-pointer hover:bg-gray-200 select-none"
+                      onClick={() => handleSort('Last Log In')}
+                    >
+                      <div className="flex items-center gap-2">
+                        Last Log In
+                        {sortColumn === 'Last Log In' && (
+                          sortDirection === 'desc' ? <MoveDown className="w-4 h-4" /> : <MoveUp className="w-4 h-4" />
+                        )}
+                      </div>
+                    </TableHead>
                   )}
                   {visibleColumns.includes('Last Order') && (
-                    <TableHead className="font-semibold">Last Order</TableHead>
-                  )}
-                  {visibleColumns.includes('Order Count') && (
-                    <TableHead className="font-semibold">Order Count</TableHead>
+                    <TableHead
+                      className="font-semibold cursor-pointer hover:bg-gray-200 select-none"
+                      onClick={() => handleSort('Last Order')}
+                    >
+                      <div className="flex items-center gap-2">
+                        Last Order
+                        {sortColumn === 'Last Order' && (
+                          sortDirection === 'desc' ? <MoveDown className="w-4 h-4" /> : <MoveUp className="w-4 h-4" />
+                        )}
+                      </div>
+                    </TableHead>
                   )}
                   <TableHead className="w-12"></TableHead>
                 </TableRow>
@@ -633,9 +672,6 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
               <TableBody>
                 {paginatedUsers.map((user) => (
                   <TableRow key={user.id} className="hover:bg-gray-100">
-                    <TableCell>
-                      <input type="checkbox" className="w-4 h-4 cursor-pointer" />
-                    </TableCell>
                     {visibleColumns.includes('E-mail') && (
                       <TableCell className="text-sm">{user.email}</TableCell>
                     )}
@@ -643,53 +679,26 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                       <TableCell className="text-sm">{user.name}</TableCell>
                     )}
                     {visibleColumns.includes('Last Log In') && (
-                      <TableCell className="text-sm">{formatDate(user.lastLogIn)}</TableCell>
+                      <TableCell className="text-sm">{formatOrderDate(user.lastLogIn)}</TableCell>
                     )}
                     {visibleColumns.includes('Last Order') && (
-                      <TableCell className="text-sm">{formatDate(user.lastOrder)}</TableCell>
-                    )}
-                    {visibleColumns.includes('Order Count') && (
-                      <TableCell className="text-sm">{user.orderCount}</TableCell>
+                      <TableCell className="text-sm">{formatOrderDate(user.lastOrder)}</TableCell>
                     )}
                     <TableCell>
-                      <button className="hover:bg-gray-200 p-1 rounded">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="hover:bg-gray-200 p-1 rounded">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => handleShowAllOrders(user.id)}>
+                            Show All Orders
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditInformation(user.id)}>
+                            Edit Information
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Table - Mobile */}
-          <div className="lg:hidden border border-gray-300">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-white hover:bg-white">
-                  <TableHead className="w-12">
-                    <input type="checkbox" className="w-4 h-4 cursor-pointer" />
-                  </TableHead>
-                  {visibleColumns.includes('E-mail') && <TableHead className="font-bold">E-mail</TableHead>}
-                  {visibleColumns.includes('Name') && <TableHead className="font-bold">Name</TableHead>}
-                  {visibleColumns.includes('Last Log In') && <TableHead className="font-bold">Last</TableHead>}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <input type="checkbox" className="w-4 h-4 cursor-pointer" />
-                    </TableCell>
-                    {visibleColumns.includes('E-mail') && (
-                      <TableCell className="text-sm">{user.email}</TableCell>
-                    )}
-                    {visibleColumns.includes('Name') && (
-                      <TableCell className="text-sm">{user.name}</TableCell>
-                    )}
-                    {visibleColumns.includes('Last Log In') && (
-                      <TableCell className="text-sm">{formatDate(user.lastLogIn)}</TableCell>
-                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -734,6 +743,22 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <EditUserModal
+        isOpen={editUserModalOpen}
+        user={currentUserData}
+        onClose={() => setEditUserModalOpen(false)}
+        onSave={handleSaveUserInfo}
+        onUpdateUser={handleUpdateUserInfo}
+      />
+
+      <UserOrdersModal
+        isOpen={userOrdersModalOpen}
+        userName={currentUserId ? (initialUsers.find(u => u.id === currentUserId)?.name || '') : ''}
+        orders={currentUserId ? generateMockOrders(currentUserId) : []}
+        onClose={() => setUserOrdersModalOpen(false)}
+      />
     </div>
   );
 }

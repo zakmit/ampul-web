@@ -55,7 +55,7 @@ export interface OrderData {
   items?: OrderItem[];
 }
 
-interface ModifyOrderModalProps {
+interface EditOrderModalProps {
   isOpen: boolean;
   order: OrderData | null;
   trackingInput: string;
@@ -65,9 +65,11 @@ interface ModifyOrderModalProps {
   onSaveTrackingCode: () => void;
   onOpenAddressModal: () => void;
   onAcceptRequest: (type: 'cancel' | 'refund') => void;
+  statusUpdateLoading?: boolean;
+  statusUpdateError?: string | null;
 }
 
-export function ModifyOrderModal({
+export function EditOrderModal({
   isOpen,
   order,
   trackingInput,
@@ -77,13 +79,15 @@ export function ModifyOrderModal({
   onSaveTrackingCode,
   onOpenAddressModal,
   onAcceptRequest,
-}: ModifyOrderModalProps) {
+  statusUpdateLoading = false,
+  statusUpdateError = null,
+}: EditOrderModalProps) {
   if (!isOpen || !order) return null;
 
   return (
     <div
-      className="fixed inset-0 bg-gray-800/30 backdrop-blur-sm z-30 transition-all duration-500 flex items-center justify-center overflow-y-auto"
-      onClick={onClose}
+      className="fixed inset-0 bg-gray-800/30 backdrop-blur-sm z-70 transition-all duration-500 flex items-center justify-center overflow-y-auto"
+      onClick={statusUpdateLoading ? undefined : onClose}
     >
       <div
         className="bg-gray-100 max-w-3xl w-full"
@@ -96,8 +100,9 @@ export function ModifyOrderModal({
             <select
               value={order.status}
               onChange={(e) => onUpdateOrder({ status: e.target.value as OrderStatus })}
+              disabled={statusUpdateLoading}
               style={selectStyle}
-              className="my-1 px-3 py-1 pr-8 bg-gray-100 border-none appearance-none text-sm cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-900"
+              className={`my-1 px-3 py-1 pr-8 bg-gray-100 border-none appearance-none text-sm cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-900 ${statusUpdateLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <option value="PENDING">PENDING</option>
               <option value="REQUESTED">REQUESTED</option>
@@ -107,11 +112,17 @@ export function ModifyOrderModal({
               <option value="CANCELLED">CANCELLED</option>
               <option value="REFUNDED">REFUNDED</option>
             </select>
-            <button onClick={onClose} className="text-gray-100 hover:text-gray-200">
+            <button onClick={onClose} disabled={statusUpdateLoading} className="text-gray-100 hover:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed">
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
+        {/* Error notification */}
+        {statusUpdateError && (
+          <div className="mx-4 mt-4 px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded">
+            {statusUpdateError}
+          </div>
+        )}
         <div className="px-4 py-6">
           {/* Order ID */}
           <h3 className="text-base font-bold italic mb-4">Order ID: {order.orderNumber}</h3>
@@ -250,7 +261,7 @@ export function ModifyOrderModal({
               onClick={onClose}
               className="px-6 py-2 bg-gray-700 text-white hover:bg-gray-900"
             >
-              CONFIRM
+              CLOSE
             </button>
             {(order.status === 'REQUESTED' || order.status === 'CANCELLING') && (
               <button

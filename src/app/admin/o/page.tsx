@@ -1,22 +1,50 @@
 import OrdersClient from './OrdersClient';
 import { dummyOrders } from './_data/mockOrders';
+import { auth } from '@/auth';
+import {
+  readOrders,
+  readOrder,
+  updateTrackingCode,
+  updateOrderStatus,
+  updateOrderAddress,
+  acceptCancelRequest,
+  acceptRefundRequest
+} from './actions';
+import type { OrderStatus } from './mockData';
 
 export default async function OrdersPage() {
-  // TODO: Add auth check here
-  // const session = await auth();
-  // if (!session || session.user.role !== 'ADMIN') {
-  //   redirect('/');
-  // }
+  // Check authentication
+  const session = await auth();
 
-  // TODO: Future - Fetch real data from database
-  // const orders = await getOrders();
+  // Fetch orders if user is admin, otherwise use mock data
+  let orders = dummyOrders;
+  let serverActions = null;
 
-  // TODO: Future - Define and pass server actions
-  // const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
-  //   'use server';
-  //   // Implementation
-  // };
+  if (session && session.user.role === 'admin') {
+    const result = await readOrders({
+      timeRange: 'THIS MONTH',
+      limit: 20,
+    });
 
-  // For now, use mock data
-  return <OrdersClient initialOrders={dummyOrders} />;
+    if (result.success && result.data) {
+      // Map OrderListItem to match the Order interface expected by OrdersClient
+      orders = result.data.orders.map(order => ({
+        ...order,
+        status: order.status as OrderStatus,
+      }));
+
+      // Pass all server actions to the client component
+      serverActions = {
+        fetchOrders: readOrders,
+        fetchOrder: readOrder,
+        updateTrackingCode,
+        updateOrderStatus,
+        updateOrderAddress,
+        acceptCancelRequest,
+        acceptRefundRequest,
+      };
+    }
+  }
+
+  return <OrdersClient initialOrders={orders} serverActions={serverActions} />;
 }

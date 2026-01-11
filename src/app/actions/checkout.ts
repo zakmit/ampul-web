@@ -270,7 +270,7 @@ export async function createOrder(
         paymentMethod: 'demo',
         total: total,
         currency: currency,
-        status: 'PROCESSING',
+        status: 'PENDING',
         items: {
           create: orderItemsData,
         },

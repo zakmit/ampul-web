@@ -1,4 +1,5 @@
 'use client';
+import { X } from 'lucide-react'
 
 const INPUT_STYLE = "w-full text-sm px-2 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic";
 
@@ -13,7 +14,7 @@ export interface AddressData {
   shippingCountry?: string;
 }
 
-interface ModifyAddressModalProps {
+interface EditAddressModalProps {
   isOpen: boolean;
   address: AddressData | null;
   onClose: () => void;
@@ -21,29 +22,36 @@ interface ModifyAddressModalProps {
   onUpdateAddress: (updates: Partial<AddressData>) => void;
 }
 
-export function ModifyAddressModal({
+export function EditAddressModal({
   isOpen,
   address,
   onClose,
   onSave,
   onUpdateAddress,
-}: ModifyAddressModalProps) {
+}: EditAddressModalProps) {
   if (!isOpen || !address) return null;
 
   return (
     <div
-      className="fixed inset-0 bg-gray-800/30 backdrop-blur-sm z-40 transition-all duration-500 flex items-center justify-center"
+      className="fixed inset-0 bg-gray-800/30 backdrop-blur-sm z-80 transition-all duration-500 flex items-center justify-center"
       onClick={onClose}
     >
       <div
-        className="bg-white p-6 rounded-md w-75 lg:w-100 mx-4"
+        className="bg-white p-6 w-75 sm:w-100 mx-4 relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">Modify Address</h2>
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-900 hover:text-gray-600 transition-colors"
+          aria-label="Close"
+        >
+          <X className="w-6 h-6" strokeWidth={1.5} />
+        </button>
+        <h2 className="text-2xl font-bold mb-6 text-center">Edit Address</h2>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-base italic mb-2">Recipient Name</label>
+            <label className="block font-title text-base italic mb-2">Recipient Name</label>
             <input
               type="text"
               value={address.recipientName || ''}
@@ -53,7 +61,7 @@ export function ModifyAddressModal({
           </div>
 
           <div>
-            <label className="block text-base italic mb-2">Phone Number</label>
+            <label className="block font-title text-base italic mb-2">Phone Number</label>
             <input
               type="tel"
               value={address.recipientPhone || ''}
@@ -63,7 +71,7 @@ export function ModifyAddressModal({
           </div>
 
           <div>
-            <label className="block text-base italic mb-2">Address</label>
+            <label className="block font-title text-base italic mb-2">Address</label>
             <input
               type="text"
               placeholder="Street Address"

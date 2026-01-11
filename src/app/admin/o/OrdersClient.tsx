@@ -4,11 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/shadcn/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/shadcn/dropdown-menu';
 import { ChevronLeft, ChevronRight, Plus, Minus, MoreHorizontal, ChevronDown, X, MoveDown, MoveUp, EllipsisVertical } from 'lucide-react';
-import { readProducts } from './actions';
+import { readProducts, readOrders, readOrder, updateTrackingCode, updateOrderStatus, updateOrderAddress, acceptCancelRequest, acceptRefundRequest, type OrderFilters, type OrderDetail } from './actions';
 import type { Order as FullOrder, OrderStatus } from './mockData';
 import { mockOrderItems } from './mockData';
-import { ModifyOrderModal, type OrderData } from '@/components/ui/ModifyOrderModal';
-import { ModifyAddressModal } from '@/components/ui/ModifyAddressModal';
+import { EditOrderModal, type OrderData } from '@/components/ui/EditOrderModal';
+import { EditAddressModal, type AddressData } from '@/components/ui/EditAddressModal';
+import { formatOrderDate } from '@/lib/formatters';
 
 // Type for table display (from _data/mockOrders.ts)
 interface Order {
@@ -19,10 +20,9 @@ interface Order {
   status: OrderStatus;
   total: number;
   currency: string;
-  itemCount: number;
 }
 
-const INPUT_STYLE = "w-29 lg:w-full max-w-40 text-sm px-2 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
+const INPUT_STYLE = "w-full max-w-40 sm:max-w-80 lg:max-w-42 text-sm px-2 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
 
 // Searchable Dropdown Component for Products
 function ProductSearchableDropdown({
@@ -68,7 +68,7 @@ function ProductSearchableDropdown({
         {selectedItems.map(item => (
           <span
             key={item.id}
-            className="inline-flex items-center gap-1 bg-olive-200 border rounded-md text-olive-900 border-olive-600 px-1 text-xs whitespace-nowrap"
+            className="inline-flex items-center gap-0.5 bg-olive-200 border rounded-md text-olive-900 border-olive-600 px-1 text-xs whitespace-nowrap"
           >
             {item.label}
             <button
@@ -134,14 +134,22 @@ interface AddressCondition {
   value: string;
 }
 
-interface OrdersClientProps {
-  initialOrders: Order[];
-  // Future: server actions will be passed here
-  // onUpdateStatus?: (orderId: string, status: OrderStatus) => Promise<void>;
-  // onDeleteOrder?: (orderId: string) => Promise<void>;
+interface ServerActions {
+  fetchOrders: typeof readOrders;
+  fetchOrder: typeof readOrder;
+  updateTrackingCode: typeof updateTrackingCode;
+  updateOrderStatus: typeof updateOrderStatus;
+  updateOrderAddress: typeof updateOrderAddress;
+  acceptCancelRequest: typeof acceptCancelRequest;
+  acceptRefundRequest: typeof acceptRefundRequest;
 }
 
-export default function OrdersClient({ initialOrders }: OrdersClientProps) {
+interface OrdersClientProps {
+  initialOrders: Order[];
+  serverActions?: ServerActions | null;
+}
+
+export default function OrdersClient({ initialOrders, serverActions }: OrdersClientProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [timeRange, setTimeRange] = useState('THIS MONTH');
   const [searchColumn, setSearchColumn] = useState('Order ID');
@@ -161,6 +169,13 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [trackingCodes, setTrackingCodes] = useState<Record<string, string>>({});
   const [trackingInput, setTrackingInput] = useState('');
+  const [serverTotalCount, setServerTotalCount] = useState<number | null>(null);
+
+  // Full order data for modal (fetched when opening modal)
+  const [currentOrderData, setCurrentOrderData] = useState<OrderDetail | null>(null);
+  const [isLoadingOrder, setIsLoadingOrder] = useState(false);
+  const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
+  const [statusUpdateError, setStatusUpdateError] = useState<string | null>(null);
 
   // Fetch products on mount
   useEffect(() => {
@@ -192,18 +207,13 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
   // Total filter (temporary values before apply)
   const [totalMax, setTotalMax] = useState('');
   const [totalMin, setTotalMin] = useState('');
-
-  // Item Count filter (temporary values before apply)
-  const [itemCountMax, setItemCountMax] = useState('');
-  const [itemCountMin, setItemCountMin] = useState('');
-
+  const [totalCurrency, settotalCurrency] = useState('');
   // Applied filter values (used for actual filtering)
   const [appliedDateFrom, setAppliedDateFrom] = useState('');
   const [appliedDateTo, setAppliedDateTo] = useState('');
   const [appliedTotalMax, setAppliedTotalMax] = useState('');
   const [appliedTotalMin, setAppliedTotalMin] = useState('');
-  const [appliedItemCountMax, setAppliedItemCountMax] = useState('');
-  const [appliedItemCountMin, setAppliedItemCountMin] = useState('');
+  const [appliedTotalCurrency, setAppliedTotalCurrency] = useState('');
 
   // Address filters (can have multiple) - temporary before apply
   const [addressConditions, setAddressConditions] = useState<AddressCondition[]>([
@@ -212,6 +222,9 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
 
   // Product filter - simplified to single filter with multiple products
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+
+  // Applied product filter
+  const [appliedProductIds, setAppliedProductIds] = useState<string[]>([]);
 
   // Products list for dropdown
   const [products, setProducts] = useState<{ id: string; name: string }[]>([]);
@@ -230,6 +243,56 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
     'REFUNDED': 7,
   };
 
+  // Fetch orders from server when filters change (only if serverActions is available)
+  useEffect(() => {
+    if (!serverActions?.fetchOrders) return;
+
+    const loadOrders = async () => {
+      const filters: OrderFilters = {
+        timeRange: timeRange as OrderFilters['timeRange'],
+        searchColumn: searchColumn as OrderFilters['searchColumn'],
+        searchQuery: searchQuery || undefined,
+        statuses: activeStatuses.length > 0 ? activeStatuses : undefined,
+        dateFrom: appliedDateFrom || undefined,
+        dateTo: appliedDateTo || undefined,
+        totalMin: appliedTotalMin ? parseFloat(appliedTotalMin) : undefined,
+        totalMax: appliedTotalMax ? parseFloat(appliedTotalMax) : undefined,
+        totalCurrency: appliedTotalCurrency || undefined,
+        addressConditions: appliedAddressConditions.length > 0 ? appliedAddressConditions : undefined,
+        productIds: appliedProductIds.length > 0 ? appliedProductIds : undefined,
+        sortColumn: sortColumn as OrderFilters['sortColumn'],
+        sortDirection: sortDirection as OrderFilters['sortDirection'],
+        page: currentPage,
+        limit: 20,
+      };
+
+      const result = await serverActions.fetchOrders(filters);
+
+      if (result.success && result.data) {
+        setOrders(result.data.orders as Order[]);
+        setServerTotalCount(result.data.totalCount);
+      }
+    };
+
+    loadOrders();
+  }, [
+    serverActions,
+    timeRange,
+    searchColumn,
+    searchQuery,
+    activeStatuses,
+    appliedDateFrom,
+    appliedDateTo,
+    appliedTotalMin,
+    appliedTotalMax,
+    appliedTotalCurrency,
+    appliedAddressConditions,
+    appliedProductIds,
+    sortColumn,
+    sortDirection,
+    currentPage,
+  ]);
+
   // Sort handler
   const handleSort = (column: 'Date' | 'Status') => {
     if (sortColumn === column) {
@@ -242,8 +305,13 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
     }
   };
 
+  // When using server-side fetching, skip client-side filtering
+  // The server already applies all filters
+  const shouldUseClientFiltering = !serverActions;
+
   // Filter orders by time range
   const getTimeRangeFilteredOrders = () => {
+    if (!shouldUseClientFiltering) return orders;
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -279,8 +347,8 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
 
   const timeFilteredOrders = getTimeRangeFilteredOrders();
 
-  // Apply advanced filters (date, total, item count)
-  const advancedFilteredOrders = timeFilteredOrders.filter(order => {
+  // Apply advanced filters (date, total)
+  const advancedFilteredOrders = shouldUseClientFiltering ? timeFilteredOrders.filter(order => {
     // Date filter
     if (appliedDateFrom && new Date(order.createdAt) < new Date(appliedDateFrom)) {
       return false;
@@ -297,21 +365,16 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
       return false;
     }
 
-    // Item count filter
-    if (order.itemCount !== undefined) {
-      if (appliedItemCountMin && order.itemCount < parseInt(appliedItemCountMin)) {
-        return false;
-      }
-      if (appliedItemCountMax && order.itemCount > parseInt(appliedItemCountMax)) {
-        return false;
-      }
+    // Currency filter
+    if (appliedTotalCurrency && order.currency !== appliedTotalCurrency) {
+      return false;
     }
 
     return true;
-  });
+  }) : timeFilteredOrders;
 
   // Apply search filter
-  const searchFilteredOrders = advancedFilteredOrders.filter(order => {
+  const searchFilteredOrders = shouldUseClientFiltering ? advancedFilteredOrders.filter(order => {
     if (!searchQuery.trim()) {
       return true;
     }
@@ -325,16 +388,18 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
     // Will be implemented when connected to database
 
     return true;
-  });
+  }) : advancedFilteredOrders;
 
   // Filter orders by status (show all if activeStatuses is empty or has all statuses)
   const allStatuses: OrderStatus[] = ['PENDING', 'REQUESTED', 'CANCELLING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'];
-  const filteredOrders = activeStatuses.length === 0 || activeStatuses.length === allStatuses.length
+  const filteredOrders = shouldUseClientFiltering && (activeStatuses.length === 0 || activeStatuses.length === allStatuses.length)
     ? searchFilteredOrders
-    : searchFilteredOrders.filter(order => activeStatuses.includes(order.status));
+    : shouldUseClientFiltering
+    ? searchFilteredOrders.filter(order => activeStatuses.includes(order.status))
+    : searchFilteredOrders;
 
   // Sort orders
-  const sortedOrders = [...filteredOrders].sort((a, b) => {
+  const sortedOrders = shouldUseClientFiltering ? [...filteredOrders].sort((a, b) => {
     if (sortColumn === 'Date') {
       const dateA = new Date(a.createdAt).getTime();
       const dateB = new Date(b.createdAt).getTime();
@@ -345,16 +410,24 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
       const priorityB = statusPriority[b.status];
       return sortDirection === 'desc' ? priorityA - priorityB : priorityB - priorityA;
     }
-  });
+  }) : filteredOrders;
 
   // Pagination constants
   const ITEMS_PER_PAGE = 20;
-  const totalPages = Math.ceil(sortedOrders.length / ITEMS_PER_PAGE);
 
-  // Calculate paginated data
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedOrders = sortedOrders.slice(startIndex, endIndex);
+  // When using server-side fetching, pagination is handled by the server
+  // so we don't slice the data client-side
+  const paginatedOrders = shouldUseClientFiltering ? (() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return sortedOrders.slice(startIndex, endIndex);
+  })() : sortedOrders;
+
+  // Calculate total pages for display
+  // Use serverTotalCount when available (server-side), otherwise use sortedOrders.length (client-side)
+  const totalPages = serverTotalCount !== null
+    ? Math.ceil(serverTotalCount / ITEMS_PER_PAGE)
+    : Math.ceil(sortedOrders.length / ITEMS_PER_PAGE);
 
   const statusColors = {
     PENDING: 'border-blue-500 text-blue-900 bg-blue-200 hover:bg-blue-600 hover:text-blue-100',
@@ -409,9 +482,9 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
     setAppliedDateTo(dateTo);
     setAppliedTotalMax(totalMax);
     setAppliedTotalMin(totalMin);
-    setAppliedItemCountMax(itemCountMax);
-    setAppliedItemCountMin(itemCountMin);
+    setAppliedTotalCurrency(totalCurrency);
     setAppliedAddressConditions(addressConditions.filter(c => c.value.trim() !== ''));
+    setAppliedProductIds(selectedProductIds);
 
     // Reset to first page when applying filters
     setCurrentPage(1);
@@ -427,19 +500,18 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
     setDateTo('');
     setTotalMax('');
     setTotalMin('');
-    setItemCountMax('');
-    setItemCountMin('');
+    settotalCurrency('');
     setAddressConditions([{ id: '1', type: 'line1', value: '' }]);
     setSelectedProductIds([]);
 
     // Clear applied filter values
+    setAppliedTotalCurrency('');
     setAppliedDateFrom('');
     setAppliedDateTo('');
     setAppliedTotalMax('');
     setAppliedTotalMin('');
-    setAppliedItemCountMax('');
-    setAppliedItemCountMin('');
     setAppliedAddressConditions([]);
+    setAppliedProductIds([]);
 
     // Reset to first page
     setCurrentPage(1);
@@ -478,41 +550,53 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
     !allCurrentPageSelected;
 
   // Handle dropdown menu actions
-  const handleModifyOrder = (orderId: string) => {
+  const handleModifyOrder = async (orderId: string) => {
     setCurrentOrderId(orderId);
     setTrackingInput(trackingCodes[orderId] || '');
 
-    // Add mock data to the order if needed (for demo purposes)
-    // Extend the table order with modal-specific fields
-    setOrders(prev => prev.map(order => {
-      if (order.id === orderId) {
-        // Check if already has modal data
-        const extendedOrder = order as Partial<FullOrder>;
-        const hasModalData = extendedOrder.items && extendedOrder.recipientName;
+    if (serverActions) {
+      // Fetch full order data from server
+      setIsLoadingOrder(true);
+      const result = await serverActions.fetchOrder(orderId);
+      setIsLoadingOrder(false);
 
-        if (!hasModalData) {
-          // Add modal-specific fields for demo
-          return {
-            ...order,
-            customerEmail: 'demo@example.com',
-            recipientName: 'Apollodorus',
-            recipientPhone: '+44912345678',
-            shippingLine1: 'No.42, Rue de Rivoli',
-            shippingLine2: '',
-            shippingCity: 'Paris',
-            shippingRegion: '',
-            shippingPostal: '75005',
-            shippingCountry: 'France',
-            trackingCode: null,
-            lastFour: '4242',
-            items: mockOrderItems,
-          };
-        }
+      if (result.success && result.data) {
+        setCurrentOrderData(result.data);
+        setModifyOrderModalOpen(true);
+      } else {
+        alert(result.error || 'Failed to load order');
       }
-      return order;
-    }));
+    } else {
+      // Mock data - extend the table order with modal-specific fields
+      setOrders(prev => prev.map(order => {
+        if (order.id === orderId) {
+          const extendedOrder = order as Partial<FullOrder>;
+          const hasModalData = extendedOrder.items && extendedOrder.recipientName;
 
-    setModifyOrderModalOpen(true);
+          if (!hasModalData) {
+            // Add modal-specific fields for demo
+            return {
+              ...order,
+              customerEmail: 'demo@example.com',
+              recipientName: 'Apollodorus',
+              recipientPhone: '+44912345678',
+              shippingLine1: 'No.42, Rue de Rivoli',
+              shippingLine2: '',
+              shippingCity: 'Paris',
+              shippingRegion: '',
+              shippingPostal: '75005',
+              shippingCountry: 'France',
+              trackingCode: null,
+              lastFour: '4242',
+              items: mockOrderItems,
+            };
+          }
+        }
+        return order;
+      }));
+
+      setModifyOrderModalOpen(true);
+    }
   };
 
   const handleModifyAddress = () => {
@@ -551,10 +635,58 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
     setConfirmModalOpen(true);
   };
 
-  const confirmStatusChange = () => {
-    if (confirmAction) {
+  const confirmStatusChange = async () => {
+    if (!confirmAction) return;
+
+    if (serverActions) {
+      // Use server actions for real data
       if (confirmAction.isBulk) {
-        // Handle bulk action
+        // Handle bulk action - iterate through selected orders
+        const targetStatus = confirmAction.type === 'cancel' ? 'CANCELLING' : 'REQUESTED';
+        const orderIds = Array.from(selectedOrders).filter(id => {
+          const order = orders.find(o => o.id === id);
+          return order?.status === targetStatus;
+        });
+
+        // Process all requests
+        const actionFunc = confirmAction.type === 'cancel'
+          ? serverActions.acceptCancelRequest
+          : serverActions.acceptRefundRequest;
+
+        await Promise.all(orderIds.map(id => actionFunc(id)));
+
+        // Refresh orders list
+        const refreshResult = await serverActions.fetchOrders({
+          timeRange: timeRange as OrderFilters['timeRange'],
+          limit: 20,
+        });
+        if (refreshResult.success && refreshResult.data) {
+          setOrders(refreshResult.data.orders as Order[]);
+        }
+        setSelectedOrders(new Set());
+      } else if (confirmAction.orderId) {
+        // Handle single order action
+        const actionFunc = confirmAction.type === 'cancel'
+          ? serverActions.acceptCancelRequest
+          : serverActions.acceptRefundRequest;
+
+        const result = await actionFunc(confirmAction.orderId);
+        if (result.success) {
+          // Refresh orders list
+          const refreshResult = await serverActions.fetchOrders({
+            timeRange: timeRange as OrderFilters['timeRange'],
+            limit: 20,
+          });
+          if (refreshResult.success && refreshResult.data) {
+            setOrders(refreshResult.data.orders as Order[]);
+          }
+        } else {
+          alert(result.error || 'Failed to process request');
+        }
+      }
+    } else {
+      // Mock data behavior
+      if (confirmAction.isBulk) {
         const targetStatus = confirmAction.type === 'cancel' ? 'CANCELLING' : 'REQUESTED';
         const newStatus = confirmAction.type === 'cancel' ? 'CANCELLED' : 'REFUNDED';
 
@@ -564,10 +696,8 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
           }
           return order;
         }));
-
         setSelectedOrders(new Set());
       } else {
-        // Handle single order action
         setOrders(prev => prev.map(order => {
           if (order.id === confirmAction.orderId) {
             return {
@@ -579,15 +709,36 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
         }));
       }
     }
+
     setConfirmModalOpen(false);
     setConfirmAction(null);
   };
 
-  const handleSaveTrackingCode = () => {
-    if (currentOrderId) {
+  const handleSaveTrackingCode = async () => {
+    if (!currentOrderId) return;
+
+    if (serverActions) {
+      // Use server action for real data
+      const result = await serverActions.updateTrackingCode(currentOrderId, trackingInput);
+      if (result.success) {
+        // Update local state
+        setTrackingCodes(prev => ({ ...prev, [currentOrderId]: trackingInput.trim() }));
+        // Refresh orders list
+        const refreshResult = await serverActions.fetchOrders({
+          timeRange: timeRange as OrderFilters['timeRange'],
+          limit: 20,
+        });
+        if (refreshResult.success && refreshResult.data) {
+          setOrders(refreshResult.data.orders as Order[]);
+        }
+        setModifyOrderModalOpen(false);
+      } else {
+        alert(result.error || 'Failed to update tracking code');
+      }
+    } else {
+      // Mock data behavior
       const currentOrder = orders.find(o => o.id === currentOrderId);
       if (currentOrder?.status === 'PENDING') {
-        // Basic validation
         const trimmedCode = trackingInput.trim();
         if (trimmedCode.length > 0 && trimmedCode.length <= 50 && /^[a-zA-Z0-9-]+$/.test(trimmedCode)) {
           setTrackingCodes(prev => ({ ...prev, [currentOrderId]: trimmedCode }));
@@ -602,9 +753,44 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
     }
   };
 
-  const handleSaveAddress = () => {
-    // Address is already saved to state via form inputs
-    setModifyAddressModalOpen(false);
+  const handleSaveAddress = async () => {
+    if (!currentOrderId || !currentOrderData) return;
+
+    if (serverActions) {
+      // Use server action for real data - validate required fields
+      if (!currentOrderData.recipientName || !currentOrderData.shippingLine1 ||
+          !currentOrderData.shippingCity || !currentOrderData.shippingPostal ||
+          !currentOrderData.shippingCountry) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      const addressData = {
+        recipientName: currentOrderData.recipientName,
+        recipientPhone: currentOrderData.recipientPhone,
+        shippingLine1: currentOrderData.shippingLine1,
+        shippingLine2: currentOrderData.shippingLine2,
+        shippingCity: currentOrderData.shippingCity,
+        shippingRegion: currentOrderData.shippingRegion,
+        shippingPostal: currentOrderData.shippingPostal,
+        shippingCountry: currentOrderData.shippingCountry,
+      };
+
+      const result = await serverActions.updateOrderAddress(currentOrderId, addressData);
+      if (result.success) {
+        // Refresh order data
+        const orderResult = await serverActions.fetchOrder(currentOrderId);
+        if (orderResult.success && orderResult.data) {
+          setCurrentOrderData(orderResult.data);
+        }
+        setModifyAddressModalOpen(false);
+      } else {
+        alert(result.error || 'Failed to update address');
+      }
+    } else {
+      // Mock data behavior - address is already saved to state via form inputs
+      setModifyAddressModalOpen(false);
+    }
   };
 
   const selectStyle = {
@@ -612,15 +798,6 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'right 0.75rem center',
     backgroundSize: '1em 1em',
-  };
-
-  const formatDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}/${month}/${day} ${hours}:${minutes}`;
   };
 
   // Generate page numbers to display in pagination
@@ -660,10 +837,65 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
     return pages;
   };
 
-  // Get current order for modal - cast to FullOrder since modal needs full data
-  const getCurrentOrder = (): FullOrder | null => {
+  // Get current order for modal - use fetched data if available, otherwise fallback to table data
+  const getCurrentOrder = (): (FullOrder | OrderDetail) | null => {
+    if (currentOrderData) {
+      return currentOrderData;
+    }
     const order = currentOrderId ? orders.find(o => o.id === currentOrderId) : null;
     return order as FullOrder | null;
+  };
+
+  // Handle status update from modal
+  const handleUpdateOrderStatus = async (updates: Partial<OrderData>) => {
+    if (!currentOrderId || !updates.status) return;
+
+    if (serverActions) {
+      setStatusUpdateLoading(true);
+      setStatusUpdateError(null);
+
+      const result = await serverActions.updateOrderStatus(currentOrderId, updates.status);
+
+      setStatusUpdateLoading(false);
+
+      if (result.success) {
+        // Update current order data
+        if (currentOrderData) {
+          setCurrentOrderData({ ...currentOrderData, status: updates.status });
+        }
+        // Refresh orders list
+        const refreshResult = await serverActions.fetchOrders({
+          timeRange: timeRange as OrderFilters['timeRange'],
+          limit: 20,
+        });
+        if (refreshResult.success && refreshResult.data) {
+          setOrders(refreshResult.data.orders as Order[]);
+        }
+      } else {
+        setStatusUpdateError(result.error || 'Failed to update status');
+      }
+    } else {
+      // Mock data behavior
+      setOrders(prev => prev.map(order =>
+        order.id === currentOrderId ? { ...order, ...updates } : order
+      ));
+      if (currentOrderData && updates.status) {
+        setCurrentOrderData({ ...currentOrderData, status: updates.status });
+      }
+    }
+  };
+
+  // Handle address update from modal
+  const handleUpdateAddress = (updates: Partial<AddressData>) => {
+    if (serverActions && currentOrderData) {
+      // Update local state immediately for responsive UI
+      setCurrentOrderData({ ...currentOrderData, ...updates });
+    } else {
+      // Mock data behavior
+      setOrders(prev => prev.map(order =>
+        order.id === currentOrderId ? { ...order, ...updates } : order
+      ));
+    }
   };
 
   return (
@@ -697,24 +929,23 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
         </div>
       )}
 
-      <ModifyAddressModal
+      <EditAddressModal
         isOpen={modifyAddressModalOpen}
         address={getCurrentOrder()}
         onClose={() => setModifyAddressModalOpen(false)}
         onSave={handleSaveAddress}
-        onUpdateAddress={(updates) => setOrders(prev => prev.map(order =>
-          order.id === currentOrderId ? { ...order, ...updates } : order
-        ))}
+        onUpdateAddress={handleUpdateAddress}
       />
 
-      <ModifyOrderModal
+      <EditOrderModal
         isOpen={modifyOrderModalOpen}
         order={getCurrentOrder() as OrderData}
         trackingInput={trackingInput}
-        onClose={() => setModifyOrderModalOpen(false)}
-        onUpdateOrder={(updates) => setOrders(prev => prev.map(order =>
-          order.id === currentOrderId ? { ...order, ...updates } : order
-        ))}
+        onClose={() => {
+          setModifyOrderModalOpen(false);
+          setStatusUpdateError(null);
+        }}
+        onUpdateOrder={handleUpdateOrderStatus}
         onUpdateTrackingInput={setTrackingInput}
         onSaveTrackingCode={handleSaveTrackingCode}
         onOpenAddressModal={handleModifyAddress}
@@ -725,6 +956,8 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
             handleAcceptRefund(currentOrderId!);
           }
         }}
+        statusUpdateLoading={statusUpdateLoading}
+        statusUpdateError={statusUpdateError}
       />
 
       <div className="lg:grid lg:grid-cols-10 lg:min-h-screen">
@@ -733,7 +966,7 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
           <div className="my-6">
             <h1 className="ml-6 text-4xl font-bold">Orders</h1>
           </div>
-              <div className="lg:w-full bg-white border-r border-gray-900 py-6 my-8 overflow-x-clip ">
+              <div className="w-full bg-white border-r border-gray-900 py-6 my-8 overflow-x-clip ">
                 <div className="ml-6 flex items-center w-full gap-2 mb-6">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'round', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
                     <path d="M5,8l14,0" fill="none" strokeWidth="1.04px"/>
@@ -747,11 +980,11 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                   </div>
                 </div>
                 <div className="w-full flex justify-center items-center flex-col">
-                  <div className="space-y-6 px-1 py-1 min-w-75 items-center">
+                  <div className="space-y-6 px-1 py-1 min-w-75 w-full max-w-90 items-center">
                     {/* Date Section */}
                     <div>
                       <h3 className="text-lg font-semibold mb-4">Date</h3>
-                      <div className="w-full flex gap-2">
+                      <div className="w-full flex justify-between">
                         <input
                           type="date"
                           placeholder="MM-DD-YYYY"
@@ -759,7 +992,7 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                           onChange={(e) => setDateFrom(e.target.value)}
                           className={INPUT_STYLE}
                         />
-                        <span className="flex items-center text-gray-400">-</span>
+                        <span className="flex items-center text-gray-500">-</span>
                         <input
                           type="date"
                           placeholder="MM-DD-YYYY"
@@ -787,7 +1020,7 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                           }}
                           className={INPUT_STYLE + " text-end"}
                         />
-                        <span className="flex items-center text-gray-400">-</span>
+                        <span className="flex items-center text-gray-500">-</span>
                         <input
                           type="text"
                           inputMode="decimal"
@@ -801,44 +1034,18 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                           }}
                           className={INPUT_STYLE + " text-end"}
                         />
+                        <select
+                          value={totalCurrency}
+                          onChange={(e) => settotalCurrency(e.target.value)}
+                          style={selectStyle}
+                          className="w-16 px-1 py-2 pr-8 bg-gray-100 border-none appearance-none text-sm cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-900"
+                        >
+                          <option value="">All</option>
+                          <option value="$">$</option>
+                          <option value="€">€</option>
+                          <option value="NT$">NT$</option>
+                        </select>
                       </div>
-                    </div>
-
-                    {/* Item Count Section */}
-                    <div>
-                      <div className="mb-4 flex flex-row">
-                        <h3 className="text-lg font-semibold ">Item Count</h3><p className="text-xs text-gray-500 ml-2">*include free sample</p>
-                      </div>
-                      <div className="w-full flex gap-2 mb-1">
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          placeholder="Maximum"
-                          value={itemCountMax}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === '' || /^\d+$/.test(value)) {
-                              setItemCountMax(value);
-                            }
-                          }}
-                          className={INPUT_STYLE + " text-end"}
-                      />
-                        <span className="flex items-center text-gray-400">-</span>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          placeholder="Minimum"
-                          value={itemCountMin}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === '' || /^\d+$/.test(value)) {
-                              setItemCountMin(value);
-                            }
-                          }}
-                          className={INPUT_STYLE + " text-end"}
-                      />
-                      </div>
-
                     </div>
 
                     {/* Address Section */}
@@ -954,21 +1161,21 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                           {/* Date Section */}
                           <div className="flex flex-row justify-between items-center">
                             <span className="text-base font-semibold">Date</span>
-                            <div className="flex justify-between w-62">
+                            <div className="flex gap-2 w-64 sm:w-100">
                               <input
                                 type="date"
                                 placeholder="MM-DD-YYYY"
                                 value={dateFrom}
                                 onChange={(e) => setDateFrom(e.target.value)}
-                                className={INPUT_STYLE}
+                                className="w-full text-sm px-0 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
                               />
-                              <span className="flex items-center text-gray-400">-</span>
+                              <span className="flex items-center text-gray-500">-</span>
                               <input
                                 type="date"
                                 placeholder="MM-DD-YYYY"
                                 value={dateTo}
                                 onChange={(e) => setDateTo(e.target.value)}
-                                className={INPUT_STYLE}
+                                className="w-full text-sm px-0 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
                               />
                             </div>
                           </div>
@@ -976,7 +1183,7 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                           {/* Total Section */}
                           <div className="flex flex-row justify-between items-center">
                             <span className="text-base font-semibold">Total</span>
-                            <div className="flex justify-between w-62">
+                            <div className="flex gap-1 w-64 sm:w-100">
                               <input
                                 type="text"
                                 inputMode="decimal"
@@ -990,7 +1197,7 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                                 }}
                                 className={INPUT_STYLE + " text-end"}
                               />
-                              <span className="flex items-center text-gray-400">-</span>
+                              <span className="flex items-center text-gray-500">-</span>
                               <input
                                 type="text"
                                 inputMode="decimal"
@@ -1004,50 +1211,26 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                                 }}
                                 className={INPUT_STYLE + " text-end"}
                               />
+                              <select
+                                value={totalCurrency}
+                                onChange={(e) => settotalCurrency(e.target.value)}
+                                style={selectStyle}
+                                className="w-16 px-1 py-2 pr-8 bg-gray-100 border-none appearance-none text-sm cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-900"
+                              >
+                                <option value="">All</option>
+                                <option value="$">$</option>
+                                <option value="€">€</option>
+                                <option value="NT$">NT$</option>
+                              </select>
                             </div>
-                          </div>
-
-                          {/* Item Count Section */}
-                          <div className="flex flex-row justify-between items-center">
-                            <span className="text-base font-semibold ">Items</span>
-                            <div className="flex justify-between w-62">
-                              <input
-                                type="text"
-                                inputMode="numeric"
-                                placeholder="Maximum"
-                                value={itemCountMax}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === '' || /^\d+$/.test(value)) {
-                                    setItemCountMax(value);
-                                  }
-                                }}
-                                className={INPUT_STYLE + " text-end"}
-                            />
-                              <span className="flex items-center text-gray-400">-</span>
-                              <input
-                                type="text"
-                                inputMode="numeric"
-                                placeholder="Minimum"
-                                value={itemCountMin}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === '' || /^\d+$/.test(value)) {
-                                    setItemCountMin(value);
-                                  }
-                                }}
-                                className={INPUT_STYLE + " text-end"}
-                            />
-                            </div>
-
                           </div>
 
                           {/* Address Section */}
                           <div className="flex flex-row justify-between items-start">
                             <span className="text-base font-semibold">Address</span>
-                            <div className="space-y-3 w-62">
+                            <div className="space-y-3 w-64 sm:w-100">
                               {addressConditions.map((condition, index) => (
-                                <div key={condition.id} className="flex items-center justify-between">
+                                <div key={condition.id} className="flex items-center gap-1 sm:justify-between">
                                   <select
                                     value={condition.type}
                                     onChange={(e) => updateAddressCondition(condition.id, { type: e.target.value as AddressCondition['type'] })}
@@ -1092,7 +1275,7 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                           {/* Product Section */}
                           <div className="flex flex-row justify-between items-start">
                             <span className="text-base font-semibold">Product</span>
-                            <div className="w-62">
+                            <div className="w-64 sm:w-100">
                               <ProductSearchableDropdown
                                 selectedIds={selectedProductIds}
                                 items={products.map(p => ({ id: p.id, label: p.name }))}
@@ -1244,7 +1427,7 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                       viewBox="0 0 24 24"
                       strokeWidth={2}
                       stroke="currentColor"
-                      className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                     </svg>
@@ -1365,7 +1548,10 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
             </div>
           </div>
           <div className="text-sm mb-2">
-            {sortedOrders.length > 1 ? `${sortedOrders.length} orders` : `${sortedOrders.length} order`}
+            {(() => {
+              const totalCount = serverTotalCount !== null ? serverTotalCount : sortedOrders.length;
+              return totalCount > 1 ? `${totalCount} orders` : `${totalCount} order`;
+            })()}
             <span className="text-gray-500 ml-2">
               {selectedOrders.size > 0 ? `${selectedOrders.size} selected` : ``}
             </span>
@@ -1464,7 +1650,7 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                       <TableCell className="text-xs font-mono">{order.orderNumber}</TableCell>
                     )}
                     {visibleColumns.includes('Date') && (
-                      <TableCell className="text-sm">{formatDate(order.createdAt)}</TableCell>
+                      <TableCell className="text-sm">{formatOrderDate(order.createdAt)}</TableCell>
                     )}
                     {visibleColumns.includes('Costumer') && (
                       <TableCell className="text-sm">{order.customerName}</TableCell>
@@ -1486,10 +1672,10 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem onClick={() => handleModifyOrder(order.id)}>
-                            Modify Order
+                            Edit Order
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={handleModifyAddress}>
-                            Modify Address
+                            Edit Address
                           </DropdownMenuItem>
                           {order.status === 'CANCELLING' && (
                             <DropdownMenuItem onClick={() => handleAcceptCancel(order.id)} className="text-red-600">
@@ -1599,7 +1785,7 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                       </TableCell>
                     )}
                     {visibleColumns.includes('Date') && (
-                      <TableCell className="text-sm">{formatDate(order.createdAt)}</TableCell>
+                      <TableCell className="text-sm">{formatOrderDate(order.createdAt)}</TableCell>
                     )}
                     {visibleColumns.includes('Costumer') && (
                       <TableCell className="text-sm">{order.customerName}</TableCell>
@@ -1617,10 +1803,10 @@ export default function OrdersClient({ initialOrders }: OrdersClientProps) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem onClick={() => handleModifyOrder(order.id)}>
-                            Modify Order
+                            Edit Order
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={handleModifyAddress}>
-                            Modify Address
+                            Edit Address
                           </DropdownMenuItem>
                           {order.status === 'CANCELLING' && (
                             <DropdownMenuItem onClick={() => handleAcceptCancel(order.id)} className="text-red-600">

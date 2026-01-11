@@ -11,7 +11,6 @@ interface MockOrder {
   status: OrderStatus;
   total: number;
   currency: string;
-  itemCount: number;
 }
 
 // Helper function to generate random ID (similar to cuid format)
@@ -48,14 +47,13 @@ function getRandomDate(): Date {
   return date;
 }
 
-// Helper function to generate random total and item count (100x + 110y, x + y + 1)
-function getRandomOrderValues(): { total: number; itemCount: number } {
+// Helper function to generate random total (100x + 110y)
+function getRandomOrderValues(): { total: number } {
   let x = Math.floor(Math.random() * 10); // 0-9 items at $100
   const y = Math.floor(Math.random() * 10); // 0-9 items at $110
   if (x + y < 1) x = 1;
   return {
     total: 100 * x + 110 * y,
-    itemCount: x + y + 1 // +1 for free sample
   };
 }
 
@@ -122,7 +120,7 @@ const generateMockOrders = (): MockOrder[] => {
 
   for (let i = 0; i < 100; i++) {
     const orderId = generateId();
-    const { total, itemCount } = getRandomOrderValues();
+    const { total } = getRandomOrderValues();
     orders.push({
       id: orderId,
       orderNumber: orderId,
@@ -131,7 +129,6 @@ const generateMockOrders = (): MockOrder[] => {
       status: statuses[Math.floor(Math.random() * statuses.length)],
       total,
       currency: currencies[Math.floor(Math.random() * currencies.length)],
-      itemCount,
     });
   }
 
