@@ -430,6 +430,16 @@ export default function UsersClient({ initialUsers, serverActions }: UsersClient
     setCurrentUserData(prev => prev ? { ...prev, ...updates } : null);
   };
 
+  // Helper function to generate random ID (similar to cuid format)
+  const generateOrderId = (): string => {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let id = 'cm';
+    for (let i = 0; i < 24; i++) {
+      id += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return id;
+  };
+
   // Generate mock orders for a user
   const generateMockOrders = (userId: string): OrderTableItem[] => {
     const user = users.find(u => u.id === userId);
@@ -439,15 +449,24 @@ export default function UsersClient({ initialUsers, serverActions }: UsersClient
     const statuses: Array<'PENDING' | 'REQUESTED' | 'CANCELLING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED'> =
       ['PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED', 'REQUESTED', 'CANCELLING'];
 
-    return Array.from({ length: 15 }, (_, i) => ({
-      id: `${userId}-order-${i + 1}`,
-      orderNumber: `ORD-${Math.floor(Math.random() * 90000) + 10000}`,
-      createdAt: new Date(Date.now() - Math.floor(Math.random() * 90) * 24 * 60 * 60 * 1000),
-      customerName: user.name,
-      status: statuses[i % statuses.length],
-      total: Math.floor(Math.random() * 500) + 50,
-      currency: ['$', '€', 'NT$'][Math.floor(Math.random() * 3)],
-    }));
+    return Array.from({ length: 15 }, (_, i) => {
+      const orderId = generateOrderId();
+      // Generate total as 100x + 110y
+      let x = Math.floor(Math.random() * 10);
+      const y = Math.floor(Math.random() * 10);
+      if (x + y < 1) x = 1;
+      const total = 100 * x + 110 * y;
+
+      return {
+        id: orderId,
+        orderNumber: orderId,
+        createdAt: new Date(Date.now() - Math.floor(Math.random() * 90) * 24 * 60 * 60 * 1000),
+        customerName: user.name,
+        status: statuses[i % statuses.length],
+        total,
+        currency: ['$', '€', 'NT$'][Math.floor(Math.random() * 3)],
+      };
+    });
   };
 
   // Pagination constants
