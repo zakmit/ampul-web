@@ -1,6 +1,7 @@
 'use client'
 import { useState, useMemo } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { OrderTable, type OrderTableItem, type OrderStatus } from '@/components/ui/OrderTable';
 import {
   ChartConfig,
   ChartContainer,
@@ -330,6 +331,53 @@ const formatCurrency = (value: number, currency: string) => {
   return `${currency}${value.toLocaleString()}`;
 };
 
+// Helper function to generate random ID (similar to cuid format)
+function generateOrderId(): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let id = 'cm';
+  for (let i = 0; i < 24; i++) {
+    id += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return id;
+}
+
+// Generate 10 recent mock orders
+const generateRecentOrders = (): OrderTableItem[] => {
+  const statuses: OrderStatus[] = ['PENDING', 'SHIPPED', 'DELIVERED', 'REQUESTED', 'CANCELLING'];
+  const currencies = ['$', '€', 'NT$'];
+  const customerNames = [
+    'Cheyenne Culhane',
+    'Paityn Schleifer',
+    'James Calzoni',
+    'Maria Passaquindici Arcand',
+    'Ruben Franci',
+    'Carter Geidt',
+    'Terry Franci',
+    'Craig Siphron',
+    'Corey Press',
+    'Paityn Philips',
+  ];
+
+  return Array.from({ length: 10 }, (_, i) => {
+    const orderId = generateOrderId();
+    // Generate total as 100x + 110y
+    let x = Math.floor(Math.random() * 10);
+    const y = Math.floor(Math.random() * 10);
+    if (x + y < 1) x = 1;
+    const total = 100 * x + 110 * y;
+
+    return {
+      id: orderId,
+      orderNumber: orderId,
+      createdAt: new Date(Date.now() - Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000), // Within last 7 days
+      customerName: customerNames[i],
+      status: statuses[Math.floor(Math.random() * statuses.length)],
+      total,
+      currency: currencies[Math.floor(Math.random() * currencies.length)],
+    };
+  }).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()); // Sort by newest first
+};
+
 export default function AdminPage() {
   const [timeRange, setTimeRange] = useState('THIS MONTH');
   const [revenueCurrency, setRevenueCurrency] = useState('$');
@@ -341,6 +389,9 @@ export default function AdminPage() {
 
   const currencyList = ['$', '€', 'NT$'];
   const userName = "Apollodorus"
+
+  // Generate recent orders once
+  const recentOrders = useMemo(() => generateRecentOrders(), []);
 
   const revenueChartData = useMemo(() => generateRevenueMockData(timeRange, revenueChartCurrency as CurrencyKey), [timeRange, revenueChartCurrency]);
   const orderChartData = useMemo(() => generateOrderMockData(timeRange, ordersChartCurrency as CurrencyKey), [timeRange, ordersChartCurrency]);
@@ -384,7 +435,7 @@ export default function AdminPage() {
           <option value="ALL">ALL</option>
         </select>
       </div>
-      {/* Blocks */}
+      {/* Revenue */}
       <div className="col-span-1 sm:col-span-2 grid grid-rows-6 w-full bg-gray-700 aspect-square">
         <div className="row-span-5 text-gray-100 flex text-center items-center flex-col justify-center">
           <h3 className="text-2xl lg:text-4xl font-bold mb-2">{formatCurrency(revenueValue, revenueCurrency)}</h3>
@@ -405,6 +456,7 @@ export default function AdminPage() {
           ))}
         </div>
       </div>
+      {/* Orders */}
       <div className="col-span-1 sm:col-span-2 grid grid-rows-6 w-full bg-gray-100 aspect-square">
         <div className="row-span-5 text-gray-700 flex text-center items-center flex-col justify-center">
           <h3 className="text-2xl lg:text-4xl font-bold mb-2">{ordersValue.toLocaleString()}</h3>
@@ -425,7 +477,7 @@ export default function AdminPage() {
           ))}
         </div>
       </div>
-
+      {/* Pending Orders */}
       <div className="col-start-1 col-span-1 sm:col-span-2 sm:col-start-5 grid grid-rows-6 w-full bg-gray-100 sm:bg-gray-700 aspect-square">
         <div className="row-span-5 text-gray-700 sm:text-gray-100 flex text-center items-center flex-col justify-center">
           <h3 className="text-2xl lg:text-4xl font-bold mb-2">{pendingOrdersValue}</h3>
@@ -446,7 +498,7 @@ export default function AdminPage() {
           ))}
         </div>
       </div>
-
+      {/* Users visit */}
       <div className="col-start-2 col-span-1 sm:col-span-2 sm:col-start-7 w-full bg-gray-700 sm:bg-gray-100 aspect-square">
         <div className="text-gray-100 sm:text-gray-700 h-full flex text-center items-center flex-col justify-center">
           <h3 className="text-2xl lg:text-4xl font-bold mb-2">{userVisitsValue.toLocaleString()}</h3>
@@ -568,7 +620,15 @@ export default function AdminPage() {
           </ChartContainer>
         </div>
       </div>
-
+      {/* Orders List */}
+      <div className="col-span-2 sm:col-span-8 mt-2">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6 lg:mb-8">Recent Orders</h2>
+        <OrderTable
+          orders={recentOrders}
+          showActions={false}
+          emptyMessage="No recent orders"
+        />
+      </div>
     </div>
   );
 }
