@@ -252,15 +252,15 @@ export default function NavBar({ showBanner = true,
                   onMouseEnter={() => setIsDropdownVisible(false)}
                   className="inline-flex items-center justify-center rounded-md p-1 lg:p-2 text-gray-900"
                   >
-                  <span className="sr-only">User</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={16} stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'round', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
-                      <g transform="matrix(0.0742212,0,0,0.0755272,0.866816,-2.29218)">
-                      <circle cx="150" cy="130" r="50" style={{fill: 'none', strokeWidth:'11.8px'}}/>
-                      </g>
-                      <g transform="matrix(0.0706869,0,0,0.0706869,1.40202,1.87141)">
-                      <path d="M40,260C40,260 34.706,186.727 40,180C79.181,130.216 225.826,130.522 260,180C264.973,187.2 260,260 260,260L40,260Z" style={{fill: 'none', strokeWidth: '12.5px' }}/>
-                      </g>
-                  </svg>
+                    <span className="sr-only">User</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={16} stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'round', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
+                        <g transform="matrix(0.0742212,0,0,0.0755272,0.866816,-2.29218)">
+                        <circle cx="150" cy="130" r="50" style={{fill: 'none', strokeWidth:'11.8px'}}/>
+                        </g>
+                        <g transform="matrix(0.0706869,0,0,0.0706869,1.40202,1.87141)">
+                        <path d="M40,260C40,260 34.706,186.727 40,180C79.181,130.216 225.826,130.522 260,180C264.973,187.2 260,260 260,260L40,260Z" style={{fill: 'none', strokeWidth: '12.5px' }}/>
+                        </g>
+                    </svg>
                   </button>
                   <button
                   type="button"
