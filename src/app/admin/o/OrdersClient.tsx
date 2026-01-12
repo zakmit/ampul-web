@@ -948,7 +948,7 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen w-full bg-white">
       {/* Confirm Modal */}
       {confirmModalOpen && (
         <div className="fixed inset-0 bg-gray-800/30 backdrop-blur-sm z-30 transition-all duration-500 flex items-center justify-center">

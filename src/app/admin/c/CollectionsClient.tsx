@@ -249,7 +249,7 @@ export default function CollectionsClient({
   });
 
   return (
-    <div className="lg:min-h-screen bg-white">
+    <div className="lg:min-h-screen w-full bg-white">
       {/* Delete Confirmation Popup */}
       {deleteConfirmation !== null && (
         <div

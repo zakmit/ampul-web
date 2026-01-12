@@ -531,7 +531,7 @@ export default function UsersClient({ initialUsers, serverActions }: UsersClient
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen w-full bg-white">
       <div className="lg:grid lg:grid-cols-10 lg:min-h-screen">
         {/* Desktop Filter - 3 columns */}
         <div className="hidden lg:block lg:col-span-3">
