@@ -5,7 +5,7 @@ export default function AdminLayout({
 }) {
   return (
     <div className="flex justify-center">
-      <div className="w-full max-w-400">
+      <div className="w-full max-w-400 flex justify-center">
         {children}
       </div>
     </div>
