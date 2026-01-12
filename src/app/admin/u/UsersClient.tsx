@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/shadcn/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/shadcn/dropdown-menu';
 import { ChevronLeft, ChevronRight, Plus, Minus, MoreHorizontal, X, MoveDown, MoveUp } from 'lucide-react';
@@ -8,6 +8,21 @@ import { formatOrderDate } from '@/lib/formatters';
 import { EditUserModal, type UserInfoData } from '@/components/ui/EditUserModal';
 import { UserOrdersModal } from '@/components/ui/UserOrdersModal';
 import { type OrderTableItem } from '@/components/ui/OrderTable';
+import type {
+  readUsers,
+  readUser,
+  readUserOrders,
+  updateUser,
+  updateUserAddress,
+  readOrder,
+  updateTrackingCode,
+  updateOrderStatus,
+  updateOrderAddress,
+  acceptCancelRequest,
+  acceptRefundRequest,
+  UserFilters,
+  UserDetail,
+} from './actions';
 
 const INPUT_STYLE = "w-full max-w-40 sm:max-w-80 lg:max-w-42 text-sm px-2 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
 
@@ -21,31 +36,52 @@ interface User {
   id: string;
   email: string;
   name: string;
-  lastLogIn: Date;
-  lastOrder: Date;
-  orderCount: number;
+  lastLogIn: Date | null;
+  lastOrder: Date | null;
+}
+
+interface ServerActions {
+  fetchUsers: typeof readUsers;
+  fetchUser: typeof readUser;
+  fetchUserOrders: typeof readUserOrders;
+  updateUser: typeof updateUser;
+  updateUserAddress: typeof updateUserAddress;
+  fetchOrder: typeof readOrder;
+  updateTrackingCode: typeof updateTrackingCode;
+  updateOrderStatus: typeof updateOrderStatus;
+  updateOrderAddress: typeof updateOrderAddress;
+  acceptCancelRequest: typeof acceptCancelRequest;
+  acceptRefundRequest: typeof acceptRefundRequest;
 }
 
 interface UsersClientProps {
   initialUsers: User[];
-  // Future: server actions will be passed here
+  serverActions?: ServerActions | null;
 }
 
-export default function UsersClient({ initialUsers }: UsersClientProps) {
+export default function UsersClient({ initialUsers, serverActions }: UsersClientProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchColumn, setSearchColumn] = useState('E-mail');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchInput, setSearchInput] = useState(''); // Temporary input value before Enter
   const [visibleColumns] = useState(['E-mail', 'Name', 'Last Log In', 'Last Order']);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortColumn, setSortColumn] = useState<'Last Log In' | 'Last Order' | null>(null);
+  const [sortColumn, setSortColumn] = useState<'Last Log In' | 'Last Order' | null>('Last Log In');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
+  // User management state
+  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [serverTotalCount, setServerTotalCount] = useState<number | null>(null);
 
   // Modal states
   const [editUserModalOpen, setEditUserModalOpen] = useState(false);
   const [userOrdersModalOpen, setUserOrdersModalOpen] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [currentUserData, setCurrentUserData] = useState<UserInfoData | null>(null);
+  const [userOrders, setUserOrders] = useState<OrderTableItem[]>([]);
+  const [userUpdateLoading, setUserUpdateLoading] = useState(false);
+  const [userFieldErrors, setUserFieldErrors] = useState<Record<string, string>>({});
+  const [userGeneralError, setUserGeneralError] = useState<string | null>(null);
 
   // Handle Enter key to trigger search
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -74,6 +110,9 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
     { id: '1', type: 'line1', value: '' }
   ]);
 
+  // Applied address conditions
+  const [appliedAddressConditions, setAppliedAddressConditions] = useState<AddressCondition[]>([]);
+
   // Address condition handlers
   const addAddressCondition = () => {
     setAddressConditions([...addressConditions, { id: Date.now().toString(), type: 'region', value: '' }]);
@@ -93,6 +132,7 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
     setAppliedLastLogInTo(lastLogInTo);
     setAppliedLastOrderFrom(lastOrderFrom);
     setAppliedLastOrderTo(lastOrderTo);
+    setAppliedAddressConditions(addressConditions);
 
     // Reset to first page when applying filters
     setCurrentPage(1);
@@ -115,6 +155,7 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
     setAppliedLastLogInTo('');
     setAppliedLastOrderFrom('');
     setAppliedLastOrderTo('');
+    setAppliedAddressConditions([]);
 
     // Reset to first page
     setCurrentPage(1);
@@ -123,29 +164,77 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
     setIsFilterOpen(false);
   };
 
+  // Fetch users from server when filters change (only if serverActions is available)
+  useEffect(() => {
+    if (!serverActions?.fetchUsers) return;
+
+    const loadUsers = async () => {
+      const filters: UserFilters = {
+        searchColumn: searchColumn as UserFilters['searchColumn'],
+        searchQuery: searchQuery || undefined,
+        lastLogInFrom: appliedLastLogInFrom || undefined,
+        lastLogInTo: appliedLastLogInTo || undefined,
+        lastOrderFrom: appliedLastOrderFrom || undefined,
+        lastOrderTo: appliedLastOrderTo || undefined,
+        addressConditions: appliedAddressConditions.filter(c => c.value.trim() !== '').length > 0
+          ? appliedAddressConditions.filter(c => c.value.trim() !== '')
+          : undefined,
+        sortColumn: sortColumn as UserFilters['sortColumn'],
+        sortDirection: sortDirection as UserFilters['sortDirection'],
+        page: currentPage,
+        limit: 20,
+      };
+
+      const result = await serverActions.fetchUsers(filters);
+
+      if (result.success && result.data) {
+        setUsers(result.data.users as User[]);
+        setServerTotalCount(result.data.totalCount);
+      }
+    };
+
+    loadUsers();
+  }, [
+    serverActions,
+    searchColumn,
+    searchQuery,
+    appliedLastLogInFrom,
+    appliedLastLogInTo,
+    appliedLastOrderFrom,
+    appliedLastOrderTo,
+    appliedAddressConditions,
+    sortColumn,
+    sortDirection,
+    currentPage,
+  ]);
+
+  // When using server-side fetching, skip client-side filtering
+  // The server already applies all filters
+  const shouldUseClientFiltering = !serverActions;
+
   // Apply advanced filters
-  const advancedFilteredUsers = initialUsers.filter(user => {
+  const advancedFilteredUsers = shouldUseClientFiltering ? users.filter(user => {
     // Last Log In filter
-    if (appliedLastLogInFrom && new Date(user.lastLogIn) < new Date(appliedLastLogInFrom)) {
+    if (appliedLastLogInFrom && user.lastLogIn && new Date(user.lastLogIn) < new Date(appliedLastLogInFrom)) {
       return false;
     }
-    if (appliedLastLogInTo && new Date(user.lastLogIn) > new Date(appliedLastLogInTo + 'T23:59:59')) {
+    if (appliedLastLogInTo && user.lastLogIn && new Date(user.lastLogIn) > new Date(appliedLastLogInTo + 'T23:59:59')) {
       return false;
     }
 
     // Last Order filter
-    if (appliedLastOrderFrom && new Date(user.lastOrder) < new Date(appliedLastOrderFrom)) {
+    if (appliedLastOrderFrom && user.lastOrder && new Date(user.lastOrder) < new Date(appliedLastOrderFrom)) {
       return false;
     }
-    if (appliedLastOrderTo && new Date(user.lastOrder) > new Date(appliedLastOrderTo + 'T23:59:59')) {
+    if (appliedLastOrderTo && user.lastOrder && new Date(user.lastOrder) > new Date(appliedLastOrderTo + 'T23:59:59')) {
       return false;
     }
 
     return true;
-  });
+  }) : users;
 
   // Apply search filter
-  const searchFilteredUsers = advancedFilteredUsers.filter(user => {
+  const searchFilteredUsers = shouldUseClientFiltering ? advancedFilteredUsers.filter(user => {
     if (!searchQuery.trim()) {
       return true;
     }
@@ -161,7 +250,7 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
     // Will be implemented when connected to database
 
     return true;
-  });
+  }) : advancedFilteredUsers;
 
   // Sort handler
   const handleSort = (column: 'Last Log In' | 'Last Order') => {
@@ -175,16 +264,16 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
     }
   };
 
-  // Sort users
-  const sortedUsers = sortColumn ? [...searchFilteredUsers].sort((a, b) => {
+  // Sort users (only client-side when not using server actions)
+  const sortedUsers = shouldUseClientFiltering && sortColumn ? [...searchFilteredUsers].sort((a, b) => {
     if (sortColumn === 'Last Log In') {
-      const dateA = new Date(a.lastLogIn).getTime();
-      const dateB = new Date(b.lastLogIn).getTime();
+      const dateA = a.lastLogIn ? new Date(a.lastLogIn).getTime() : 0;
+      const dateB = b.lastLogIn ? new Date(b.lastLogIn).getTime() : 0;
       return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
     } else {
       // Last Order sorting
-      const dateA = new Date(a.lastOrder).getTime();
-      const dateB = new Date(b.lastOrder).getTime();
+      const dateA = a.lastOrder ? new Date(a.lastOrder).getTime() : 0;
+      const dateB = b.lastOrder ? new Date(b.lastOrder).getTime() : 0;
       return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
     }
   }) : searchFilteredUsers;
@@ -192,34 +281,149 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
   const filteredUsers = sortedUsers;
 
   // Handler functions for modals
-  const handleShowAllOrders = (userId: string) => {
+  const handleShowAllOrders = async (userId: string) => {
     setCurrentUserId(userId);
+
+    if (serverActions) {
+      // Fetch orders from server
+      const result = await serverActions.fetchUserOrders(userId, 1, 20);
+      if (result.success && result.data) {
+        setUserOrders(result.data.orders as OrderTableItem[]);
+      }
+    } else {
+      // Use mock data
+      setUserOrders(generateMockOrders(userId));
+    }
+
     setUserOrdersModalOpen(true);
   };
 
-  const handleEditInformation = (userId: string) => {
-    const user = initialUsers.find(u => u.id === userId);
-    if (user) {
-      setCurrentUserId(userId);
-      setCurrentUserData({
-        name: user.name,
-        email: user.email,
-        birthday: null,
-        phone: null,
-        addressLine1: '',
-        addressLine2: null,
-        city: '',
-        region: null,
-        postalCode: '',
-        country: '',
-      });
-      setEditUserModalOpen(true);
+  const handleEditInformation = async (userId: string) => {
+    setCurrentUserId(userId);
+    // Clear previous errors when opening modal
+    setUserFieldErrors({});
+    setUserGeneralError(null);
+
+    if (serverActions) {
+      // Fetch full user data from server
+      const result = await serverActions.fetchUser(userId);
+      if (result.success && result.data) {
+        setCurrentUserData({
+          name: result.data.name || '',
+          email: result.data.email,
+          birthday: result.data.birthday ? result.data.birthday.toISOString().split('T')[0] : null,
+          phone: result.data.phone,
+          addressLine1: result.data.address?.addressLine1 || '',
+          addressLine2: result.data.address?.addressLine2 || null,
+          city: result.data.address?.city || '',
+          region: result.data.address?.region || null,
+          postalCode: result.data.address?.postalCode || '',
+          country: result.data.address?.country || '',
+        });
+        setEditUserModalOpen(true);
+      } else {
+        alert(result.error || 'Failed to load user');
+      }
+    } else {
+      // Mock data behavior
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        setCurrentUserData({
+          name: user.name,
+          email: user.email,
+          birthday: null,
+          phone: null,
+          addressLine1: '',
+          addressLine2: null,
+          city: '',
+          region: null,
+          postalCode: '',
+          country: '',
+        });
+        setEditUserModalOpen(true);
+      }
     }
   };
 
-  const handleSaveUserInfo = () => {
-    // In real app, this would save to server
-    setEditUserModalOpen(false);
+  const handleSaveUserInfo = async () => {
+    if (!currentUserId || !currentUserData) return;
+
+    // Clear previous errors
+    setUserFieldErrors({});
+    setUserGeneralError(null);
+
+    if (serverActions) {
+      setUserUpdateLoading(true);
+
+      // Update user info
+      const userData = {
+        name: currentUserData.name,
+        birthday: currentUserData.birthday,
+        phone: currentUserData.phone,
+      };
+
+      const userResult = await serverActions.updateUser(currentUserId, userData);
+      if (!userResult.success) {
+        setUserUpdateLoading(false);
+        const resultData = userResult.data as { fieldErrors?: Record<string, string> } | undefined;
+        if (resultData?.fieldErrors) {
+          setUserFieldErrors(resultData.fieldErrors);
+          setUserGeneralError('Please correct the errors below');
+        } else {
+          setUserGeneralError(userResult.error || 'Failed to update user');
+        }
+        return;
+      }
+
+      // Update address if any address field is provided
+      const hasAddressData = currentUserData.addressLine1?.trim() ||
+                            currentUserData.city?.trim() ||
+                            currentUserData.postalCode?.trim() ||
+                            currentUserData.country?.trim();
+
+      if (hasAddressData) {
+        const addressData = {
+          recipientName: currentUserData.name,
+          recipientPhone: currentUserData.phone,
+          addressLine1: currentUserData.addressLine1 || '',
+          addressLine2: currentUserData.addressLine2,
+          city: currentUserData.city || '',
+          region: currentUserData.region,
+          postalCode: currentUserData.postalCode || '',
+          country: currentUserData.country || '',
+        };
+
+        const addressResult = await serverActions.updateUserAddress(currentUserId, addressData);
+        if (!addressResult.success) {
+          setUserUpdateLoading(false);
+          const addressResultData = addressResult.data as { fieldErrors?: Record<string, string> } | undefined;
+          if (addressResultData?.fieldErrors) {
+            setUserFieldErrors(addressResultData.fieldErrors);
+            setUserGeneralError('Please correct the errors below');
+          } else {
+            setUserGeneralError(addressResult.error || 'Failed to update address');
+          }
+          return;
+        }
+      }
+
+      // Refresh users list
+      const refreshResult = await serverActions.fetchUsers({
+        sortColumn: sortColumn as UserFilters['sortColumn'],
+        sortDirection,
+        page: currentPage,
+        limit: 20,
+      });
+      if (refreshResult.success && refreshResult.data) {
+        setUsers(refreshResult.data.users as User[]);
+      }
+
+      setUserUpdateLoading(false);
+      setEditUserModalOpen(false);
+    } else {
+      // Mock data behavior
+      setEditUserModalOpen(false);
+    }
   };
 
   const handleUpdateUserInfo = (updates: Partial<UserInfoData>) => {
@@ -228,7 +432,7 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
 
   // Generate mock orders for a user
   const generateMockOrders = (userId: string): OrderTableItem[] => {
-    const user = initialUsers.find(u => u.id === userId);
+    const user = users.find(u => u.id === userId);
     if (!user) return [];
 
     // Generate 15 mock orders for demo
@@ -248,12 +452,20 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
 
   // Pagination constants
   const ITEMS_PER_PAGE = 20;
-  const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
 
-  // Calculate paginated data
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+  // When using server-side fetching, pagination is handled by the server
+  // so we don't slice the data client-side
+  const paginatedUsers = shouldUseClientFiltering ? (() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredUsers.slice(startIndex, endIndex);
+  })() : filteredUsers;
+
+  // Calculate total pages for display
+  // Use serverTotalCount when available (server-side), otherwise use filteredUsers.length (client-side)
+  const totalPages = serverTotalCount !== null
+    ? Math.ceil(serverTotalCount / ITEMS_PER_PAGE)
+    : Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
 
   const selectStyle = {
     backgroundImage: `url("data:image/svg+xml,%3Csvg fill='%23000000' height='24px' width='24px' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 28.769 28.769' xml:space='preserve'%3E%3Cg%3E%3Cg id='c106_arrow'%3E%3Cpath d='M28.678,5.798L14.713,23.499c-0.16,0.201-0.495,0.201-0.658,0L0.088,5.798C-0.009,5.669-0.027,5.501,0.04,5.353 C0.111,5.209,0.26,5.12,0.414,5.12H28.35c0.16,0,0.31,0.089,0.378,0.233C28.798,5.501,28.776,5.669,28.678,5.798z'/%3E%3C/g%3E%3Cg id='Capa_1_26_'%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -679,10 +891,10 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
                       <TableCell className="text-sm">{user.name}</TableCell>
                     )}
                     {visibleColumns.includes('Last Log In') && (
-                      <TableCell className="text-sm">{formatOrderDate(user.lastLogIn)}</TableCell>
+                      <TableCell className="text-sm">{user.lastLogIn ? formatOrderDate(user.lastLogIn) : 'N/A'}</TableCell>
                     )}
                     {visibleColumns.includes('Last Order') && (
-                      <TableCell className="text-sm">{formatOrderDate(user.lastOrder)}</TableCell>
+                      <TableCell className="text-sm">{user.lastOrder ? formatOrderDate(user.lastOrder) : 'N/A'}</TableCell>
                     )}
                     <TableCell>
                       <DropdownMenu>
@@ -751,13 +963,24 @@ export default function UsersClient({ initialUsers }: UsersClientProps) {
         onClose={() => setEditUserModalOpen(false)}
         onSave={handleSaveUserInfo}
         onUpdateUser={handleUpdateUserInfo}
+        fieldErrors={userFieldErrors}
+        generalError={userGeneralError}
+        isLoading={userUpdateLoading}
       />
 
       <UserOrdersModal
         isOpen={userOrdersModalOpen}
-        userName={currentUserId ? (initialUsers.find(u => u.id === currentUserId)?.name || '') : ''}
-        orders={currentUserId ? generateMockOrders(currentUserId) : []}
+        userName={currentUserId ? (users.find(u => u.id === currentUserId)?.name || '') : ''}
+        orders={userOrders}
         onClose={() => setUserOrdersModalOpen(false)}
+        serverActions={serverActions ? {
+          fetchOrder: serverActions.fetchOrder,
+          updateTrackingCode: serverActions.updateTrackingCode,
+          updateOrderStatus: serverActions.updateOrderStatus,
+          updateOrderAddress: serverActions.updateOrderAddress,
+          acceptCancelRequest: serverActions.acceptCancelRequest,
+          acceptRefundRequest: serverActions.acceptRefundRequest,
+        } : null}
       />
     </div>
   );

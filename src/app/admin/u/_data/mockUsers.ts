@@ -1,13 +1,12 @@
 // Mock user data for demonstration purposes
-// This file contains 100 randomized users with varied dates and order counts
+// This file contains 100 randomized users with varied dates
 
 interface MockUser {
   id: string;
   email: string;
   name: string;
-  lastLogIn: Date;
-  lastOrder: Date;
-  orderCount: number;
+  lastLogIn: Date | null;
+  lastOrder: Date | null;
 }
 
 // Helper function to generate random ID (similar to cuid format)
@@ -141,12 +140,15 @@ const generateMockUsers = (): MockUser[] => {
       name,
       lastLogIn,
       lastOrder,
-      orderCount: getRandomOrderCount(),
     });
   }
 
   // Sort by lastLogIn (most recent first)
-  return users.sort((a, b) => b.lastLogIn.getTime() - a.lastLogIn.getTime());
+  return users.sort((a, b) => {
+    const aTime = a.lastLogIn ? a.lastLogIn.getTime() : 0;
+    const bTime = b.lastLogIn ? b.lastLogIn.getTime() : 0;
+    return bTime - aTime;
+  });
 };
 
 export const dummyUsers = generateMockUsers();

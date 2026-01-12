@@ -2,15 +2,35 @@
 
 import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { OrderTable, type OrderTableItem } from './OrderTable';
+import { OrderTable, type OrderTableItem, type OrderStatus } from './OrderTable';
 import { EditOrderModal, type OrderData } from './EditOrderModal';
 import { EditAddressModal, type AddressData } from './EditAddressModal';
+
+// Import types for server actions
+import type {
+  readOrder,
+  updateTrackingCode,
+  updateOrderStatus,
+  updateOrderAddress,
+  acceptCancelRequest,
+  acceptRefundRequest,
+} from '@/app/admin/o/actions';
+
+interface ServerActions {
+  fetchOrder: typeof readOrder;
+  updateTrackingCode: typeof updateTrackingCode;
+  updateOrderStatus: typeof updateOrderStatus;
+  updateOrderAddress: typeof updateOrderAddress;
+  acceptCancelRequest: typeof acceptCancelRequest;
+  acceptRefundRequest: typeof acceptRefundRequest;
+}
 
 interface UserOrdersModalProps {
   isOpen: boolean;
   userName: string;
   orders: OrderTableItem[];
   onClose: () => void;
+  serverActions?: ServerActions | null;
 }
 
 export function UserOrdersModal({
@@ -18,6 +38,7 @@ export function UserOrdersModal({
   userName,
   orders,
   onClose,
+  serverActions,
 }: UserOrdersModalProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [modifyOrderModalOpen, setModifyOrderModalOpen] = useState(false);
@@ -28,6 +49,9 @@ export function UserOrdersModal({
   const [trackingInput, setTrackingInput] = useState('');
   const [ordersList, setOrdersList] = useState<OrderTableItem[]>(orders);
   const [trackingCodes, setTrackingCodes] = useState<Record<string, string>>({});
+  const [currentOrderData, setCurrentOrderData] = useState<OrderData | null>(null);
+  const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
+  const [statusUpdateError, setStatusUpdateError] = useState<string | null>(null);
 
   // Sync ordersList when orders prop changes
   useEffect(() => {
@@ -70,10 +94,24 @@ export function UserOrdersModal({
     return pages;
   };
 
-  const handleModifyOrder = (orderId: string) => {
+  const handleModifyOrder = async (orderId: string) => {
     setCurrentOrderId(orderId);
-    setTrackingInput(trackingCodes[orderId] || '');
-    setModifyOrderModalOpen(true);
+
+    if (serverActions) {
+      // Fetch full order details from server
+      const result = await serverActions.fetchOrder(orderId);
+      if (result.success && result.data) {
+        setCurrentOrderData(result.data as OrderData);
+        setTrackingInput(result.data.trackingCode || '');
+        setModifyOrderModalOpen(true);
+      } else {
+        alert(result.error || 'Failed to load order');
+      }
+    } else {
+      // Mock data behavior
+      setTrackingInput(trackingCodes[orderId] || '');
+      setModifyOrderModalOpen(true);
+    }
   };
 
   const handleModifyAddress = () => {
@@ -90,55 +128,155 @@ export function UserOrdersModal({
     setConfirmModalOpen(true);
   };
 
-  const confirmStatusChange = () => {
+  const confirmStatusChange = async () => {
     if (!confirmAction?.orderId) return;
 
-    setOrdersList(prev => prev.map(order => {
-      if (order.id === confirmAction.orderId) {
-        return {
-          ...order,
-          status: confirmAction.type === 'cancel' ? 'CANCELLED' : 'REFUNDED'
-        };
-      }
-      return order;
-    }));
+    if (serverActions) {
+      // Use server action
+      const result = confirmAction.type === 'cancel'
+        ? await serverActions.acceptCancelRequest(confirmAction.orderId)
+        : await serverActions.acceptRefundRequest(confirmAction.orderId);
 
-    setConfirmModalOpen(false);
-    setConfirmAction(null);
-  };
-
-  const handleSaveTrackingCode = () => {
-    if (!currentOrderId) return;
-
-    const currentOrder = ordersList.find(o => o.id === currentOrderId);
-    if (currentOrder?.status === 'PENDING') {
-      const trimmedCode = trackingInput.trim();
-      if (trimmedCode.length > 0 && trimmedCode.length <= 50 && /^[a-zA-Z0-9-]+$/.test(trimmedCode)) {
-        setTrackingCodes(prev => ({ ...prev, [currentOrderId]: trimmedCode }));
-        setOrdersList(prev => prev.map(order =>
-          order.id === currentOrderId ? { ...order, status: 'SHIPPED' as const } : order
-        ));
-        setModifyOrderModalOpen(false);
+      if (result.success) {
+        // Update local state
+        setOrdersList(prev => prev.map(order => {
+          if (order.id === confirmAction.orderId) {
+            return {
+              ...order,
+              status: confirmAction.type === 'cancel' ? 'CANCELLED' : 'REFUNDED'
+            };
+          }
+          return order;
+        }));
+        setConfirmModalOpen(false);
+        setConfirmAction(null);
+      } else {
+        alert(result.error || 'Failed to update order status');
       }
     } else {
+      // Mock data behavior
+      setOrdersList(prev => prev.map(order => {
+        if (order.id === confirmAction.orderId) {
+          return {
+            ...order,
+            status: confirmAction.type === 'cancel' ? 'CANCELLED' : 'REFUNDED'
+          };
+        }
+        return order;
+      }));
+      setConfirmModalOpen(false);
+      setConfirmAction(null);
+    }
+  };
+
+  const handleSaveTrackingCode = async () => {
+    if (!currentOrderId || !currentOrderData) return;
+
+    const trimmedCode = trackingInput.trim();
+    if (trimmedCode.length === 0 || trimmedCode.length > 50 || !/^[a-zA-Z0-9-]+$/.test(trimmedCode)) {
+      alert('Invalid tracking code. Must be 1-50 characters and contain only letters, numbers, and hyphens.');
+      return;
+    }
+
+    if (serverActions) {
+      // Use server action
+      const result = await serverActions.updateTrackingCode(currentOrderId, trimmedCode);
+      if (result.success) {
+        setTrackingCodes(prev => ({ ...prev, [currentOrderId]: trimmedCode }));
+        // Only update status to SHIPPED if currently PENDING
+        const newStatus: OrderStatus = currentOrderData.status === 'PENDING' ? 'SHIPPED' : currentOrderData.status;
+        setOrdersList(prev => prev.map(order =>
+          order.id === currentOrderId ? { ...order, status: newStatus } : order
+        ));
+        // Update current order data as well
+        setCurrentOrderData(prev => prev ? { ...prev, status: newStatus, trackingCode: trimmedCode } : null);
+        setModifyOrderModalOpen(false);
+      } else {
+        alert(result.error || 'Failed to update tracking code');
+      }
+    } else {
+      // Mock data behavior
+      setTrackingCodes(prev => ({ ...prev, [currentOrderId]: trimmedCode }));
+      const newStatus: OrderStatus = currentOrderData.status === 'PENDING' ? 'SHIPPED' : currentOrderData.status;
+      setOrdersList(prev => prev.map(order =>
+        order.id === currentOrderId ? { ...order, status: newStatus } : order
+      ));
+      setCurrentOrderData(prev => prev ? { ...prev, status: newStatus, trackingCode: trimmedCode } : null);
       setModifyOrderModalOpen(false);
     }
   };
 
-  const handleUpdateOrderStatus = (updates: Partial<OrderData>) => {
+  const handleUpdateOrderStatus = async (updates: Partial<OrderData>) => {
     if (!currentOrderId || !updates.status) return;
 
-    setOrdersList(prev => prev.map(order =>
-      order.id === currentOrderId ? { ...order, ...updates } : order
-    ));
+    if (serverActions) {
+      setStatusUpdateLoading(true);
+      setStatusUpdateError(null);
+
+      // Use server action
+      const result = await serverActions.updateOrderStatus(currentOrderId, updates.status);
+
+      setStatusUpdateLoading(false);
+
+      if (result.success) {
+        setOrdersList(prev => prev.map(order =>
+          order.id === currentOrderId ? { ...order, ...updates } : order
+        ));
+        // Also update current order data to reflect the change
+        setCurrentOrderData(prev => prev ? { ...prev, ...updates } : null);
+      } else {
+        setStatusUpdateError(result.error || 'Failed to update order status');
+      }
+    } else {
+      // Mock data behavior
+      setOrdersList(prev => prev.map(order =>
+        order.id === currentOrderId ? { ...order, ...updates } : order
+      ));
+      setCurrentOrderData(prev => prev ? { ...prev, ...updates } : null);
+    }
   };
 
   const handleUpdateAddress = (updates: Partial<AddressData>) => {
-    // Update address in the extended order data
-    // This is for demo purposes - in real app this would update the server
+    // Just update local state, don't save yet
+    setCurrentOrderData(prev => prev ? { ...prev, ...updates } : null);
+  };
+
+  const handleSaveAddress = async () => {
+    if (!currentOrderId || !currentOrderData) return;
+
+    if (serverActions) {
+      // Merge updates with current data to ensure all required fields are present
+      const addressData = {
+        recipientName: currentOrderData.recipientName ?? '',
+        recipientPhone: currentOrderData.recipientPhone,
+        shippingLine1: currentOrderData.shippingLine1 ?? '',
+        shippingLine2: currentOrderData.shippingLine2,
+        shippingCity: currentOrderData.shippingCity ?? '',
+        shippingRegion: currentOrderData.shippingRegion,
+        shippingPostal: currentOrderData.shippingPostal ?? '',
+        shippingCountry: currentOrderData.shippingCountry ?? '',
+      };
+
+      // Use server action
+      const result = await serverActions.updateOrderAddress(currentOrderId, addressData);
+      if (result.success) {
+        setModifyAddressModalOpen(false);
+      } else {
+        alert(result.error || 'Failed to update address');
+      }
+    } else {
+      // Mock data behavior - just close modal
+      setModifyAddressModalOpen(false);
+    }
   };
 
   const getCurrentOrder = (): OrderData | null => {
+    // If we have fetched order data from server, use that
+    if (serverActions && currentOrderData) {
+      return currentOrderData;
+    }
+
+    // Otherwise, use mock data
     const order = currentOrderId ? ordersList.find(o => o.id === currentOrderId) : null;
     if (!order) return null;
 
@@ -196,7 +334,7 @@ export function UserOrdersModal({
         isOpen={modifyAddressModalOpen}
         address={getCurrentOrder()}
         onClose={() => setModifyAddressModalOpen(false)}
-        onSave={() => setModifyAddressModalOpen(false)}
+        onSave={handleSaveAddress}
         onUpdateAddress={handleUpdateAddress}
       />
 
@@ -216,6 +354,8 @@ export function UserOrdersModal({
             handleAcceptRefund(currentOrderId!);
           }
         }}
+        statusUpdateLoading={statusUpdateLoading}
+        statusUpdateError={statusUpdateError}
       />
 
       <div
@@ -223,12 +363,12 @@ export function UserOrdersModal({
         onClick={onClose}
       >
         <div
-          className="bg-white p-6 w-full max-w-5xl mx-4 my-8"
+          className="bg-white p-6 w-full max-w-5xl my-8"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">All Orders - {userName}</h2>
+            <h2 className="text-2xl font-bold">Orders</h2>
             <button onClick={onClose} className="text-gray-600 hover:text-gray-900">
               <X className="w-6 h-6" />
             </button>

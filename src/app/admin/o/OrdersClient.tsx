@@ -552,7 +552,6 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
   // Handle dropdown menu actions
   const handleModifyOrder = async (orderId: string) => {
     setCurrentOrderId(orderId);
-    setTrackingInput(trackingCodes[orderId] || '');
 
     if (serverActions) {
       // Fetch full order data from server
@@ -562,6 +561,8 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
 
       if (result.success && result.data) {
         setCurrentOrderData(result.data);
+        // Set tracking input from fetched order data
+        setTrackingInput(result.data.trackingCode || '');
         setModifyOrderModalOpen(true);
       } else {
         alert(result.error || 'Failed to load order');
@@ -599,8 +600,56 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
     }
   };
 
-  const handleModifyAddress = () => {
-    setModifyAddressModalOpen(true);
+  const handleModifyAddress = async (orderId: string) => {
+    setCurrentOrderId(orderId);
+
+    if (serverActions) {
+      // Fetch full order data from server if not already loaded
+      if (!currentOrderData || currentOrderData.id !== orderId) {
+        setIsLoadingOrder(true);
+        const result = await serverActions.fetchOrder(orderId);
+        setIsLoadingOrder(false);
+
+        if (result.success && result.data) {
+          setCurrentOrderData(result.data);
+          setModifyAddressModalOpen(true);
+        } else {
+          alert(result.error || 'Failed to load order');
+        }
+      } else {
+        // Already have the data, just open modal
+        setModifyAddressModalOpen(true);
+      }
+    } else {
+      // Mock data - make sure order has address fields
+      setOrders(prev => prev.map(order => {
+        if (order.id === orderId) {
+          const extendedOrder = order as Partial<FullOrder>;
+          const hasModalData = extendedOrder.items && extendedOrder.recipientName;
+
+          if (!hasModalData) {
+            // Add modal-specific fields for demo
+            return {
+              ...order,
+              customerEmail: 'demo@example.com',
+              recipientName: 'Apollodorus',
+              recipientPhone: '+44912345678',
+              shippingLine1: 'No.42, Rue de Rivoli',
+              shippingLine2: '',
+              shippingCity: 'Paris',
+              shippingRegion: '',
+              shippingPostal: '75005',
+              shippingCountry: 'France',
+              trackingCode: trackingCodes[orderId] || null,
+              lastFour: '4242',
+              items: mockOrderItems,
+            };
+          }
+        }
+        return order;
+      }));
+      setModifyAddressModalOpen(true);
+    }
   };
 
   const handleAcceptCancel = (orderId: string) => {
@@ -948,7 +997,7 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
         onUpdateOrder={handleUpdateOrderStatus}
         onUpdateTrackingInput={setTrackingInput}
         onSaveTrackingCode={handleSaveTrackingCode}
-        onOpenAddressModal={handleModifyAddress}
+        onOpenAddressModal={() => handleModifyAddress(currentOrderId!)}
         onAcceptRequest={(type) => {
           if (type === 'cancel') {
             handleAcceptCancel(currentOrderId!);
@@ -1674,7 +1723,7 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
                           <DropdownMenuItem onClick={() => handleModifyOrder(order.id)}>
                             Edit Order
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={handleModifyAddress}>
+                          <DropdownMenuItem onClick={() => handleModifyAddress(order.id)}>
                             Edit Address
                           </DropdownMenuItem>
                           {order.status === 'CANCELLING' && (
@@ -1805,7 +1854,7 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
                           <DropdownMenuItem onClick={() => handleModifyOrder(order.id)}>
                             Edit Order
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={handleModifyAddress}>
+                          <DropdownMenuItem onClick={() => handleModifyAddress(order.id)}>
                             Edit Address
                           </DropdownMenuItem>
                           {order.status === 'CANCELLING' && (
