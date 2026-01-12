@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { OrderTable, type OrderTableItem, type OrderStatus } from '@/components/ui/OrderTable';
 import {
@@ -19,6 +19,10 @@ import type {
   updateOrderAddress,
   acceptCancelRequest,
   acceptRefundRequest,
+  getDashboardStats,
+  getRevenueChartData,
+  getOrdersChartData,
+  DashboardStats,
 } from './actions';
 
 interface ServerActions {
@@ -28,11 +32,17 @@ interface ServerActions {
   updateOrderAddress: typeof updateOrderAddress;
   acceptCancelRequest: typeof acceptCancelRequest;
   acceptRefundRequest: typeof acceptRefundRequest;
+  getDashboardStats: typeof getDashboardStats;
+  getRevenueChartData: typeof getRevenueChartData;
+  getOrdersChartData: typeof getOrdersChartData;
 }
 
 interface DashboardClientProps {
   initialOrders: OrderTableItem[];
   serverActions?: ServerActions | null;
+  initialDashboardStats?: DashboardStats | null;
+  initialRevenueChartData?: Array<{ date: string; revenue: number }> | null;
+  initialOrdersChartData?: Array<{ date: string; orders: number }> | null;
 }
 
 // Function to generate mock revenue data based on time range and currency
@@ -357,13 +367,24 @@ const formatCurrency = (value: number, currency: string) => {
   return `${currency}${value.toLocaleString()}`;
 };
 
-export default function DashboardClient({ initialOrders, serverActions }: DashboardClientProps) {
+export default function DashboardClient({
+  initialOrders,
+  serverActions,
+  initialDashboardStats,
+  initialRevenueChartData,
+  initialOrdersChartData
+}: DashboardClientProps) {
   const [timeRange, setTimeRange] = useState('THIS MONTH');
   const [revenueCurrency, setRevenueCurrency] = useState('$');
   const [ordersCurrency, setOrdersCurrency] = useState('ALL');
   const [pendingOrdersCurrency, setPendingOrdersCurrency] = useState('ALL');
   const [revenueChartCurrency, setRevenueChartCurrency] = useState('$');
   const [ordersChartCurrency, setOrdersChartCurrency] = useState('ALL');
+
+  // State for real data
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(initialDashboardStats || null);
+  const [revenueChartDataReal, setRevenueChartDataReal] = useState<Array<{ date: string; revenue: number }> | null>(initialRevenueChartData || null);
+  const [ordersChartDataReal, setOrdersChartDataReal] = useState<Array<{ date: string; orders: number }> | null>(initialOrdersChartData || null);
 
   // Modal states
   const [modifyOrderModalOpen, setModifyOrderModalOpen] = useState(false);
@@ -379,21 +400,90 @@ export default function DashboardClient({ initialOrders, serverActions }: Dashbo
   const [statusUpdateError, setStatusUpdateError] = useState<string | null>(null);
 
   const currencyList = ['$', '€', 'NT$'];
-  const userName = "Apollodorus"
 
-  const revenueChartData = useMemo(() => generateRevenueMockData(timeRange, revenueChartCurrency as CurrencyKey), [timeRange, revenueChartCurrency]);
-  const orderChartData = useMemo(() => generateOrderMockData(timeRange, ordersChartCurrency as CurrencyKey), [timeRange, ordersChartCurrency]);
+  // Use real data if available, otherwise use mock data
+  const userName = dashboardStats?.userName || "Apollodorus";
+
+  const revenueChartData = useMemo(() => {
+    if (serverActions && revenueChartDataReal) {
+      return revenueChartDataReal;
+    }
+    return generateRevenueMockData(timeRange, revenueChartCurrency as CurrencyKey);
+  }, [serverActions, revenueChartDataReal, timeRange, revenueChartCurrency]);
+
+  const orderChartData = useMemo(() => {
+    if (serverActions && ordersChartDataReal) {
+      return ordersChartDataReal;
+    }
+    return generateOrderMockData(timeRange, ordersChartCurrency as CurrencyKey);
+  }, [serverActions, ordersChartDataReal, timeRange, ordersChartCurrency]);
 
   // Generate base data for all currencies at once (ensures they add up correctly)
-  const revenueData = useMemo(() => generateBaseRevenueData(timeRange), [timeRange]);
-  const ordersData = useMemo(() => generateBaseOrderData(timeRange), [timeRange]);
-  const pendingOrdersData = useMemo(() => generateBasePendingOrderData(), []);
-  const userVisitsValue = useMemo(() => generateMockUserVisits(timeRange), [timeRange]);
+  const revenueData = useMemo(() => {
+    if (serverActions && dashboardStats) {
+      return dashboardStats.revenue;
+    }
+    return generateBaseRevenueData(timeRange);
+  }, [serverActions, dashboardStats, timeRange]);
+
+  const ordersData = useMemo(() => {
+    if (serverActions && dashboardStats) {
+      return dashboardStats.orders;
+    }
+    return generateBaseOrderData(timeRange);
+  }, [serverActions, dashboardStats, timeRange]);
+
+  const pendingOrdersData = useMemo(() => {
+    if (serverActions && dashboardStats) {
+      return dashboardStats.pendingOrders;
+    }
+    return generateBasePendingOrderData();
+  }, [serverActions, dashboardStats]);
+
+  const userVisitsValue = useMemo(() => {
+    if (serverActions && dashboardStats) {
+      return dashboardStats.userVisits;
+    }
+    return generateMockUserVisits(timeRange);
+  }, [serverActions, dashboardStats, timeRange]);
 
   // Get values for selected currencies
   const revenueValue = revenueData[revenueCurrency as CurrencyKey] || 0;
   const ordersValue = ordersData[ordersCurrency as CurrencyKey] || 0;
   const pendingOrdersValue = pendingOrdersData[pendingOrdersCurrency as CurrencyKey] || 0;
+
+  // Fetch dashboard stats when timeRange changes
+  useEffect(() => {
+    if (serverActions) {
+      serverActions.getDashboardStats(timeRange).then(result => {
+        if (result.success && result.data) {
+          setDashboardStats(result.data);
+        }
+      });
+    }
+  }, [timeRange, serverActions]);
+
+  // Fetch revenue chart data when timeRange or currency changes
+  useEffect(() => {
+    if (serverActions) {
+      serverActions.getRevenueChartData(timeRange, revenueChartCurrency).then(result => {
+        if (result.success && result.data) {
+          setRevenueChartDataReal(result.data);
+        }
+      });
+    }
+  }, [timeRange, revenueChartCurrency, serverActions]);
+
+  // Fetch orders chart data when timeRange or currency changes
+  useEffect(() => {
+    if (serverActions) {
+      serverActions.getOrdersChartData(timeRange, ordersChartCurrency).then(result => {
+        if (result.success && result.data) {
+          setOrdersChartDataReal(result.data);
+        }
+      });
+    }
+  }, [timeRange, ordersChartCurrency, serverActions]);
 
   // Handler functions for modals
   const handleModifyOrder = async (orderId: string) => {
@@ -706,7 +796,7 @@ export default function DashboardClient({ initialOrders, serverActions }: Dashbo
               backgroundPosition: 'right 0.75rem center',
               backgroundSize: '1em 1em',
             }}
-            className="px-2 py-1 sm:py-2 lg:py-3 pr-8 sm:pr-10 text-sm sm:text-lg bg-gray-100 border border-gray-900 appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-900 font-semibold"
+            className="px-2 py-1 sm:py-2 lg:py-3 pr-8 sm:pr-10 text-sm sm:text-lg bg-gray-100 border border-gray-900 appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-700 font-semibold"
           >
             <option value="TODAY">TODAY</option>
             <option value="7 DAYS">7 DAYS</option>

@@ -1,6 +1,17 @@
 import { auth } from '@/auth';
 import DashboardClient from './DashboardClient';
-import { readRecentOrders, readOrder, updateTrackingCode, updateOrderStatus, updateOrderAddress, acceptCancelRequest, acceptRefundRequest } from './actions';
+import {
+  readRecentOrders,
+  readOrder,
+  updateTrackingCode,
+  updateOrderStatus,
+  updateOrderAddress,
+  acceptCancelRequest,
+  acceptRefundRequest,
+  getDashboardStats,
+  getRevenueChartData,
+  getOrdersChartData,
+} from './actions';
 import { dummyOrders } from './o/_data/mockOrders';
 import type { OrderTableItem, OrderStatus } from '@/components/ui/OrderTable';
 
@@ -19,16 +30,42 @@ export default async function AdminPage() {
   }));
 
   let serverActions = null;
+  let dashboardStats = null;
+  let revenueChartData = null;
+  let ordersChartData = null;
 
-  // If authenticated as admin, fetch real orders and provide server actions
+  // If authenticated as admin, fetch real data and provide server actions
   if (session && session.user.role === 'admin') {
-    const result = await readRecentOrders();
+    const ordersResult = await readRecentOrders();
 
-    if (result.success && result.data) {
-      orders = result.data.map(order => ({
+    if (ordersResult.success && ordersResult.data) {
+      orders = ordersResult.data.map(order => ({
         ...order,
         status: order.status as OrderStatus,
       }));
+
+      // Fetch initial dashboard data with default filters
+      const defaultTimeRange = 'THIS MONTH';
+      const defaultRevenueCurrency = '$';
+      const defaultOrdersCurrency = 'ALL';
+
+      const [statsResult, revenueResult, ordersChartResult] = await Promise.all([
+        getDashboardStats(defaultTimeRange),
+        getRevenueChartData(defaultTimeRange, defaultRevenueCurrency),
+        getOrdersChartData(defaultTimeRange, defaultOrdersCurrency),
+      ]);
+
+      if (statsResult.success && statsResult.data) {
+        dashboardStats = statsResult.data;
+      }
+
+      if (revenueResult.success && revenueResult.data) {
+        revenueChartData = revenueResult.data;
+      }
+
+      if (ordersChartResult.success && ordersChartResult.data) {
+        ordersChartData = ordersChartResult.data;
+      }
 
       // Provide server actions for authenticated admin
       serverActions = {
@@ -38,9 +75,20 @@ export default async function AdminPage() {
         updateOrderAddress,
         acceptCancelRequest,
         acceptRefundRequest,
+        getDashboardStats,
+        getRevenueChartData,
+        getOrdersChartData,
       };
     }
   }
 
-  return <DashboardClient initialOrders={orders} serverActions={serverActions} />;
+  return (
+    <DashboardClient
+      initialOrders={orders}
+      serverActions={serverActions}
+      initialDashboardStats={dashboardStats}
+      initialRevenueChartData={revenueChartData}
+      initialOrdersChartData={ordersChartData}
+    />
+  );
 }
