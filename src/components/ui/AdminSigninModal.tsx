@@ -90,16 +90,16 @@ export default function AdminSignInModal({ isOpen, isAtBottom, isNavVisible, onC
             </button>
 
             {/* Content */}
-            <div className="flex flex-col h-full lg:w-96 lg:h-auto px-6 pb-8 pt-12 overflow-y-auto">
+            <div className="flex flex-col h-full lg:w-96 lg:h-auto px-6 pb-4 pt-8 overflow-y-auto">
               {!isSignedIn ? (
                 /* Sign In View */
                 <>
-                  <div className="flex-1 flex flex-col justify-center lg:justify-start">
+                  <div className="flex-1 flex flex-col justify-center items-center">
                     <h2 className="text-xl font-bold text-center mb-4 font-title">
                       Sign In
                     </h2>
 
-                    <div className="border-t border-gray-500 mb-6 mx-2"></div>
+                    <div className="border-t border-gray-500 w-full mb-6 mx-2"></div>
 
                     {error && (
                       <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded">
@@ -125,18 +125,18 @@ export default function AdminSignInModal({ isOpen, isAtBottom, isNavVisible, onC
                         </span>
                       </button>
                     </div>
+
+                    <p className="text-xs text-gray-500 italic mt-2">Demo mode: some data will be read-only or mocked</p>
                   </div>
                 </>
               ) : (
                 /* After Sign In View */
                 <>
-                  <div className="flex-1 flex flex-col justify-center lg:justify-start">
-                    <p className="text-xl font-semibold text-center mb-9">
+                  <div className="flex-1 flex flex-col items-center">
+                    <p className="text-xl font-semibold text-center mb-4">
                       Hello, {user?.name || 'Apollodorus'}
                     </p>
-
-
-                    <div className="mt-auto pt-8">
+                    <div className="">
                       <button
                         onClick={handleSignOutClick}
                         className="text-sm underline hover:font-bold hover:text-gray-700 cursor-pointer transition-all w-full text-center disabled:opacity-50 disabled:cursor-not-allowed"
@@ -144,6 +144,9 @@ export default function AdminSignInModal({ isOpen, isAtBottom, isNavVisible, onC
                         {isPending ? 'Signing out...' : "Sign Out"}
                       </button>
                     </div>
+                    {user.role === "admin" ? (<></>) : (
+                      <p className="text-xs text-gray-500 italic mt-2">Demo mode: some data will be read-only or mocked</p>
+                    )}
                   </div>
                 </>
               )}
