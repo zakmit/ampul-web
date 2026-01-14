@@ -33,10 +33,19 @@ export async function handleSignIn(provider: string, callbackUrl?: string) {
   }
 }
 
-export async function handleSignOut() {
+export async function handleSignOut(callbackUrl?: string) {
   try {
+    // If no callbackUrl provided, get it from the referer header
+    let redirectTo = callbackUrl
+
+    if (!redirectTo) {
+      const headersList = await headers()
+      const referer = headersList.get('referer')
+      redirectTo = referer || '/'
+    }
+
     await signOut({
-      redirectTo: '/',
+      redirectTo,
     })
   } catch (error) {
     if (error instanceof AuthError) {
