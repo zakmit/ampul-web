@@ -62,7 +62,7 @@ export function CategorySection({
     <div className="border-b border-gray-500 lg:mx-6 lg:mt-2 lg:mb-0">
       <button
         onClick={onToggleExpanded}
-        className={`w-full flex items-center justify-between p-6 lg:px-2 hover:bg-gray-50 bg-white ${
+        className={`w-full flex items-center justify-between p-6 lg:px-2 hover:bg-gray-100 bg-white ${
           expanded ? 'lg:sticky lg:z-10' : ''
         }`}
       >
@@ -187,7 +187,7 @@ export function TagSection({
     <div className="border-b border-gray-500 lg:mx-6">
       <button
         onClick={onToggleExpanded}
-        className={`w-full flex items-center justify-between p-6 lg:px-2 hover:bg-gray-50 bg-white ${
+        className={`w-full flex items-center justify-between p-6 lg:px-2 hover:bg-gray-100 bg-white ${
           expanded ? 'lg:sticky lg:z-10' : ''
         }`}
       >
@@ -312,7 +312,7 @@ export function VolumeSection({
     <div className="border-b border-gray-500 lg:mx-6">
       <button
         onClick={onToggleExpanded}
-        className={`w-full flex items-center justify-between p-6 lg:px-2 hover:bg-gray-50 bg-white ${
+        className={`w-full flex items-center justify-between p-6 lg:px-2 hover:bg-gray-100 bg-white ${
           expanded ? 'lg:sticky lg:z-10' : ''
         }`}
       >

@@ -1878,7 +1878,7 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-center gap-1 mt-7">
+          <div className="flex items-center justify-center gap-1 mt-7 mb-4">
             <button
               onClick={() => setCurrentPage(currentPage - 1)}
               className="p-2 hover:bg-gray-300 rounded-full disabled:opacity-50"

@@ -522,10 +522,10 @@ export default function ProductsClient({
                         className="object-cover"
                       />
                       <div className="absolute inset-0 bg-linear-to-t from-gray-900/60 via-gray-900/20 to-transparent" />
-                      <span className="relative z-10 text-3xl font-title text-white">
+                      <span className="relative z-1 text-3xl font-title text-white">
                         {product.translations['en-US'].name}
                       </span>
-                      <ChevronRight className="relative z-10 w-8 h-8 text-white" />
+                      <ChevronRight className="relative z-1 w-8 h-8 text-white" />
                     </button>
                   ))}
                 </div>
@@ -552,10 +552,10 @@ export default function ProductsClient({
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-linear-to-t from-gray-900/60 via-gray-900/20 to-transparent" />
-                    <span className="relative z-10 text-2xl font-title text-white">
+                    <span className="relative z-1 text-2xl font-title text-white">
                       {product.translations['en-US'].name}
                     </span>
-                    <ChevronRight className="relative z-10 w-6 h-6 text-white" />
+                    <ChevronRight className="relative z-1 w-6 h-6 text-white" />
                   </button>
                 ))}
               </div>

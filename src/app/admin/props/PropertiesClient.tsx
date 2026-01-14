@@ -354,7 +354,7 @@ export default function PropertiesClient({
         </div>
       )}
 
-      <div className="lg:grid-flow-col lg:grid lg:grid-cols-12 lg:h-screen lg:max-h-400 lg:min-h-160">
+      <div className="min-h-dvh lg:grid-flow-col lg:grid lg:grid-cols-12 lg:h-screen lg:max-h-400 lg:min-h-160">
         {/* Left Panel - List */}
         <div className="lg:col-span-7 border-r border-gray-300 lg:overflow-y-auto lg:h-full">
           <CategorySection

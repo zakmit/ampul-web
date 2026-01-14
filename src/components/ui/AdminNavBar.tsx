@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import AdminSignInModal from "./AdminSigninModal"
 
 export default function AdminNavBar() {
     const [isNavVisible, setIsNavVisible] = useState(true)
     const [isAtBottom, setIsAtBottom] = useState(false)
     const [lastScrollY, setLastScrollY] = useState(0)
     const [showProductsMenu, setShowProductsMenu] = useState(false)
+    const [isSignInModalOpen, setIsSignInModalOpen] = useState(false)
 
     useEffect(() => {
       const controlNavbar = () => {
@@ -53,8 +55,8 @@ export default function AdminNavBar() {
   
   return(
     <div className="left-0 right-0 flex w-full h-13 items-center justify-center">
-      <nav className={`w-full max-w-3xl px-2 bottom-2 z-10 transition-all duration-300 ease-in-out ${getNavPosition()} ${getNavBottomPosition()}`}>
-        <div className="bg-white p-1 text-sm text-center items-center rounded-full border border-gray-900 grid grid-cols-10 md:grid-cols-9 h-9 z-10">
+      <nav className={`w-full max-w-3xl px-2 bottom-2 z-20 transition-all duration-300 ease-in-out ${getNavPosition()} ${getNavBottomPosition()}`}>
+        <div className="bg-white p-1 text-sm text-center items-center rounded-full border border-gray-900 shadow-lg grid grid-cols-10 md:grid-cols-9 h-9 z-10">
           <Link href="/admin" className="col-span-3 md:col-span-2 text-bold h-full flex items-center justify-center rounded-full hover:bg-gray-700 hover:text-gray-100 transition">
             <h3>Dashboard</h3>
           </Link>
@@ -107,8 +109,7 @@ export default function AdminNavBar() {
           </Link>
           <button
             type="button"
-            // onClick={}
-            // onMouseEnter={()}
+            onClick={() => setIsSignInModalOpen(true)}
             className="inline-flex items-center justify-center rounded-md cols-span-1 text-gray-900"
           >
             <span className="sr-only">User</span>
@@ -123,6 +124,14 @@ export default function AdminNavBar() {
           </button>
         </div>
       </nav>
+
+      {/* Admin Sign In Modal */}
+      <AdminSignInModal
+        isOpen={isSignInModalOpen}
+        isAtBottom={isAtBottom}
+        isNavVisible={isNavVisible}
+        onClose={() => setIsSignInModalOpen(false)}
+      />
     </div>
   );
 }
