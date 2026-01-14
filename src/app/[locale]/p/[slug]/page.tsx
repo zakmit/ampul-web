@@ -83,7 +83,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   return (
     <div className="overflow-x-hidden max-w-360 mx-auto">
       {/* Main Product Section */}
-      <div className="flex items-center flex-col lg:flex-row">
+      <div className="flex items-start flex-col lg:flex-row">
         {/* Product Image Section - Mobile: full width, Desktop: 5/8 width sticky */}
         <div className="relative w-screen h-[100vw] max-w-150 max-h-150 lg:w-[62.5%] lg:max-w-225 lg:h-225 lg:max-h-225 lg:sticky lg:top-0 flex items-center justify-center bg-transparent">
           <div className="w-full lg:max-w-none lg:w-full h-full flex items-center justify-center">
