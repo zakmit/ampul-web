@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import type { Locale } from '@/components/ui/LanguageSelector';
 import type { CategoryWithTranslations, TagWithTranslations, VolumeWithTranslations } from './data';
-import {
+import type {
   createCategory,
   updateCategory,
   deleteCategory,
@@ -64,14 +64,28 @@ function transformVolumes(volumes: VolumeWithTranslations[]): Volume[] {
   }));
 }
 
+interface ServerActions {
+  createCategory: typeof createCategory;
+  updateCategory: typeof updateCategory;
+  deleteCategory: typeof deleteCategory;
+  createTag: typeof createTag;
+  updateTag: typeof updateTag;
+  deleteTag: typeof deleteTag;
+  createVolume: typeof createVolume;
+  updateVolume: typeof updateVolume;
+  deleteVolume: typeof deleteVolume;
+}
+
 export default function PropertiesClient({
   initialCategories,
   initialTags,
   initialVolumes,
+  serverActions = null,
 }: {
   initialCategories: CategoryWithTranslations[]
   initialTags: TagWithTranslations[]
   initialVolumes: VolumeWithTranslations[]
+  serverActions?: ServerActions | null
 }) {
   const [categories, setCategories] = useState(transformCategories(initialCategories));
   const [tags, setTags] = useState(transformTags(initialTags));
@@ -134,6 +148,8 @@ export default function PropertiesClient({
 
   // Category handlers
   const handleSubmitNewCategory = async (newCategory: Omit<Category, 'id'>) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
       const translations = Object.entries(newCategory.translations).map(([locale, data]) => ({
         locale,
@@ -141,7 +157,7 @@ export default function PropertiesClient({
         description: data.description,
       }));
 
-      const result = await createCategory({ slug: newCategory.slug, translations });
+      const result = await serverActions.createCategory({ slug: newCategory.slug, translations });
 
       if (result.success && result.data) {
         const transformed = transformCategories([result.data]);
@@ -154,6 +170,8 @@ export default function PropertiesClient({
   };
 
   const handleUpdateCategory = async (id: number, updatedCategory: Omit<Category, 'id'>) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
       const translations = Object.entries(updatedCategory.translations).map(([locale, data]) => ({
         locale,
@@ -161,7 +179,7 @@ export default function PropertiesClient({
         description: data.description,
       }));
 
-      const result = await updateCategory(id, { slug: updatedCategory.slug, translations });
+      const result = await serverActions.updateCategory(id, { slug: updatedCategory.slug, translations });
 
       if (result.success && result.data) {
         const transformed = transformCategories([result.data]);
@@ -174,8 +192,10 @@ export default function PropertiesClient({
   };
 
   const handleDeleteCategory = async (id: number) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
-      const result = await deleteCategory(id);
+      const result = await serverActions.deleteCategory(id);
 
       if (result.success) {
         setCategories(categories.filter((c) => c.id !== id));
@@ -189,13 +209,15 @@ export default function PropertiesClient({
 
   // Tag handlers
   const handleSubmitNewTag = async (newTag: Omit<Tag, 'id'>) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
       const translations = Object.entries(newTag.translations).map(([locale, data]) => ({
         locale,
         name: data.name,
       }));
 
-      const result = await createTag({ slug: newTag.slug, translations });
+      const result = await serverActions.createTag({ slug: newTag.slug, translations });
 
       if (result.success && result.data) {
         const transformed = transformTags([result.data]);
@@ -208,13 +230,15 @@ export default function PropertiesClient({
   };
 
   const handleUpdateTag = async (id: number, updatedTag: Omit<Tag, 'id'>) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
       const translations = Object.entries(updatedTag.translations).map(([locale, data]) => ({
         locale,
         name: data.name,
       }));
 
-      const result = await updateTag(id, { slug: updatedTag.slug, translations });
+      const result = await serverActions.updateTag(id, { slug: updatedTag.slug, translations });
 
       if (result.success && result.data) {
         const transformed = transformTags([result.data]);
@@ -227,8 +251,10 @@ export default function PropertiesClient({
   };
 
   const handleDeleteTag = async (id: number) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
-      const result = await deleteTag(id);
+      const result = await serverActions.deleteTag(id);
 
       if (result.success) {
         setTags(tags.filter((t) => t.id !== id));
@@ -242,13 +268,15 @@ export default function PropertiesClient({
 
   // Volume handlers
   const handleSubmitNewVolume = async (newVolume: Omit<Volume, 'id'>) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
       const translations = Object.entries(newVolume.translations).map(([locale, data]) => ({
         locale,
         displayName: data.displayName,
       }));
 
-      const result = await createVolume({ value: newVolume.value, translations });
+      const result = await serverActions.createVolume({ value: newVolume.value, translations });
 
       if (result.success && result.data) {
         const transformed = transformVolumes([result.data]);
@@ -261,13 +289,15 @@ export default function PropertiesClient({
   };
 
   const handleUpdateVolume = async (id: number, updatedVolume: Omit<Volume, 'id'>) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
       const translations = Object.entries(updatedVolume.translations).map(([locale, data]) => ({
         locale,
         displayName: data.displayName,
       }));
 
-      const result = await updateVolume(id, { value: updatedVolume.value, translations });
+      const result = await serverActions.updateVolume(id, { value: updatedVolume.value, translations });
 
       if (result.success && result.data) {
         const transformed = transformVolumes([result.data]);
@@ -280,8 +310,10 @@ export default function PropertiesClient({
   };
 
   const handleDeleteVolume = async (id: number) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
-      const result = await deleteVolume(id);
+      const result = await serverActions.deleteVolume(id);
 
       if (result.success) {
         setVolumes(volumes.filter((v) => v.id !== id));

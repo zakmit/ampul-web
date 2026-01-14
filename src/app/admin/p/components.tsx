@@ -831,7 +831,7 @@ export function ProductEditForm({
         )}
 
         {/* Language Selector */}
-        <div className="border-b -mx-6 lg:mx-8 text-center">
+        <div className="border-b border-gray-900 -mx-6 lg:mx-8 text-center">
           <LanguageSelector
             value={selectedLocale}
             onChange={(locale) => setSelectedLocale(locale)}

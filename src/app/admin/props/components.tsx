@@ -484,7 +484,7 @@ export function CategoryEditForm({
         </div>
 
         {/* Language Selector */}
-        <div className="border-b -mx-6 lg:-mx-22 xl:-mx-28 text-center">
+        <div className="border-b border-gray-900 -mx-6 lg:-mx-22 xl:-mx-28 text-center">
           <LanguageSelector
             value={selectedLocale}
             onChange={(locale) => {
@@ -655,7 +655,7 @@ export function TagEditForm({
         </div>
 
         {/* Language Selector */}
-        <div className="border-b -mx-6 lg:-mx-22 xl:-mx-28 text-center">
+        <div className="border-b border-gray-900 -mx-6 lg:-mx-22 xl:-mx-28 text-center">
           <LanguageSelector
             value={selectedLocale}
             onChange={(locale) => {
@@ -799,7 +799,7 @@ export function VolumeEditForm({
         </div>
 
         {/* Language Selector */}
-        <div className="border-b -mx-6 lg:-mx-22 xl:-mx-28 text-center">
+        <div className="border-b border-gray-900 -mx-6 lg:-mx-22 xl:-mx-28 text-center">
           <LanguageSelector
             value={selectedLocale}
             onChange={(locale) => {

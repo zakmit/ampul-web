@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { auth } from '@/auth'
 import {
   createCategorySchema,
   createTagSchema,
@@ -32,6 +33,12 @@ export async function getCategories() {
 
 export async function createCategory(data: unknown) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     // Validate input
     const validated = createCategorySchema.parse(data)
 
@@ -70,6 +77,12 @@ export async function createCategory(data: unknown) {
 
 export async function updateCategory(id: number, data: unknown) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     // Validate input
     const validated = createCategorySchema.parse(data)
 
@@ -116,6 +129,12 @@ export async function updateCategory(id: number, data: unknown) {
 
 export async function deleteCategory(id: number) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     await prisma.category.delete({
       where: { id },
     })
@@ -151,6 +170,12 @@ export async function getTags() {
 
 export async function createTag(data: unknown) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     // Validate input
     const validated = createTagSchema.parse(data)
 
@@ -189,6 +214,12 @@ export async function createTag(data: unknown) {
 
 export async function updateTag(id: number, data: unknown) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     // Validate input
     const validated = createTagSchema.parse(data)
 
@@ -235,6 +266,12 @@ export async function updateTag(id: number, data: unknown) {
 
 export async function deleteTag(id: number) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     await prisma.tag.delete({
       where: { id },
     })
@@ -270,6 +307,12 @@ export async function getVolumes() {
 
 export async function createVolume(data: unknown) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     // Validate input
     const validated = createVolumeSchema.parse(data)
 
@@ -308,6 +351,12 @@ export async function createVolume(data: unknown) {
 
 export async function updateVolume(id: number, data: unknown) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     // Validate input
     const validated = createVolumeSchema.parse(data)
 
@@ -354,6 +403,12 @@ export async function updateVolume(id: number, data: unknown) {
 
 export async function deleteVolume(id: number) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     await prisma.volume.delete({
       where: { id },
     })

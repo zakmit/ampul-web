@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import type { Locale } from '@/components/ui/LanguageSelector';
 import type { CollectionWithTranslations } from './data';
-import {
+import type {
   createCollection,
   updateCollection,
   deleteCollection,
@@ -35,10 +35,20 @@ function transformCollections(collections: CollectionWithTranslations[]): Collec
   }));
 }
 
+interface ServerActions {
+  createCollection: typeof createCollection;
+  updateCollection: typeof updateCollection;
+  deleteCollection: typeof deleteCollection;
+  uploadCollectionImage: typeof uploadCollectionImage;
+  deleteCollectionImages: typeof deleteCollectionImages;
+}
+
 export default function CollectionsClient({
   initialCollections,
+  serverActions = null,
 }: {
   initialCollections: CollectionWithTranslations[]
+  serverActions?: ServerActions | null
 }) {
   const [collections, setCollections] = useState(transformCollections(initialCollections));
   const [isPending, startTransition] = useTransition();
@@ -76,22 +86,24 @@ export default function CollectionsClient({
 
   const clearAllEditing = async () => {
     // Clean up current form images if user is canceling
-    const imagesToDelete = [];
-    if (currentFormImages.desktop && currentFormImages.desktop.startsWith('/uploads/')) {
-      // Only delete if it's a newly uploaded image (not the original)
-      if (!originalImages || currentFormImages.desktop !== originalImages.desktop) {
-        imagesToDelete.push(currentFormImages.desktop);
+    if (serverActions) {
+      const imagesToDelete = [];
+      if (currentFormImages.desktop && currentFormImages.desktop.startsWith('/uploads/')) {
+        // Only delete if it's a newly uploaded image (not the original)
+        if (!originalImages || currentFormImages.desktop !== originalImages.desktop) {
+          imagesToDelete.push(currentFormImages.desktop);
+        }
       }
-    }
-    if (currentFormImages.mobile && currentFormImages.mobile.startsWith('/uploads/')) {
-      // Only delete if it's a newly uploaded image (not the original)
-      if (!originalImages || currentFormImages.mobile !== originalImages.mobile) {
-        imagesToDelete.push(currentFormImages.mobile);
+      if (currentFormImages.mobile && currentFormImages.mobile.startsWith('/uploads/')) {
+        // Only delete if it's a newly uploaded image (not the original)
+        if (!originalImages || currentFormImages.mobile !== originalImages.mobile) {
+          imagesToDelete.push(currentFormImages.mobile);
+        }
       }
-    }
 
-    if (imagesToDelete.length > 0) {
-      await deleteCollectionImages(imagesToDelete);
+      if (imagesToDelete.length > 0) {
+        await serverActions.deleteCollectionImages(imagesToDelete);
+      }
     }
 
     setEditingCollection(null);
@@ -126,6 +138,8 @@ export default function CollectionsClient({
 
   // Collection handlers
   const handleSubmitNewCollection = async (newCollection: Omit<Collection, 'id'>) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
       const translations = Object.entries(newCollection.translations).map(([locale, data]) => ({
         locale,
@@ -133,7 +147,7 @@ export default function CollectionsClient({
         description: data.description,
       }));
 
-      const result = await createCollection({
+      const result = await serverActions.createCollection({
         slug: newCollection.slug,
         coverImage1x1: newCollection.coverImage1x1,
         coverImage16x9: newCollection.coverImage16x9,
@@ -153,6 +167,8 @@ export default function CollectionsClient({
   };
 
   const handleUpdateCollection = async (id: number, updatedCollection: Omit<Collection, 'id'>) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
       const translations = Object.entries(updatedCollection.translations).map(([locale, data]) => ({
         locale,
@@ -160,7 +176,7 @@ export default function CollectionsClient({
         description: data.description,
       }));
 
-      const result = await updateCollection(id, {
+      const result = await serverActions.updateCollection(id, {
         slug: updatedCollection.slug,
         coverImage1x1: updatedCollection.coverImage1x1,
         coverImage16x9: updatedCollection.coverImage16x9,
@@ -181,8 +197,10 @@ export default function CollectionsClient({
   };
 
   const handleDeleteCollection = async (id: number) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
-      const result = await deleteCollection(id);
+      const result = await serverActions.deleteCollection(id);
 
       if (result.success) {
         setCollections(collections.filter((c) => c.id !== id));
@@ -201,6 +219,8 @@ export default function CollectionsClient({
   };
 
   const handleImageUpload = async (file: File, imageType: 'desktop' | 'mobile') => {
+    if (!serverActions) return null; // Ignore if not admin
+
     // Get the current image URL for this type
     const currentImageUrl = currentFormImages[imageType];
 
@@ -209,7 +229,7 @@ export default function CollectionsClient({
     formData.append('file', file);
     formData.append('imageType', imageType);
 
-    const result = await uploadCollectionImage(formData);
+    const result = await serverActions.uploadCollectionImage(formData);
 
     if (result.success && result.data) {
       // Delete the old image if it exists and is not the original
@@ -217,7 +237,7 @@ export default function CollectionsClient({
         // Only delete if it's not the original image from the database
         const isOriginal = originalImages && originalImages[imageType] === currentImageUrl;
         if (!isOriginal) {
-          await deleteCollectionImages([currentImageUrl]);
+          await serverActions.deleteCollectionImages([currentImageUrl]);
         }
       }
 

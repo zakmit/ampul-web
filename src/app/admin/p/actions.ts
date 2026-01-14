@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import type { Prisma } from '@/generated/prisma/client'
 import { revalidatePath } from 'next/cache'
+import { auth } from '@/auth'
 import { CreateProductSchema, UpdateProductSchema } from './validation'
 import { writeFile, unlink, mkdir } from 'fs/promises'
 import { join } from 'path'
@@ -37,6 +38,12 @@ async function ensureUploadDir() {
 // Upload product image
 export async function uploadProductImage(formData: FormData): Promise<ActionResult<{ url: string }>> {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     const file = formData.get('file') as File
     const imageType = formData.get('imageType') as string
 
@@ -67,6 +74,12 @@ export async function uploadProductImage(formData: FormData): Promise<ActionResu
 // Delete product images
 export async function deleteProductImages(imagePaths: string[]): Promise<ActionResult> {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     for (const imagePath of imagePaths) {
       // Only delete files in the uploads/products directory
       if (imagePath.startsWith('/uploads/products/')) {
@@ -100,6 +113,12 @@ export async function createProduct(
   }
 ): Promise<ActionResult> {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     // Validate input
     const validatedData = CreateProductSchema.parse(input)
 
@@ -197,6 +216,12 @@ export async function updateProduct(
   }
 ): Promise<ActionResult> {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     // Validate and sanitize input
     const validatedData = UpdateProductSchema.parse({ ...input, id })
 
@@ -318,6 +343,12 @@ export async function updateProduct(
 // Delete product
 export async function deleteProduct(id: string): Promise<ActionResult> {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     // Get product to find images to delete
     const product = await prisma.product.findUnique({
       where: { id },

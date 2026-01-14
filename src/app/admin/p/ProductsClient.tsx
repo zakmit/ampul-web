@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import type { Locale } from '@/components/ui/LanguageSelector';
-import {
+import type {
   createProduct,
   updateProduct,
   deleteProduct,
@@ -24,12 +24,21 @@ import Image from 'next/image';
 import ProductFilters, { FilterSection } from '@/components/ProductFilters';
 import MobileFilterPanel from '@/components/MobileFilterPanel';
 
+interface ServerActions {
+  createProduct: typeof createProduct;
+  updateProduct: typeof updateProduct;
+  deleteProduct: typeof deleteProduct;
+  uploadProductImage: typeof uploadProductImage;
+  deleteProductImages: typeof deleteProductImages;
+}
+
 interface ProductsClientProps {
   initialProducts: Product[];
   categories: Category[];
   collections: Collection[];
   volumes: Volume[];
   tags: Tag[];
+  serverActions?: ServerActions | null;
 }
 
 export default function ProductsClient({
@@ -38,6 +47,7 @@ export default function ProductsClient({
   collections,
   volumes,
   tags,
+  serverActions = null,
 }: ProductsClientProps) {
   const [products, setProducts] = useState(initialProducts);
   const [isPending, startTransition] = useTransition();
@@ -114,36 +124,38 @@ export default function ProductsClient({
 
   const clearAllEditing = async () => {
     // Clean up current form images if user is canceling
-    const imagesToDelete = [];
-    if (currentFormImages.desktop && currentFormImages.desktop.startsWith('/uploads/products/')) {
-      if (!originalImages || currentFormImages.desktop !== originalImages.desktop) {
-        imagesToDelete.push(currentFormImages.desktop);
+    if (serverActions) {
+      const imagesToDelete = [];
+      if (currentFormImages.desktop && currentFormImages.desktop.startsWith('/uploads/products/')) {
+        if (!originalImages || currentFormImages.desktop !== originalImages.desktop) {
+          imagesToDelete.push(currentFormImages.desktop);
+        }
       }
-    }
-    if (currentFormImages.mobile && currentFormImages.mobile.startsWith('/uploads/products/')) {
-      if (!originalImages || currentFormImages.mobile !== originalImages.mobile) {
-        imagesToDelete.push(currentFormImages.mobile);
+      if (currentFormImages.mobile && currentFormImages.mobile.startsWith('/uploads/products/')) {
+        if (!originalImages || currentFormImages.mobile !== originalImages.mobile) {
+          imagesToDelete.push(currentFormImages.mobile);
+        }
       }
-    }
-    if (currentFormImages.product && currentFormImages.product.startsWith('/uploads/products/')) {
-      if (!originalImages || currentFormImages.product !== originalImages.product) {
-        imagesToDelete.push(currentFormImages.product);
+      if (currentFormImages.product && currentFormImages.product.startsWith('/uploads/products/')) {
+        if (!originalImages || currentFormImages.product !== originalImages.product) {
+          imagesToDelete.push(currentFormImages.product);
+        }
       }
-    }
-    if (currentFormImages.box && currentFormImages.box.startsWith('/uploads/products/')) {
-      if (!originalImages || currentFormImages.box !== originalImages.box) {
-        imagesToDelete.push(currentFormImages.box);
+      if (currentFormImages.box && currentFormImages.box.startsWith('/uploads/products/')) {
+        if (!originalImages || currentFormImages.box !== originalImages.box) {
+          imagesToDelete.push(currentFormImages.box);
+        }
       }
-    }
-    if (currentFormImages.gallery.length > 0) {
-      const newGalleryImages = currentFormImages.gallery.filter(img =>
-        (!originalImages || !originalImages.gallery.includes(img)) && img.startsWith('/uploads/products/')
-      );
-      imagesToDelete.push(...newGalleryImages);
-    }
+      if (currentFormImages.gallery.length > 0) {
+        const newGalleryImages = currentFormImages.gallery.filter(img =>
+          (!originalImages || !originalImages.gallery.includes(img)) && img.startsWith('/uploads/products/')
+        );
+        imagesToDelete.push(...newGalleryImages);
+      }
 
-    if (imagesToDelete.length > 0) {
-      await deleteProductImages(imagesToDelete);
+      if (imagesToDelete.length > 0) {
+        await serverActions.deleteProductImages(imagesToDelete);
+      }
     }
 
     setEditingProduct(null);
@@ -184,6 +196,8 @@ export default function ProductsClient({
 
   // Product handlers
   const handleSubmitNewProduct = async (newProduct: Omit<Product, 'id'>) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
       const translations = Object.entries(newProduct.translations).map(([locale, data]) => ({
         locale,
@@ -201,7 +215,7 @@ export default function ProductsClient({
         }))
       );
 
-      const result = await createProduct({
+      const result = await serverActions.createProduct({
         slug: newProduct.slug,
         categoryId: newProduct.categoryId,
         collectionId: newProduct.collectionId,
@@ -228,6 +242,8 @@ export default function ProductsClient({
   };
 
   const handleUpdateProduct = async (id: string, updatedProduct: Omit<Product, 'id'>) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
       const translations = Object.entries(updatedProduct.translations).map(([locale, data]) => ({
         locale,
@@ -245,7 +261,7 @@ export default function ProductsClient({
         }))
       );
 
-      const result = await updateProduct(id, {
+      const result = await serverActions.updateProduct(id, {
         slug: updatedProduct.slug,
         categoryId: updatedProduct.categoryId,
         collectionId: updatedProduct.collectionId,
@@ -272,8 +288,10 @@ export default function ProductsClient({
   };
 
   const handleDeleteProduct = async (id: string) => {
+    if (!serverActions) return; // Ignore if not admin
+
     startTransition(async () => {
-      const result = await deleteProduct(id);
+      const result = await serverActions.deleteProduct(id);
 
       if (result.success) {
         setProducts(products.filter((p) => p.id !== id));
@@ -292,13 +310,15 @@ export default function ProductsClient({
   };
 
   const handleImageUpload = async (file: File, imageType: 'desktop' | 'mobile' | 'product' | 'box' | 'gallery') => {
+    if (!serverActions) return null; // Ignore if not admin
+
     const currentImageUrl = imageType === 'gallery' ? '' : currentFormImages[imageType];
 
     const formData = new FormData();
     formData.append('file', file);
     formData.append('imageType', imageType);
 
-    const result = await uploadProductImage(formData);
+    const result = await serverActions.uploadProductImage(formData);
 
     if (result.success && result.data) {
       const uploadedUrl = result.data.url;
@@ -307,7 +327,7 @@ export default function ProductsClient({
       if (currentImageUrl && currentImageUrl.startsWith('/uploads/')) {
         const isOriginal = originalImages && originalImages[imageType as keyof typeof originalImages] === currentImageUrl;
         if (!isOriginal) {
-          await deleteProductImages([currentImageUrl]);
+          await serverActions.deleteProductImages([currentImageUrl]);
         }
       }
 

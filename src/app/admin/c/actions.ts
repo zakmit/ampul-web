@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { auth } from '@/auth'
 import { createCollectionSchema } from './validation'
 import { ZodError } from 'zod'
 import { writeFile, mkdir, unlink } from 'fs/promises'
@@ -53,6 +54,12 @@ export async function getCollections() {
 
 export async function createCollection(data: unknown) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     // Validate input
     const validated = createCollectionSchema.parse(data)
 
@@ -93,6 +100,12 @@ export async function createCollection(data: unknown) {
 
 export async function updateCollection(id: number, data: unknown, oldImages?: { desktop: string, mobile: string }) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     // Validate input
     const validated = createCollectionSchema.parse(data)
 
@@ -151,6 +164,12 @@ export async function updateCollection(id: number, data: unknown, oldImages?: { 
 
 export async function deleteCollection(id: number) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     // Get collection data before deleting to access image URLs
     const collection = await prisma.collection.findUnique({
       where: { id },
@@ -187,6 +206,12 @@ export async function deleteCollection(id: number) {
 
 export async function uploadCollectionImage(formData: FormData) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     const file = formData.get('file') as File
     const imageType = formData.get('imageType') as string // 'desktop' or 'mobile'
 
@@ -236,6 +261,12 @@ export async function uploadCollectionImage(formData: FormData) {
 // Delete uploaded images (used when canceling create/edit operations)
 export async function deleteCollectionImages(imageUrls: string[]) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized' }
+    }
+
     for (const imageUrl of imageUrls) {
       await deleteImageFile(imageUrl)
     }
