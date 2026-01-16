@@ -7,8 +7,10 @@ export interface MenuLink {
 
 export interface MenuListProps {
     title?: string;
+    titleLink?: string;
     items: MenuLink[];
     className?: string;
+    onLinkClick?: () => void;
 }
 
 export interface FeatureCardProp {
@@ -18,6 +20,7 @@ export interface FeatureCardProp {
     image?: string;
     href?: string;
     badge?: string;
+    onLinkClick?: () => void;
 }
 
 export interface FeatureCardsProps {

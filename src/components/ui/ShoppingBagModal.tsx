@@ -2,6 +2,7 @@
 import { useTranslations } from 'next-intl'
 import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
+import { motion, AnimatePresence } from 'framer-motion'
 import type { ShoppingBagItemDetails } from '@/app/actions/shoppingBag'
 
 interface ShoppingBagModalProps {
@@ -40,8 +41,6 @@ export default function ShoppingBagModal({
   const router = useRouter()
   const params = useParams()
 
-  if (!isOpen) return null
-
   const handleQuantityInput = (productId: string, volumeId: number, value: string) => {
     const numValue = parseInt(value, 10)
     if (!isNaN(numValue) && numValue >= 1) {
@@ -79,21 +78,33 @@ export default function ShoppingBagModal({
   }
 
   return (
-    <>
-      {/* Background Blur - Click to close */}
-      <div
-        className="fixed inset-0 top-0 bg-gray-800/30 backdrop-blur-sm z-30 transition-all duration-500"
-        onClick={handleClose}
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Background Blur - Click to close */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 top-0 bg-gray-800/30 backdrop-blur-sm z-30"
+            onClick={handleClose}
+          />
 
-      {/* Modal Container - Full screen overlay on desktop, full width modal on mobile */}
-      <div className={`fixed inset-0 z-50 ${getTopPosition()} lg:top-0`}>
-        <div
-          className={`relative bg-white w-full h-full transform origin-top transition-all duration-300 ${
-            isOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0'
-          }`}
-          onClick={(e) => e.stopPropagation()}
-        >
+          {/* Modal Container - Full screen overlay on desktop, full width modal on mobile */}
+          <div className={`fixed inset-0 z-50 ${getTopPosition()} lg:top-0 overflow-hidden`}>
+            <motion.div
+              initial={{ y: '-100%', x: 0 }}
+              animate={{ y: 0, x: 0 }}
+              exit={{ y: '-100%', x: 0 }}
+              transition={{
+                type: 'tween',
+                duration: 0.45,
+                ease: [0.32, 0.72, 0, 1]
+              }}
+              className="relative bg-white w-full h-full lg:origin-top-right"
+              onClick={(e) => e.stopPropagation()}
+            >
           {/* Close Button */}
           <button
             onClick={handleClose}
@@ -408,9 +419,11 @@ export default function ShoppingBagModal({
                 </button>
               </div>
             </div>
+            </div>
+          </motion.div>
           </div>
-        </div>
-      </div>
-    </>
+        </>
+      )}
+    </AnimatePresence>
   )
 }

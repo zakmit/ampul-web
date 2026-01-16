@@ -63,7 +63,7 @@ export default function MobileFilterPanel({
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               aria-label="Close filter panel"
             >
-              <X className="w-6 h-6" />
+              <X className="w-6 h-6" strokeWidth={1.5}/>
             </button>
           </div>
 

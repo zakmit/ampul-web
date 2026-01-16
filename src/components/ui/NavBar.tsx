@@ -2,8 +2,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { MenuList, MenuCard } from "@/components/ui";
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { useTranslations, useLocale } from 'next-intl';
+import MobileNavBarPanel from './MobileNavBarPanel';
 import SignInModal from './SignInModal';
+import SearchModal from './SearchModal'
 import ShoppingBagModalWrapper from './ShoppingBagModalWrapper';
 import AddedToBagModalWrapper from './AddedToBagModalWrapper';
 import { useShoppingBag } from '@/components/providers/ShoppingBagProvider';
@@ -11,36 +14,28 @@ interface NavbarProps {
   showBanner?: boolean;
   bannerHeight?: number;
 }
-const desPlaceHolder = `"How does it feel like when Icarus falls into the ground?", experience for our sensational feast, with the most iconic one in our selections.`
-const newItems = [
-  { label: "Gift for Chrismas", href: "#" },
-  { label: "Greek Mythology", href: "#" }
-];
-const fragItems = [
-  { label: "Icarus", href: "#" },
-  { label: "Greek Mythology", href: "#" },
-  { label: "This is something VERY LONG, For testing the style", href: "#" }
-];
-
-const aboutItems = [
-  { label: "About AMPUL", href: "#" },
-  { label: "Greek Mythology", href: "#" }
-];
-const dropMenuStyle = "bg-white z-40 left-0 right-0 px-6 gap-6 flex transition-all justify-between";
+const dropMenuStyle = "bg-white z-40 left-0 right-0 px-6 gap-6 flex justify-between";
 const navHeight = 14;
-const menuListStyle = "max-w-3xs min-w-30 pr-4";
+const menuListStyle = "pr-4";
 export default function NavBar({ showBanner = true,
     bannerHeight = 6 // h-6
     }: NavbarProps) {
   const t = useTranslations('NavBar');
+  const locale = useLocale();
+
+
   const { totalItems, forceNavVisible } = useShoppingBag();
   const [isNavVisible, setIsNavVisible] = useState(true)
   const [isDropdownVisible, setIsDropdownVisible] = useState(false)
+  const [isMobileNavVisible, setIsMobileNavVisible] = useState(false)
+
   const [lastScrollY, setLastScrollY] = useState(0)
   const [isAtTop, setIsAtTop] = useState(true)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [isShoppingBagOpen, setIsShoppingBagOpen] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+
 
   const currentBannerState = useRef(showBanner)
 
@@ -101,6 +96,17 @@ export default function NavBar({ showBanner = true,
         }
         return 'fixed'
     }
+
+  const fragItems = [
+    { label: `${t('productTitles.icare')}`, href: `/${locale}/p/icare` },
+    { label: `${t('productTitles.antigone')}`, href: `/${locale}/p/antigone` },
+    { label: `${t('productTitles.cassandre')}`, href: `/${locale}/p/cassandre` },
+    { label: `${t('productTitles.narcisse')}`, href: `/${locale}//p/narcisse` }
+  ];
+
+
+    const closeDropdown = () => setIsDropdownVisible(false);
+
     const menuItems = [
       {
         id: 'new',
@@ -108,9 +114,14 @@ export default function NavBar({ showBanner = true,
         content: (
           <div className={dropMenuStyle}>
             <div>
-              <MenuList items={newItems} className="mb-6"></MenuList>
+              <Link className={`text-base font-medium mb-2 hover:text-gray-500 hover:underline`} href={`/${locale}/e/greek-mythology`} onClick={closeDropdown}>
+                {t('exploreGreekMythology')}
+              </Link>
             </div>
-            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW"></MenuCard>
+            <div className="flex flex-row gap-6">
+              <MenuCard title={t('productTitles.cassandre')} description={t('productDescriptions.cassandre')} image="/products/cassandre-bottle.jpg" href={`/${locale}/p/cassandre`} badge={t('badge.new')} onLinkClick={closeDropdown}></MenuCard>
+              <MenuCard title={t('productTitles.narcisse')} description={t('productDescriptions.narcisse')} image="/products/narcisse-bottle.jpg" href={`/${locale}/p/narcisse`} badge={t('badge.new')} onLinkClick={closeDropdown}></MenuCard>
+            </div>
           </div>
         )
       },
@@ -119,17 +130,13 @@ export default function NavBar({ showBanner = true,
         label: t('menu.fragrance'),
         content: (
           <div className={dropMenuStyle}>
-            <div className="border-r border-gray-500">
-              <MenuList items={fragItems} className={menuListStyle}></MenuList>
+            <div className="">
+              <MenuList title={t('greekMythologyCollection')} titleLink={`/${locale}/c/greek-mythology`} items={fragItems} className={menuListStyle} onLinkClick={closeDropdown}></MenuList>
             </div>
-            <div className="border-r border-gray-500">
-              <MenuList title="Mythology" items={fragItems} className={menuListStyle}></MenuList>
+            <div className="flex flex-row gap-6">
+              <MenuCard title={t('productTitles.icare')} description={t('productDescriptions.icare')} image="/products/icare-bottle.jpg" href={`/${locale}/p/icare`} badge={t('badge.new')} onLinkClick={closeDropdown}></MenuCard>
+              <MenuCard title={t('productTitles.antigone')} description={t('productDescriptions.antigone')} image="/products/antigone-bottle.jpg" href={`/${locale}/p/antigone`} badge={t('badge.new')} onLinkClick={closeDropdown}></MenuCard>
             </div>
-            <div>
-              <MenuList items={fragItems} className={menuListStyle}></MenuList>
-            </div>
-            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW"></MenuCard>
-            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW"></MenuCard>
           </div>
         )
       },
@@ -137,11 +144,10 @@ export default function NavBar({ showBanner = true,
         id: 'about',
         label: t('menu.about'),
         content: (
-          <div className={dropMenuStyle}>
-            <div>
-              <MenuList items={aboutItems} className="mb-6"></MenuList>
-            </div>
-            <MenuCard title="Icarus" description={desPlaceHolder} image="/products/icare-bottle.jpg" href="#" badge="NEW"></MenuCard>
+          <div className="bg-white z-40 left-0 right-0 px-6 gap-16 flex justify-start">
+              <MenuCard title={t('aboutSections.concept.title')} description={t('aboutSections.concept.description')} image="/products/concept.jpg" onLinkClick={closeDropdown}></MenuCard>
+              <MenuCard title={t('aboutSections.bottle.title')} description={t('aboutSections.bottle.description')} image="/products/icare-bottle.jpg" onLinkClick={closeDropdown}></MenuCard>
+              <MenuCard title={t('aboutSections.box.title')} description={t('aboutSections.box.description')} image="/products/narcisse-box.jpg" onLinkClick={closeDropdown}></MenuCard>
           </div>
         )
       }
@@ -175,6 +181,12 @@ export default function NavBar({ showBanner = true,
                   {/* Mobile menu button */}
                   <button
                   type="button"
+                  onClick={() => {
+                    setIsMobileNavVisible(true);
+                    setIsSignInModalOpen(false);
+                    setIsShoppingBagOpen(false);
+                    setIsSearchModalOpen(false);
+                  }}
                   className="inline-flex items-center justify-center rounded-md p-1 text-gray-700"
                   >
                   <span className="sr-only">{t('openMenu')}</span>
@@ -193,6 +205,14 @@ export default function NavBar({ showBanner = true,
               </div>
               <button
                 type="button"
+                onClick={() => {
+                  setIsMobileNavVisible(false);
+                  setIsSignInModalOpen(false);
+                  setIsShoppingBagOpen(false);
+                  setIsSearchModalOpen(true);
+                }}
+                onMouseEnter={() => setIsDropdownVisible(false)}
+
                 className="inline-flex lg:hidden items-center justify-center rounded-md p-1 text-gray-900"
                 >
                 <span className="sr-only">{t('search')}</span>
@@ -206,15 +226,15 @@ export default function NavBar({ showBanner = true,
                 </svg>
               </button>
               <div className="flex grow lg:grow-0 h-10 w-36 relative">
-                  <a href="#" className="items-center py-auto">
-                  <span className="sr-only">AMPUL</span>
-                  <Image
-                      src="/AMPUL.png"
-                      fill
-                      className="object-contain"
-                      alt="AMPUL"
-                  />
-                  </a>
+                  <Link href={`/${locale}/`} className="items-center py-auto">
+                    <span className="sr-only">AMPUL</span>
+                    <Image
+                        src="/AMPUL.png"
+                        fill
+                        className="object-contain"
+                        alt="AMPUL"
+                    />
+                  </Link>
               </div>
               <div className={`hidden lg:flex-1 lg:flex lg:mr-4`}>
                 {menuItems.map((item) => (
@@ -225,34 +245,45 @@ export default function NavBar({ showBanner = true,
                   >
                     <button className={`w-49 text-xl transition-colors font-title duration-200 ${isDropdownVisible && (activeDropdown === item.id) ? "text-gray-500 underline": "text-gray-900 no-underline"}`}>
                       {item.label}
-                      
                     </button>
                   </div>
                 ))}
               </div>
               <div className="items-end">
-                  <button 
+                  <button
                   type="button"
+                  onClick={() => {
+                    setIsMobileNavVisible(false);
+                    setIsSignInModalOpen(false);
+                    setIsShoppingBagOpen(false);
+                    setIsSearchModalOpen(true);
+                  }}
+                  onMouseEnter={() => setIsDropdownVisible(false)}
                   className="hidden lg:inline-flex items-center justify-center rounded-md p-2 text-gray-900"
                   >
-                  <span className="sr-only">Search</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'square', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
+                    <span className="sr-only">{t('search')}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'square', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
                       <g transform="matrix(0.091376,0,0,0.091376,-2.83008,-2.4913)">
                       <circle cx="155" cy="145" r="75" style={{fill: 'none', strokeWidth:'10.94px'}}/>
                       </g>
                       <g transform="matrix(0.0740887,0,0,0.0740887,1.14601,1.31192)">
                       <path d="M199,200.773L248,260" style={{fill:'none', strokeWidth:'13.5px'}}/>
                       </g>
-                  </svg>
+                    </svg>
                   </button>
 
                   <button
                   type="button"
-                  onClick={() => setIsSignInModalOpen(true)}
+                  onClick={() => {
+                    setIsMobileNavVisible(false);
+                    setIsSearchModalOpen(false);
+                    setIsSignInModalOpen(true);
+                    setIsShoppingBagOpen(false);
+                  }}
                   onMouseEnter={() => setIsDropdownVisible(false)}
                   className="inline-flex items-center justify-center rounded-md p-1 lg:p-2 text-gray-900"
                   >
-                    <span className="sr-only">User</span>
+                    <span className="sr-only">{t('user')}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={16} stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'round', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
                         <g transform="matrix(0.0742212,0,0,0.0755272,0.866816,-2.29218)">
                         <circle cx="150" cy="130" r="50" style={{fill: 'none', strokeWidth:'11.8px'}}/>
@@ -262,13 +293,19 @@ export default function NavBar({ showBanner = true,
                         </g>
                     </svg>
                   </button>
+
                   <button
                   type="button"
-                  onClick={() => setIsShoppingBagOpen(true)}
+                  onClick={() => {
+                    setIsShoppingBagOpen(true);
+                    setIsMobileNavVisible(false);
+                    setIsSignInModalOpen(false);
+                    setIsSearchModalOpen(false);
+                  }}
                   onMouseEnter={() => setIsDropdownVisible(false)}
                   className="inline-flex items-center justify-center rounded-md p-1 lg:p-2 text-gray-900 relative"
                   >
-                  <span className="sr-only">ShoppingBag</span>
+                  <span className="sr-only">{t('shoppingBag')}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'square', strokeMiterlimit: 1.5 }}>
                       <path d="M19.2,7.195l0,10.047c0,1.849 -1.501,3.35 -3.349,3.35l-7.702,-0c-1.848,-0 -3.349,-1.501 -3.349,-3.35l0,-10.047l14.4,0Z" style={{fill: 'none', strokeWidth: '1px' }}/>
                       <path d="M8,11.2c0.001,-9.598 8.004,-9.598 8,0" style={{fill: 'none', strokeWidth: '1px', strokeLinecap: 'round'}} />
@@ -306,7 +343,10 @@ export default function NavBar({ showBanner = true,
               </div>
             </div>
           </header>
-
+          <MobileNavBarPanel
+            isOpen={isMobileNavVisible}
+            onClose={() => setIsMobileNavVisible(false)}
+          />
           {/* Sign In Modal */}
           <SignInModal
             isOpen={isSignInModalOpen}
@@ -314,6 +354,13 @@ export default function NavBar({ showBanner = true,
             isAtTop={isAtTop}
             isNavVisible={isNavVisible}
             onClose={() => setIsSignInModalOpen(false)}
+          />
+          <SearchModal
+            isOpen={isSearchModalOpen}
+            showBanner={showBanner}
+            isAtTop={isAtTop}
+            isNavVisible={isNavVisible}
+            onClose={() => setIsSearchModalOpen(false)}
           />
 
           {/* Shopping Bag Modal */}

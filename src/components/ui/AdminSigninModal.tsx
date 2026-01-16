@@ -75,7 +75,7 @@ export default function AdminSignInModal({ isOpen, isAtBottom, isNavVisible, onC
             onClick={handleClose}
           />
           <div
-            className={`relative bg-white border z-50 border-gray-900 rounded-md w-full h-auto sm:w-96 shadow-lg transform origin-top transition-all duration-300 ${
+            className={`relative bg-white border z-50 border-gray-900 rounded-md w-full h-auto ${!isSignedIn ?( 'sm:w-96' ):('sm:w-86')} shadow-lg transform origin-top transition-all duration-300 ${
               isOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0'
             }`}
             onClick={(e) => e.stopPropagation()}
@@ -90,7 +90,7 @@ export default function AdminSignInModal({ isOpen, isAtBottom, isNavVisible, onC
             </button>
 
             {/* Content */}
-            <div className="flex flex-col h-full lg:w-96 lg:h-auto px-6 pb-4 pt-8 overflow-y-auto">
+            <div className="flex flex-col px-6 pb-4 pt-8 overflow-y-auto">
               {!isSignedIn ? (
                 /* Sign In View */
                 <>
@@ -145,7 +145,7 @@ export default function AdminSignInModal({ isOpen, isAtBottom, isNavVisible, onC
                       </button>
                     </div>
                     {user.role === "admin" ? (<></>) : (
-                      <p className="text-xs text-gray-500 italic mt-2">Demo mode: some data will be read-only or mocked</p>
+                      <p className="text-xs text-gray-500 italic mt-3">Demo mode: some data will be read-only or mocked</p>
                     )}
                   </div>
                 </>

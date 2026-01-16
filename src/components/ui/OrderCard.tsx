@@ -35,6 +35,7 @@ type Order = {
   total: number;
   currency: string;
   status: OrderStatus;
+  paymentMethod: string;
   items: OrderItem[];
   createdAt: string;
 };
@@ -178,9 +179,8 @@ export default function OrderCard({ order }: OrderCardProps) {
                             <p>{order.shippingLine1}</p>
                             {order.shippingLine2 && <p>{order.shippingLine2}</p>}
                             <p>
-                              {order.shippingPostal} {order.shippingCity}
+                              {order.shippingPostal} {order.shippingCity}{order.shippingRegion && ` ${order.shippingRegion}`}
                             </p>
-                            {order.shippingRegion && <p>{order.shippingRegion}</p>}
                             <p>{order.shippingCountry}</p>
                           </>
                         )
@@ -200,10 +200,21 @@ export default function OrderCard({ order }: OrderCardProps) {
                   })()}
                 </div>
               </div>
-              <div className="flex flex-col justify-between">
-                <div>
-                  <h4 className="text-base font-bold mb-1 italic">{t('tracking')}</h4>
-                  <p className="text-sm ml-2">{order.trackingCode || t('trackingNotAvailable')}</p>
+              <div>
+                <div className="mb-4">
+                  <h4 className="text-base font-bold italic mb-2">{t('payment')}</h4>
+                  <p className="text-sm ml-2">
+                    {order.paymentMethod === 'demo'
+                      ? t('cardEndingIn', { last4: '4242' })
+                      : order.paymentMethod
+                    }
+                  </p>
+                </div>
+                <div className="flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-base font-bold mb-1 italic">{t('tracking')}</h4>
+                    <p className="text-sm ml-2">{order.trackingCode || t('trackingNotAvailable')}</p>
+                  </div>
                 </div>
               </div>
             </div>

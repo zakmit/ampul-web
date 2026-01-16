@@ -29,8 +29,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const locale = useLocale();
 
   return (
-    <div className="flex flex-col">
-      <Link href={`/${locale}/p/${product.slug}`} className="group">
+    <div className="flex flex-col group">
+      <Link href={`/${locale}/p/${product.slug}`} className="">
         <div className="relative aspect-square mb-4 overflow-hidden">
           <Image
             src={product.image}
@@ -43,7 +43,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       <div className="flex flex-col flex-1">
         <Link href={`/${locale}/p/${product.slug}`}>
-          <h3 className="text-center text-xl font-bold mb-1 hover:underline">{product.name}</h3>
+          <h3 className="text-center text-xl font-bold mb-1 hover:text-gray-500 hover:underline">{product.name}</h3>
         </Link>
 
         <p className="text-sm italic text-center text-gray-900 mb-2">
