@@ -378,13 +378,13 @@ export function ProductEditForm({
     <div className="lg:grid lg:grid-flow-col lg:content-center justify-around lg:h-screen">
       {/* Mobile Header */}
       <h3 className="block text-xl text-center font-bold pb-3 mb-3 border-b border-gray-500 lg:hidden">
-        {isNew ? 'Edit Product' : 'Edit Product'}
+        {isNew ? 'Add Product' : 'Edit Product'}
       </h3>
 
       {/* Left Side - Images (Desktop Only) */}
-      <div className="hidden lg:flex lg:flex-col w-124 bg-white py-8 overflow-y-auto">
-        <h3 className="text-4xl font-bold mb-8">
-          {isNew ? 'Edit Product' : 'Edit Product'}
+      <div className="hidden lg:flex lg:flex-col w-124 bg-white py-6 overflow-y-hidden">
+        <h3 className="text-4xl font-bold mb-4">
+          {isNew ? 'Add Product' : 'Edit Product'}
         </h3>
 
         {/* Top Row: 16:9 and 1:1 Promotional */}

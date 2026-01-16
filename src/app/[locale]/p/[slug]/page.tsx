@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
+import type { Metadata } from 'next';
 import ProductImageGallery from '@/components/ProductImageGallery';
 import ExpandableSections from '@/components/ExpandableSections';
 import Breadcrumb from '@/components/ui/Breadcrumb';
@@ -14,6 +15,22 @@ interface ProductDetailPageProps {
     locale: Locale;
     slug: string;
   }>;
+}
+
+export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const productData = await getProductBySlug(slug, locale);
+
+  if (!productData) {
+    return {
+      title: 'Product Not Found - AMPUL',
+    };
+  }
+
+  return {
+    title: `${productData.name} - ${productData.category.name} - AMPUL`,
+    description: productData.sensations,
+  };
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
@@ -83,7 +100,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   return (
     <div className="overflow-x-hidden max-w-360 mx-auto">
       {/* Main Product Section */}
-      <div className="flex items-start flex-col lg:flex-row">
+      <div className="flex items-center lg:items-start flex-col lg:flex-row">
         {/* Product Image Section - Mobile: full width, Desktop: 5/8 width sticky */}
         <div className="relative w-screen h-[100vw] max-w-150 max-h-150 lg:w-[62.5%] lg:max-w-225 lg:h-225 lg:max-h-225 lg:sticky lg:top-0 flex items-center justify-center bg-transparent">
           <div className="w-full lg:max-w-none lg:w-full h-full flex items-center justify-center">
@@ -93,7 +110,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
         {/* Product Details Section - Mobile: full width below, Desktop: 3/8 width */}
         <div className="bg-white lg:w-[37.5%]">
-          <div className="max-w-md mx-auto lg:max-w-none px-6 lg:px-12 pt-2 lg:pt-8 pb-8 lg:pb-16">
+          <div className="w-full mx-auto lg:max-w-none px-6 lg:px-12 pt-2 lg:pt-8 pb-8 lg:pb-16">
             {/* Product Title - Mobile: center, Desktop: right-aligned */}
             <h1 className="text-4xl lg:text-5xl font-bold text-center mb-1 lg:text-left lg:mb-2">
               {product.name}
@@ -141,7 +158,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
       {/* Explore the Collection - Mobile: scrollable, Desktop: grid */}
       <div className="bg-gray-100 inset-shadow-[0_4px_4px_0] inset-shadow-gray-900/20 lg:inset-shadow-none">
-        <div className="max-w-md lg:max-w-7xl mx-auto px-6 lg:px-12 pt-6 lg:pt-16 lg:pb-16">
+        <div className="max-w-150 lg:max-w-7xl mx-auto px-6 lg:px-12 pt-6 lg:pt-16 lg:pb-16">
           <h2 className="text-3xl lg:text-4xl italic font-bold text-center mb-8 lg:mb-12">
             {t('exploreCollection')}
           </h2>
@@ -152,17 +169,17 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <Link
                 key={relatedProduct.slug}
                 href={`/${locale}/p/${relatedProduct.slug}`}
-                className="group shrink-0 w-48 snap-start"
+                className="shrink-0 w-48 snap-start group"
               >
-                <div className="aspect-[1] relative rounded-sm overflow-hidden mb-2">
+                <div className="aspect-[1] relative overflow-hidden mb-2">
                   <Image
                     src={relatedProduct.image}
                     alt={relatedProduct.name}
                     fill
-                    className="object-cover"
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
-                <h3 className="text-center font-bold text-lg">
+                <h3 className="text-center font-bold text-lg hover:text-gray-500 hover:underline">
                   {relatedProduct.name}
                 </h3>
                 <p className="text-center text-xs px-1">
@@ -180,15 +197,15 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 href={`/${locale}/p/${relatedProduct.slug}`}
                 className="group shrink-0 w-64"
               >
-                <div className="aspect-[1] relative rounded-sm overflow-hidden mb-4">
+                <div className="aspect-[1] relative overflow-hidden mb-4">
                   <Image
                     src={relatedProduct.image}
                     alt={relatedProduct.name}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
-                <h3 className="text-center font-bold text-xl mb-1">
+                <h3 className="text-center font-bold text-xl mb-1 hover:text-gray-500 hover:underline">
                   {relatedProduct.name}
                 </h3>
                 <p className="text-center text-sm italic px-2">

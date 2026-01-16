@@ -1,5 +1,22 @@
 import { getProfile } from './actions'
 import ProfileForm from './ProfileForm'
+import { getTranslations } from 'next-intl/server'
+import type { Metadata } from 'next'
+
+interface ProfilePageProps {
+  params: Promise<{
+    locale: string
+  }>
+}
+
+export async function generateMetadata({ params }: ProfilePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+  return {
+    title: t('profile'),
+  };
+}
 
 export default async function ProfilePage() {
   // Auth check is now handled in layout

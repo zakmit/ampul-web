@@ -9,6 +9,7 @@ import HeroCarouselMobile from '@/components/home/HeroCarouselMobile';
 import ScrollSection from '@/components/home/ScrollSection';
 import BottleViewer from '@/components/home/BottleViewer';
 import MobileCharacterSections from '@/components/home/MobileCharacterSections';
+import type { Metadata } from 'next';
 
 const localeToDbLocale: Record<Locale, string> = {
   'us': 'en-US',
@@ -20,6 +21,16 @@ interface HomePageProps {
   params: Promise<{
     locale: Locale;
   }>;
+}
+
+export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+  return {
+    title: t('home.title'),
+    description: t('home.description'),
+  };
 }
 
 export default async function HomePage({ params }: HomePageProps) {
@@ -294,16 +305,16 @@ export default async function HomePage({ params }: HomePageProps) {
           <div className="flex gap-4 overflow-x-auto lg:hidden text-center pb-4 -mx-4 px-4">
             {characters.map((character) => (
               <div key={character.slug} className="flex flex-col shrink-0 w-[calc(50vw-24px)] max-w-60">
-                <Link href={`/${locale}/p/${character.slug}`} className="block">
-                  <div className="aspect-square relative mb-3">
+                <Link href={`/${locale}/p/${character.slug}`} className="block group">
+                  <div className="aspect-square relative mb-3 overflow-hidden">
                     <Image
                       src={character.productImage}
                       alt={character.title}
                       fill
-                      className="object-cover"
+                      className="object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
-                  <h3 className="font-bold text-base mb-1">{character.title}</h3>
+                  <h3 className="font-bold text-base mb-1 hover:text-gray-500 hover:underline">{character.title}</h3>
                   <p className="content-start text-xs px-2 h-12 italic mb-2 line-clamp-3">
                     {character.quote}
                   </p>
@@ -325,16 +336,16 @@ export default async function HomePage({ params }: HomePageProps) {
           <div className="hidden lg:grid lg:grid-cols-4 gap-8 text-center">
             {characters.map((character) => (
               <div key={character.slug} className="flex flex-col">
-                <Link href={`/${locale}/p/${character.slug}`} className="block">
-                  <div className="aspect-square relative mb-4 overflow-hidden group">
+                <Link href={`/${locale}/p/${character.slug}`} className="block group">
+                  <div className="aspect-square relative mb-4 overflow-hidden">
                     <Image
                       src={character.productImage}
                       alt={character.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
-                  <h3 className="font-bold text-xl mb-2">{character.title}</h3>
+                  <h3 className="font-bold text-xl mb-2 hover:text-gray-500 hover:underline">{character.title}</h3>
                   <p className="text-sm italic text-gray-700 mb-3 h-10 line-clamp-2">
                     {character.quote}
                   </p>

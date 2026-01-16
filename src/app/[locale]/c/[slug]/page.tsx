@@ -5,6 +5,27 @@ import { getCollectionBySlug, getProductsByCollectionSlug, getFilterOptionsForCo
 import type { Locale } from '@/i18n/config';
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
+
+interface CollectionPageProps {
+  params: Promise<{ locale: Locale; slug: string }>;
+}
+
+export async function generateMetadata({ params }: CollectionPageProps): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const collectionData = await getCollectionBySlug(slug, locale);
+
+  if (!collectionData) {
+    return {
+      title: 'Collection Not Found - AMPUL',
+    };
+  }
+
+  return {
+    title: `${collectionData.name} - AMPUL`,
+    description: collectionData.description,
+  };
+}
 
 export default async function CollectionPage({
   params,
@@ -64,7 +85,7 @@ export default async function CollectionPage({
         <h1 className="text-4xl lg:text-5xl font-bold text-center mb-4">
           {collectionData.name}
         </h1>
-        <p className="text-center italic text-gray-700 max-w-3xl mx-auto">
+        <p className="text-center italic max-w-3xl mx-auto">
           {collectionData.description}
         </p>
       </div>

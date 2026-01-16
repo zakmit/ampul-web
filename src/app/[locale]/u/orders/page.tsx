@@ -2,6 +2,8 @@ import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import OrderCard from '@/components/ui/OrderCard'
 import Pagination from '@/components/ui/Pagination'
+import { getTranslations } from 'next-intl/server'
+import type { Metadata } from 'next'
 
 const ORDERS_PER_PAGE = 10
 
@@ -14,10 +16,20 @@ interface OrdersPageProps {
   }>
 }
 
+export async function generateMetadata({ params }: OrdersPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+  return {
+    title: t('orders'),
+  };
+}
+
 export default async function OrdersPage({ params, searchParams }: OrdersPageProps) {
   const { locale } = await params
   const searchParamsData = await searchParams
   const session = await auth()
+  const t = await getTranslations({ locale, namespace: 'OrdersPage' })
 
   // Authentication is handled by the layout, so session will always exist here
   if (!session?.user?.email) {
@@ -69,6 +81,7 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
     total: Number(order.total),
     currency: order.currency,
     status: order.status,
+    paymentMethod: order.paymentMethod,
     items: order.items.map((item) => ({
       id: item.id,
       productName: item.productName,
@@ -90,7 +103,7 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
           ordersForCards.map((order) => <OrderCard key={order.id} order={order} />)
         ) : (
           <div className="text-center py-12 text-gray-500 italic">
-            No orders found
+            {t('noOrders')}
           </div>
         )}
       </div>

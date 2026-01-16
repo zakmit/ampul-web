@@ -1,4 +1,14 @@
 import AdminNavBar from "@/components/ui/AdminNavBar";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Admin - AMPUL",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default function AdminLayout({
   children,
 }: {

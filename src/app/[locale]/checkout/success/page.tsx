@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { getTranslations } from 'next-intl/server'
 import OrderCard from '@/components/ui/OrderCard'
 import SignInForm from '@/components/ui/SignInForm'
+import type { Metadata } from 'next'
 
 interface SuccessPageProps {
   params: Promise<{
@@ -12,6 +13,15 @@ interface SuccessPageProps {
   searchParams: Promise<{
     orderId?: string
   }>
+}
+
+export async function generateMetadata({ params }: SuccessPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+  return {
+    title: t('checkoutSuccess'),
+  };
 }
 
 export default async function CheckoutSuccessPage({ params, searchParams }: SuccessPageProps) {
@@ -65,6 +75,7 @@ export default async function CheckoutSuccessPage({ params, searchParams }: Succ
     total: Number(order.total),
     currency: order.currency,
     status: order.status,
+    paymentMethod: order.paymentMethod,
     items: order.items.map((item) => ({
       id: item.id,
       productName: item.productName,
