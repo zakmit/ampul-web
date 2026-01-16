@@ -22,7 +22,7 @@
     "fragrances": "Fragrances"
   },
   "NavBar": {
-    "banner": "Enter the world of mythology",
+    "banner": "This website is for demonstration purposes only.",
     "menu": {
       "new": "New",
       "fragrance": "Fragrance",
@@ -84,7 +84,7 @@
       "about": {
         "title": "ABOUT",
         "heritage": "Heritage",
-        "story": "Story"
+        "concept": "Concept"
       },
       "legal": {
         "title": "LEGAL",

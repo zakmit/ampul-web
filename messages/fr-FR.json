@@ -22,7 +22,7 @@
     "fragrances": "Parfums"
   },
   "NavBar": {
-    "banner": "Entrez dans le monde de la mythologie",
+    "banner": "Ce site web est uniquement à des fins de démonstration.",
     "menu": {
       "new": "Nouveau",
       "fragrance": "Parfum",
@@ -84,7 +84,7 @@
       "about": {
         "title": "À PROPOS",
         "heritage": "Héritage",
-        "story": "Histoire"
+        "concept": "Concept"
       },
       "legal": {
         "title": "LÉGAL",

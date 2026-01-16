@@ -77,7 +77,7 @@ export default function Footer() {
     {
       title: t('about.title'),
       links: [
-        { label: t('about.heritage'), href: '#' },
+        { label: t('about.concept'), href: '#' },
       ],
     },
     {

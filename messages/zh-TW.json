@@ -22,7 +22,7 @@
     "fragrances": "氣味"
   },
   "NavBar": {
-    "banner": "進入神話世界",
+    "banner": "本網站僅供展示用途",
     "menu": {
       "new": "新品",
       "fragrance": "氣味",
@@ -84,7 +84,7 @@
       "about": {
         "title": "關於我們",
         "heritage": "傳承",
-        "story": "故事"
+        "concept": "概念"
       },
       "legal": {
         "title": "法律",
