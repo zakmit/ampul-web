@@ -1,6 +1,6 @@
 'use client';
 
-import { MenuList, MenuCard } from "@/components/ui";
+import { MenuList, MenuCard } from "@/components/common";
 import { useEffect, useState } from 'react';
 import { X, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';

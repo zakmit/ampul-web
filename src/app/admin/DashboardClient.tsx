@@ -1,15 +1,15 @@
 'use client'
 import { useState, useMemo, useEffect } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-import { OrderTable, type OrderTableItem, type OrderStatus } from '@/components/ui/OrderTable';
+import { OrderTable, type OrderTableItem, type OrderStatus } from '@/components/admin/OrderTable';
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/shadcn/chart";
-import { EditOrderModal, type OrderData } from '@/components/ui/EditOrderModal';
-import { EditAddressModal, type AddressData } from '@/components/ui/EditAddressModal';
+} from "@/components/shadcn/chart";
+import { EditOrderModal, type OrderData } from '@/components/admin/EditOrderModal';
+import { EditAddressModal, type AddressData } from '@/components/admin/EditAddressModal';
 
 // Import types for server actions
 import type {

@@ -1,4 +1,4 @@
-import AdminNavBar from "@/components/ui/AdminNavBar";
+import AdminNavBar from "@/components/admin/AdminNavBar";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {

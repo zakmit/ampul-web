@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslations, useLocale } from 'next-intl';
-import AddToBagButton from '@/components/AddToBagButton';
+import AddToBagButton from '@/components/product/AddToBagButton';
 
 export interface Product {
   id: string;

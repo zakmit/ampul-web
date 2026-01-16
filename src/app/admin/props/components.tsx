@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
-import LanguageSelector, { type Locale } from '@/components/ui/LanguageSelector';
+import LanguageSelector, { type Locale } from '@/components/common/LanguageSelector';
 
 // Style constants
 export const INPUT_STYLE = "w-full text-sm px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic";

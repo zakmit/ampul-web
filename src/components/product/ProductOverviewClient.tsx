@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import ProductCard, { Product } from '@/components/ProductCard';
-import ProductFilters, { FilterSection } from '@/components/ProductFilters';
-import MobileFilterPanel from '@/components/MobileFilterPanel';
+import ProductCard, { Product } from '@/components/product/ProductCard';
+import ProductFilters, { FilterSection } from '@/components/product/ProductFilters';
+import MobileFilterPanel from '@/components/product/MobileFilterPanel';
 
 type FilterOption = {
   id: string;

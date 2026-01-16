@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import type { Locale } from '@/components/ui/LanguageSelector';
+import type { Locale } from '@/components/common/LanguageSelector';
 import type { CollectionWithTranslations } from './data';
 import type {
   createCollection,
@@ -18,8 +18,8 @@ import {
 } from './components';
 import { ChevronRight, Plus } from 'lucide-react';
 import Image from 'next/image';
-import ProductFilters, { FilterSection } from '@/components/ProductFilters';
-import MobileFilterPanel from '@/components/MobileFilterPanel';
+import ProductFilters, { FilterSection } from '@/components/product/ProductFilters';
+import MobileFilterPanel from '@/components/product/MobileFilterPanel';
 
 // Transform Prisma data to UI format
 function transformCollections(collections: CollectionWithTranslations[]): Collection[] {

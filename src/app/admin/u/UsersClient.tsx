@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/shadcn/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/shadcn/dropdown-menu';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/shadcn/dropdown-menu';
 import { ChevronLeft, ChevronRight, Plus, Minus, MoreHorizontal, X, MoveDown, MoveUp } from 'lucide-react';
 import { formatOrderDate } from '@/lib/formatters';
-import { EditUserModal, type UserInfoData } from '@/components/ui/EditUserModal';
-import { UserOrdersModal } from '@/components/ui/UserOrdersModal';
-import { type OrderTableItem } from '@/components/ui/OrderTable';
+import { EditUserModal, type UserInfoData } from '@/components/admin/EditUserModal';
+import { UserOrdersModal } from '@/components/admin/UserOrdersModal';
+import { type OrderTableItem } from '@/components/admin/OrderTable';
 import type {
   readUsers,
   readUser,

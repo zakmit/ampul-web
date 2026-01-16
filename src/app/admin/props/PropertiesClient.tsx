@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import type { Locale } from '@/components/ui/LanguageSelector';
+import type { Locale } from '@/components/common/LanguageSelector';
 import type { CategoryWithTranslations, TagWithTranslations, VolumeWithTranslations } from './data';
 import type {
   createCategory,

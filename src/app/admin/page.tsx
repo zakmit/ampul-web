@@ -13,7 +13,7 @@ import {
   getOrdersChartData,
 } from './actions';
 import { dummyOrders } from './o/_data/mockOrders';
-import type { OrderTableItem, OrderStatus } from '@/components/ui/OrderTable';
+import type { OrderTableItem, OrderStatus } from '@/components/admin/OrderTable';
 
 export default async function AdminPage() {
   const session = await auth();

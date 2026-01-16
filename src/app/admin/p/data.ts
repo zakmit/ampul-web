@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import type { Locale } from '@/components/ui/LanguageSelector'
+import type { Locale } from '@/components/common/LanguageSelector'
 import type { Prisma } from '@/generated/prisma/client'
 import type { Product, Category, Collection, Volume, Tag } from './components'
 

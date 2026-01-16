@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { Eye, X } from 'lucide-react';
-import LanguageSelector, { type Locale } from '@/components/ui/LanguageSelector';
+import LanguageSelector, { type Locale } from '@/components/common/LanguageSelector';
 import Image from 'next/image';
 
 // Style constants

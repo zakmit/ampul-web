@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import Breadcrumb from '@/components/ui/Breadcrumb';
-import AddToBagButton from '@/components/AddToBagButton';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import AddToBagButton from '@/components/product/AddToBagButton';
 import { prisma } from '@/lib/prisma';
 import type { Locale } from '@/i18n/config';
 import { getTranslations } from 'next-intl/server';

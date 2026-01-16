@@ -2,8 +2,8 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getTranslations } from 'next-intl/server'
-import OrderCard from '@/components/ui/OrderCard'
-import SignInForm from '@/components/ui/SignInForm'
+import OrderCard from '@/components/product/OrderCard'
+import SignInForm from '@/components/modals/SignInForm'
 import type { Metadata } from 'next'
 
 interface SuccessPageProps {

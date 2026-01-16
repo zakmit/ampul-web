@@ -3,10 +3,10 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
-import ProductImageGallery from '@/components/ProductImageGallery';
-import ExpandableSections from '@/components/ExpandableSections';
-import Breadcrumb from '@/components/ui/Breadcrumb';
-import AddToBagButton from '@/components/AddToBagButton';
+import ProductImageGallery from '@/components/product/ProductImageGallery';
+import ExpandableSections from '@/components/product/ExpandableSections';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import AddToBagButton from '@/components/product/AddToBagButton';
 import { getProductBySlug, getCollectionProducts, getAllProductSlugs } from './data';
 import type { Locale } from '@/i18n/config';
 

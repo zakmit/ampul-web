@@ -1,7 +1,7 @@
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
-import OrderCard from '@/components/ui/OrderCard'
-import Pagination from '@/components/ui/Pagination'
+import OrderCard from '@/components/product/OrderCard'
+import Pagination from '@/components/common/Pagination'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
 

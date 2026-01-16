@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/shadcn/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuTrigger, DropdownMenuItem } from '@/components/ui/shadcn/dropdown-menu';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuTrigger, DropdownMenuItem } from '@/components/shadcn/dropdown-menu';
 import { ChevronLeft, ChevronRight, Plus, Minus, MoreHorizontal, ChevronDown, X, MoveDown, MoveUp, EllipsisVertical } from 'lucide-react';
 import { readProducts, readOrders, readOrder, updateTrackingCode, updateOrderStatus, updateOrderAddress, acceptCancelRequest, acceptRefundRequest, type OrderFilters, type OrderDetail } from './actions';
 import type { Order as FullOrder, OrderStatus } from './mockData';
 import { mockOrderItems } from './mockData';
-import { EditOrderModal, type OrderData } from '@/components/ui/EditOrderModal';
-import { EditAddressModal, type AddressData } from '@/components/ui/EditAddressModal';
+import { EditOrderModal, type OrderData } from '@/components/admin/EditOrderModal';
+import { EditAddressModal, type AddressData } from '@/components/admin/EditAddressModal';
 import { formatOrderDate } from '@/lib/formatters';
 
 // Type for table display (from _data/mockOrders.ts)

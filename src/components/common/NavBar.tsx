@@ -1,14 +1,14 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { MenuList, MenuCard } from "@/components/ui";
+import { MenuList, MenuCard } from "@/components/common";
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
-import MobileNavBarPanel from './MobileNavBarPanel';
-import SignInModal from './SignInModal';
-import SearchModal from './SearchModal'
-import ShoppingBagModalWrapper from './ShoppingBagModalWrapper';
-import AddedToBagModalWrapper from './AddedToBagModalWrapper';
+import MobileNavBarPanel from '@/components/common/MobileNavBarPanel';
+import SignInModal from '@/components/modals/SignInModal';
+import SearchModal from '@/components/modals/SearchModal'
+import ShoppingBagModalWrapper from '@/components/modals/ShoppingBagModalWrapper';
+import AddedToBagModalWrapper from '@/components/modals/AddedToBagModalWrapper';
 import { useShoppingBag } from '@/components/providers/ShoppingBagProvider';
 interface NavbarProps {
   showBanner?: boolean;

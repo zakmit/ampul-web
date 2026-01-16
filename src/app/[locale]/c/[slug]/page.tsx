@@ -1,6 +1,6 @@
-import ProductOverviewClient from '@/components/ProductOverviewClient';
-import { Product } from '@/components/ProductCard';
-import Breadcrumb from '@/components/ui/Breadcrumb';
+import ProductOverviewClient from '@/components/product/ProductOverviewClient';
+import { Product } from '@/components/product/ProductCard';
+import Breadcrumb from '@/components/common/Breadcrumb';
 import { getCollectionBySlug, getProductsByCollectionSlug, getFilterOptionsForCollection, getAllCollectionSlugs } from './data';
 import type { Locale } from '@/i18n/config';
 import { getTranslations } from 'next-intl/server';

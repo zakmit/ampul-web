@@ -1,7 +1,7 @@
 import { auth } from '@/auth';
 import { getTranslations } from 'next-intl/server';
 import UserLayoutClient from './UserLayoutClient';
-import SignInForm from '@/components/ui/SignInForm';
+import SignInForm from '@/components/modals/SignInForm';
 
 export default async function UserLayout({
   children,
