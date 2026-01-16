@@ -51,6 +51,9 @@ export const getAllProducts = cache(async (locale: Locale = 'us'): Promise<Produ
     const dbLocale = localeToDbLocale[locale]
     const fallbackDbLocale = localeToDbLocale['us']
 
+    // Filter translations at DB level to reduce data transfer
+    const localeFilter = { locale: { in: [dbLocale, fallbackDbLocale] } }
+
     const products = await prisma.product.findMany({
       where: {
         isDeleted: false,
@@ -58,15 +61,15 @@ export const getAllProducts = cache(async (locale: Locale = 'us'): Promise<Produ
       include: {
         collection: {
           include: {
-            translations: true,
+            translations: { where: localeFilter },
           },
         },
-        translations: true,
+        translations: { where: localeFilter },
         volumes: {
           include: {
             volume: {
               include: {
-                translations: true,
+                translations: { where: localeFilter },
               },
             },
           },
@@ -75,7 +78,7 @@ export const getAllProducts = cache(async (locale: Locale = 'us'): Promise<Produ
           include: {
             tag: {
               include: {
-                translations: true,
+                translations: { where: localeFilter },
               },
             },
           },
@@ -145,11 +148,14 @@ export const getFilterOptions = cache(async (locale: Locale = 'us'): Promise<Fil
     const dbLocale = localeToDbLocale[locale]
     const fallbackDbLocale = localeToDbLocale['us']
 
+    // Filter translations at DB level to reduce data transfer
+    const localeFilter = { locale: { in: [dbLocale, fallbackDbLocale] } }
+
     // Fetch all filter options in parallel
     const [volumes, collections, tags] = await Promise.all([
       prisma.volume.findMany({
         include: {
-          translations: true,
+          translations: { where: localeFilter },
         },
         orderBy: {
           value: 'asc',
@@ -157,7 +163,7 @@ export const getFilterOptions = cache(async (locale: Locale = 'us'): Promise<Fil
       }),
       prisma.collection.findMany({
         include: {
-          translations: true,
+          translations: { where: localeFilter },
         },
         orderBy: {
           id: 'asc',
@@ -165,7 +171,7 @@ export const getFilterOptions = cache(async (locale: Locale = 'us'): Promise<Fil
       }),
       prisma.tag.findMany({
         include: {
-          translations: true,
+          translations: { where: localeFilter },
         },
         orderBy: {
           slug: 'asc',

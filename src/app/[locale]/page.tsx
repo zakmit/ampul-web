@@ -209,6 +209,7 @@ export default async function HomePage({ params }: HomePageProps) {
                       src={character.productImage}
                       alt={character.title}
                       fill
+                      sizes="(max-width: 640px) 50vw, 240px"
                       className="object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
@@ -240,6 +241,7 @@ export default async function HomePage({ params }: HomePageProps) {
                       src={character.productImage}
                       alt={character.title}
                       fill
+                      sizes="(max-width: 1280px) 25vw, 320px"
                       className="object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>

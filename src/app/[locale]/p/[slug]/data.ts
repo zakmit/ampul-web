@@ -62,25 +62,28 @@ export const getProductBySlug = cache(async (slug: string, locale: Locale = 'us'
     const dbLocale = localeToDbLocale[locale]
     const fallbackDbLocale = localeToDbLocale['us']
 
+    // Filter translations at DB level to reduce data transfer
+    const localeFilter = { locale: { in: [dbLocale, fallbackDbLocale] } }
+
     const product = await prisma.product.findUnique({
       where: { slug },
       include: {
         category: {
           include: {
-            translations: true,
+            translations: { where: localeFilter },
           },
         },
         collection: {
           include: {
-            translations: true,
+            translations: { where: localeFilter },
           },
         },
-        translations: true,
+        translations: { where: localeFilter },
         volumes: {
           include: {
             volume: {
               include: {
-                translations: true,
+                translations: { where: localeFilter },
               },
             },
           },
@@ -89,7 +92,7 @@ export const getProductBySlug = cache(async (slug: string, locale: Locale = 'us'
           include: {
             tag: {
               include: {
-                translations: true,
+                translations: { where: localeFilter },
               },
             },
           },
@@ -183,6 +186,9 @@ export const getCollectionProducts = cache(async (collectionId: number, currentP
     const dbLocale = localeToDbLocale[locale]
     const fallbackDbLocale = localeToDbLocale['us']
 
+    // Filter translations at DB level to reduce data transfer
+    const localeFilter = { locale: { in: [dbLocale, fallbackDbLocale] } }
+
     const products = await prisma.product.findMany({
       where: {
         collectionId,
@@ -191,7 +197,7 @@ export const getCollectionProducts = cache(async (collectionId: number, currentP
         },
       },
       include: {
-        translations: true,
+        translations: { where: localeFilter },
         volumes: {
           include: {
             volume: true,
