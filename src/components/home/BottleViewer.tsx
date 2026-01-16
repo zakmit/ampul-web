@@ -22,6 +22,9 @@ function BottleModel() {
   );
 }
 
+// Preload the model so it starts fetching immediately when this module loads
+useGLTF.preload('/models/Bottle.glb');
+
 
 interface BottleViewerProps {
   isMobile?: boolean;
