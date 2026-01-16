@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { motion, useScroll, useMotionValueEvent, useTransform } from 'framer-motion';
+import { m, useScroll, useMotionValueEvent, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -178,7 +178,7 @@ export default function MobileCharacterSections({
               style={{ height: '200vh' }} // Extra height for scroll progress
             >
               {/* Sticky content - sticks at top of viewport */}
-              <motion.div
+              <m.div
                 className="sticky top-0 h-dvh w-full text-gold overflow-hidden"
                 style={{ opacity: sectionOpacities[index] }}
               >
@@ -210,7 +210,7 @@ export default function MobileCharacterSections({
                   </Link>
                 </div>
               </div>
-              </motion.div>
+              </m.div>
             </div>
             {/* Gap between sections for fade transition */}
             <div style={{ height: '50dvh' }} />
@@ -219,7 +219,7 @@ export default function MobileCharacterSections({
       })}
 
       {/* Single Progress Indicator - Fixed at bottom */}
-      <motion.div
+      <m.div
         className="fixed bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10 lg:hidden"
         initial={{ opacity: 0, y: 20 }}
         animate={{
@@ -229,7 +229,7 @@ export default function MobileCharacterSections({
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
         {Array.from({ length: 4 }).map((_, index) => (
-          <motion.div
+          <m.div
             key={index}
             className="h-1.5 rounded-full overflow-hidden relative"
             initial={false}
@@ -242,7 +242,7 @@ export default function MobileCharacterSections({
             transition={{ duration: 0.3, ease: 'easeInOut' }}
           >
             {/* Progress fill */}
-            <motion.div
+            <m.div
               className="absolute inset-0 rounded-full origin-left"
               style={{
                 backgroundColor: 'oklch(0.8693 0.0153 94.22)'
@@ -253,9 +253,9 @@ export default function MobileCharacterSections({
               }}
               transition={{ duration: 0.1, ease: 'linear' }}
             />
-          </motion.div>
+          </m.div>
         ))}
-      </motion.div>
+      </m.div>
     </div>
   );
 }

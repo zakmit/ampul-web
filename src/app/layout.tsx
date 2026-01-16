@@ -5,6 +5,7 @@ import './globals.css';
 import SessionProvider from '@/components/providers/SessionProvider';
 import { ShoppingBagProvider } from '@/components/providers/ShoppingBagProvider';
 import { LoadingOverlayProvider } from '@/components/providers/LoadingOverlayProvider';
+import FramerMotionProvider from '@/components/providers/FramerMotionProvider';
 import { auth } from '@/auth';
 
 const aSLibre = Averia_Serif_Libre({
@@ -42,7 +43,9 @@ export default async function RootLayout({
         <SessionProvider session={session}>
           <ShoppingBagProvider>
             <LoadingOverlayProvider>
-              {children}
+              <FramerMotionProvider>
+                {children}
+              </FramerMotionProvider>
             </LoadingOverlayProvider>
           </ShoppingBagProvider>
         </SessionProvider>

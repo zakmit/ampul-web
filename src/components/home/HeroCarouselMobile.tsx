@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface HeroSlide {
@@ -54,7 +54,7 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
           {/* Image Section */}
           <div className="relative w-full h-[56.25dvw]">
             <AnimatePresence mode="wait">
-              <motion.div
+              <m.div
                 key={currentSlide}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -69,14 +69,14 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
                   className="object-cover object-center"
                   priority={currentSlide === 0}
                 />
-              </motion.div>
+              </m.div>
             </AnimatePresence>
           </div>
 
           {/* Text Content Section */}
           <div className="bg-white px-0 pt-4 pb-6 h-40">
             <AnimatePresence mode="wait">
-              <motion.div
+              <m.div
                 key={currentSlide}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -94,7 +94,7 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
                     {slides[currentSlide].description}
                   </p>
                 )}
-              </motion.div>
+              </m.div>
             </AnimatePresence>
           </div>
         </Link>
@@ -103,7 +103,7 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
           {/* Image Section */}
           <div className="relative w-dvw h-[56.25dvw]">
             <AnimatePresence mode="wait">
-              <motion.div
+              <m.div
                 key={currentSlide}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -118,14 +118,14 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
                   className="object-cover object-center"
                   priority={currentSlide === 0}
                 />
-              </motion.div>
+              </m.div>
             </AnimatePresence>
           </div>
 
           {/* Text Content Section */}
           <div className="bg-white px-6 pt-4 pb-2">
             <AnimatePresence mode="wait">
-              <motion.div
+              <m.div
                 key={currentSlide}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -143,7 +143,7 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
                     {slides[currentSlide].description}
                   </p>
                 )}
-              </motion.div>
+              </m.div>
             </AnimatePresence>
           </div>
         </>

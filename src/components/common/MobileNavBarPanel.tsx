@@ -6,7 +6,7 @@ import { X, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 interface MobileNavBarPanelProps {
   isOpen: boolean;
@@ -110,7 +110,7 @@ export default function MobileNavBarPanel({isOpen, onClose}: MobileNavBarPanelPr
           <AnimatePresence mode="wait" initial={false}>
             {activeSection === null ? (
               // Main menu
-              <motion.div
+              <m.div
                 key="main-menu"
                 initial={{ x: '-100%' }}
                 animate={{ x: 0 }}
@@ -140,10 +140,10 @@ export default function MobileNavBarPanel({isOpen, onClose}: MobileNavBarPanelPr
                 >
                   <h2 className="text-2xl">{t('menu.about')}</h2>
                 </button>
-              </motion.div>
+              </m.div>
             ) : (
               // Sub-panel
-              <motion.div
+              <m.div
                 key={activeSection}
                 initial={{ x: '100%' }}
                 animate={{ x: 0 }}
@@ -166,7 +166,7 @@ export default function MobileNavBarPanel({isOpen, onClose}: MobileNavBarPanelPr
                 <div className="flex-1 px-3 h-full">
                   {menuItems.find(item => item.id === activeSection)?.content}
                 </div>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>

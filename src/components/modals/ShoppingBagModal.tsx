@@ -2,7 +2,7 @@
 import { useTranslations } from 'next-intl'
 import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import type { ShoppingBagItemDetails } from '@/app/actions/shoppingBag'
 import { useLoadingOverlay } from '@/components/providers/LoadingOverlayProvider'
 
@@ -85,7 +85,7 @@ export default function ShoppingBagModal({
       {isOpen && (
         <>
           {/* Background Blur - Click to close */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -96,7 +96,7 @@ export default function ShoppingBagModal({
 
           {/* Modal Container - Full screen overlay on desktop, full width modal on mobile */}
           <div className={`fixed inset-0 z-50 ${getTopPosition()} lg:top-0 overflow-hidden`}>
-            <motion.div
+            <m.div
               initial={{ y: '-100%', x: 0 }}
               animate={{ y: 0, x: 0 }}
               exit={{ y: '-100%', x: 0 }}
@@ -423,7 +423,7 @@ export default function ShoppingBagModal({
               </div>
             </div>
             </div>
-          </motion.div>
+          </m.div>
           </div>
         </>
       )}

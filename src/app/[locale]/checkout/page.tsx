@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useRouter, useParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { useShoppingBag } from '@/components/providers/ShoppingBagProvider'
 import { useLoadingOverlay } from '@/components/providers/LoadingOverlayProvider'
 import { getShoppingBagItems, getAvailableProductsForSample } from '@/app/actions/shoppingBag'
@@ -249,7 +249,7 @@ export default function CheckoutPage() {
                     ${currentStep === 2 ? 'border' : 'border-t'}`}>
                   <AnimatePresence initial={false}>
                     {currentStep === 2 && (
-                    <motion.div
+                    <m.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
@@ -394,7 +394,7 @@ export default function CheckoutPage() {
                         </button>
                       </div>
                     </div>
-                    </motion.div>
+                    </m.div>
                     )}
                   </AnimatePresence>
                 </div>
@@ -408,7 +408,7 @@ export default function CheckoutPage() {
                 >
                 <AnimatePresence initial={false}>
                   {currentStep >= 3 && (
-                  <motion.div
+                  <m.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
@@ -555,7 +555,7 @@ export default function CheckoutPage() {
                     </button>
                   </div>
                 </div>
-                  </motion.div>
+                  </m.div>
                   )}
                 </AnimatePresence>
               </div>
@@ -645,7 +645,7 @@ export default function CheckoutPage() {
                   ${currentStep === 2 ? 'border' : 'border-t'}`} >
               <AnimatePresence initial={false}>
                 {currentStep === 2 && (
-                <motion.div
+                <m.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -783,7 +783,7 @@ export default function CheckoutPage() {
                     </button>
                   </div>
                 </div>
-                </motion.div>
+                </m.div>
                 )}
               </AnimatePresence>
             </div>
@@ -797,7 +797,7 @@ export default function CheckoutPage() {
               >
                 <AnimatePresence initial={false}>
                   {currentStep >= 3 && (
-                  <motion.div
+                  <m.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
@@ -950,7 +950,7 @@ export default function CheckoutPage() {
                     </button>
                   </div>
                 </div>
-                  </motion.div>
+                  </m.div>
                   )}
                 </AnimatePresence>
               </div>

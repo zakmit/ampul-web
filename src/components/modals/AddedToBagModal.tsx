@@ -2,7 +2,7 @@
 import { useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 
 interface AddedToBagModalProps {
   isOpen: boolean
@@ -64,7 +64,7 @@ export default function AddedToBagModal({
       {isOpen && (
         <>
           {/* Background Blur - Click to close - extends under navbar */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -75,7 +75,7 @@ export default function AddedToBagModal({
 
           {/* Modal Container */}
           <div className={`fixed right-0 z-50 w-full lg:w-auto flex justify-center lg:justify-end overflow-hidden ${getTopPosition()}`}>
-            <motion.div
+            <m.div
               initial={{ y: '-100%', x: 0 }}
               animate={{ y: 0, x: 0 }}
               exit={{ y: '-100%', x: 0 }}
@@ -157,7 +157,7 @@ export default function AddedToBagModal({
                   </>
                 )}
               </div>
-            </motion.div>
+            </m.div>
           </div>
         </>
       )}

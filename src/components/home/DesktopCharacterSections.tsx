@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { motion, useScroll, useMotionValueEvent, useTransform } from 'framer-motion';
+import { m, useScroll, useMotionValueEvent, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -99,7 +99,7 @@ export default function DesktopCharacterSections({
           ref={section0Ref}
           style={{ height: '300vh' }}
         >
-          <motion.div
+          <m.div
             className="sticky top-0 h-dvh w-full text-gold overflow-hidden"
             style={{ opacity: sectionOpacities[0] }}
           >
@@ -150,7 +150,7 @@ export default function DesktopCharacterSections({
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
         {/* Gap between sections */}
         <div style={{ height: '50dvh' }} />
@@ -162,7 +162,7 @@ export default function DesktopCharacterSections({
           ref={section1Ref}
           style={{ height: '300vh' }}
         >
-          <motion.div
+          <m.div
             className="sticky top-0 h-dvh w-full text-gold overflow-hidden"
             style={{ opacity: sectionOpacities[1] }}
           >
@@ -213,14 +213,14 @@ export default function DesktopCharacterSections({
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
         {/* Gap after last section */}
         <div style={{ height: '50dvh' }} />
       </div>
 
       {/* Progress Indicator - Fixed at bottom */}
-      <motion.div
+      <m.div
         className="fixed bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{
@@ -230,7 +230,7 @@ export default function DesktopCharacterSections({
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
         {Array.from({ length: 2 }).map((_, index) => (
-          <motion.div
+          <m.div
             key={index}
             className="h-1.5 rounded-full overflow-hidden relative"
             initial={false}
@@ -243,7 +243,7 @@ export default function DesktopCharacterSections({
             transition={{ duration: 0.3, ease: 'easeInOut' }}
           >
             {/* Progress fill */}
-            <motion.div
+            <m.div
               className="absolute inset-0 rounded-full origin-left"
               style={{
                 backgroundColor: 'oklch(0.8693 0.0153 94.22)'
@@ -254,9 +254,9 @@ export default function DesktopCharacterSections({
               }}
               transition={{ duration: 0.1, ease: 'linear' }}
             />
-          </motion.div>
+          </m.div>
         ))}
-      </motion.div>
+      </m.div>
     </div>
   );
 }

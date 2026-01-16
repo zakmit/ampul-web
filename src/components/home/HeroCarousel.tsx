@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface HeroSlide {
@@ -52,7 +52,7 @@ export default function HeroCarousel({ slides, autoPlayInterval = 10000 }: HeroC
       {slides[currentSlide].link ? (
         <Link href={slides[currentSlide].link!} className="block absolute inset-0">
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={currentSlide}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -67,13 +67,13 @@ export default function HeroCarousel({ slides, autoPlayInterval = 10000 }: HeroC
                 className="object-cover object-center"
                 priority={currentSlide === 0}
               />
-            </motion.div>
+            </m.div>
           </AnimatePresence>
 
           {/* Text Content */}
           <div className="absolute inset-0 flex flex-col items-center justify-end text-center px-6">
             <AnimatePresence mode="wait">
-              <motion.div
+              <m.div
                 key={currentSlide}
                 className={`mb-8 items-center ${
                   slides[currentSlide].textColor === 'light' ? 'text-gray-100' : 'text-gray-900'
@@ -93,14 +93,14 @@ export default function HeroCarousel({ slides, autoPlayInterval = 10000 }: HeroC
                     {slides[currentSlide].description}
                   </p>
                 )}
-              </motion.div>
+              </m.div>
             </AnimatePresence>
           </div>
         </Link>
       ) : (
         <>
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={currentSlide}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -115,13 +115,13 @@ export default function HeroCarousel({ slides, autoPlayInterval = 10000 }: HeroC
                 className="object-cover object-center"
                 priority={currentSlide === 0}
               />
-            </motion.div>
+            </m.div>
           </AnimatePresence>
 
           {/* Text Content */}
           <div className="absolute inset-0 flex flex-col items-center justify-end text-center px-6 pointer-events-none">
             <AnimatePresence mode="wait">
-              <motion.div
+              <m.div
                 key={currentSlide}
                 className={`mb-8 items-center ${
                   slides[currentSlide].textColor === 'light' ? 'text-gray-100' : 'text-gray-900'
@@ -141,7 +141,7 @@ export default function HeroCarousel({ slides, autoPlayInterval = 10000 }: HeroC
                     {slides[currentSlide].description}
                   </p>
                 )}
-              </motion.div>
+              </m.div>
             </AnimatePresence>
           </div>
         </>

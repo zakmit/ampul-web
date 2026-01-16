@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 
 interface LoadingOverlayContextType {
   isLoading: boolean
@@ -27,7 +27,7 @@ export function LoadingOverlayProvider({ children }: { children: ReactNode }) {
       {children}
       <AnimatePresence>
         {isLoading && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -38,7 +38,7 @@ export function LoadingOverlayProvider({ children }: { children: ReactNode }) {
               {/* Simple spinner */}
               <div className="w-10 h-10 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin" />
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </LoadingOverlayContext.Provider>
