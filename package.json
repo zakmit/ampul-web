@@ -2,6 +2,9 @@
   "name": "ampul-web",
   "version": "0.1.0",
   "private": true,
+  "overrides": {
+    "hono": "^4.10.7"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
