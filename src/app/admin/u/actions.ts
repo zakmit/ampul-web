@@ -465,6 +465,7 @@ import {
   acceptCancelRequest as _acceptCancelRequest,
   acceptRefundRequest as _acceptRefundRequest,
 } from '@/app/admin/o/actions'
+import type { AddressUpdateData } from '@/app/admin/o/validation'
 
 export type { OrderDetail } from '@/app/admin/o/actions'
 
@@ -480,7 +481,7 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
   return _updateOrderStatus(orderId, status)
 }
 
-export async function updateOrderAddress(orderId: string, addressData: any) {
+export async function updateOrderAddress(orderId: string, addressData: AddressUpdateData) {
   return _updateOrderAddress(orderId, addressData)
 }
 

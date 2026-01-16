@@ -76,7 +76,7 @@ export default async function LocaleLayout({
         } as React.CSSProperties : undefined}
       >
         <NextIntlClientProvider messages={messages} locale={locale}>
-          <NavBar showBanner={true} bannerHeight={6} />
+          <NavBar showBanner={true} />
           {children}
           <Footer/>
           <LocaleSelector />

@@ -31,7 +31,6 @@ export default function ShoppingBagModal({
   items,
   availableProducts,
   selectedSample,
-  isLoading,
   onQuantityChange,
   onQuantitySet,
   onRemoveItem,

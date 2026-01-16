@@ -13,8 +13,8 @@ import { getUserAddress, createOrder, type CheckoutAddress } from '@/app/actions
 import type { ShoppingBagItemDetails } from '@/app/actions/shoppingBag'
 import type { Locale } from '@/i18n/config'
 import SignInForm from '@/components/modals/SignInForm'
-export const INPUT_STYLE = "w-full text-sm px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
-export const INPUT_ERROR_STYLE = "w-full text-sm px-4 py-2 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 placeholder:italic"
+const INPUT_STYLE = "w-full text-sm px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
+const INPUT_ERROR_STYLE = "w-full text-sm px-4 py-2 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 placeholder:italic"
 
 type CheckoutStep = 1 | 2 | 3
 

@@ -173,7 +173,6 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
 
   // Full order data for modal (fetched when opening modal)
   const [currentOrderData, setCurrentOrderData] = useState<OrderDetail | null>(null);
-  const [isLoadingOrder, setIsLoadingOrder] = useState(false);
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
   const [statusUpdateError, setStatusUpdateError] = useState<string | null>(null);
   const [addressFieldErrors, setAddressFieldErrors] = useState<AddressFieldErrors>({});
@@ -557,9 +556,7 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
 
     if (serverActions) {
       // Fetch full order data from server
-      setIsLoadingOrder(true);
       const result = await serverActions.fetchOrder(orderId);
-      setIsLoadingOrder(false);
 
       if (result.success && result.data) {
         setCurrentOrderData(result.data);
@@ -608,9 +605,7 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
     if (serverActions) {
       // Fetch full order data from server if not already loaded
       if (!currentOrderData || currentOrderData.id !== orderId) {
-        setIsLoadingOrder(true);
         const result = await serverActions.fetchOrder(orderId);
-        setIsLoadingOrder(false);
 
         if (result.success && result.data) {
           setCurrentOrderData(result.data);

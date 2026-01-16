@@ -12,13 +12,10 @@ import AddedToBagModalWrapper from '@/components/modals/AddedToBagModalWrapper';
 import { useShoppingBag } from '@/components/providers/ShoppingBagProvider';
 interface NavbarProps {
   showBanner?: boolean;
-  bannerHeight?: number;
 }
 const dropMenuStyle = "bg-white z-40 left-0 right-0 px-6 gap-6 flex justify-between";
-const navHeight = 14;
 const menuListStyle = "pr-4";
 export default function NavBar({ showBanner = true,
-    bannerHeight = 6 // h-6
     }: NavbarProps) {
   const t = useTranslations('NavBar');
   const locale = useLocale();

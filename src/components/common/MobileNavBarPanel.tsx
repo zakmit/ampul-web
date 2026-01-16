@@ -3,7 +3,6 @@
 import { MenuList, MenuCard } from "@/components/common";
 import { useEffect, useState } from 'react';
 import { X, ChevronLeft } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 import { m, AnimatePresence } from 'framer-motion';

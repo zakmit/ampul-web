@@ -1,7 +1,6 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { useSession } from 'next-auth/react'
-import Link from 'next/link'
 import { X } from 'lucide-react'
 import { handleSignIn, handleSignOut } from '@/app/actions/auth'
 

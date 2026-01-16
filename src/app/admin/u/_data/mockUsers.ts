@@ -33,35 +33,6 @@ function getRandomDate(): Date {
 
   return date;
 }
-
-// Helper function to generate order count (weighted toward lower numbers)
-function getRandomOrderCount(): number {
-  const weights = [
-    { count: 1, weight: 30 },
-    { count: 2, weight: 25 },
-    { count: 3, weight: 20 },
-    { count: 4, weight: 10 },
-    { count: 5, weight: 7 },
-    { count: 6, weight: 4 },
-    { count: 7, weight: 2 },
-    { count: 8, weight: 1 },
-    { count: 9, weight: 0.5 },
-    { count: 10, weight: 0.5 },
-  ];
-
-  const totalWeight = weights.reduce((sum, w) => sum + w.weight, 0);
-  let random = Math.random() * totalWeight;
-
-  for (const { count, weight } of weights) {
-    random -= weight;
-    if (random <= 0) {
-      return count;
-    }
-  }
-
-  return 1;
-}
-
 // First name pool
 const firstNames = [
   'Cheyenne', 'Paityn', 'James', 'Maria', 'Ruben', 'Carter', 'Terry', 'Craig', 'Corey',

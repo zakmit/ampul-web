@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import type { Locale } from '@/components/common/LanguageSelector';
 import type {
   createProduct,
   updateProduct,
@@ -350,8 +349,6 @@ export default function ProductsClient({
       return null;
     }
   };
-
-  const isEditing = editingProduct !== null || isCreating;
 
   // Filter and sort products
   let filteredProducts = [...products];
