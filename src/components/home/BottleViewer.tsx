@@ -28,8 +28,6 @@ interface BottleViewerProps {
 }
 
 export default function BottleViewer({ isMobile = false }: BottleViewerProps) {
-  const width = isMobile ? '100vw' : '50vw';
-  const height = isMobile ? 'calc(100vw / 1.618)' : 'calc(50vw / 1.618)';
 
   return (
     <div
@@ -39,7 +37,7 @@ export default function BottleViewer({ isMobile = false }: BottleViewerProps) {
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
       }}
-      className={`mx-auto ${isMobile ? "w-dvw h-[61.8dvw]":"w-[50dvw] h-[30.9dvw] max-h-123.5"}`}
+      className={`mx-auto w-full ${isMobile ? "h-[61.8dvw]":"h-[30.9dvw] max-h-123.5"}`}
     >
       <Canvas
         camera={{ position: [0, 0, 3], fov: 45 }}

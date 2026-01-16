@@ -52,7 +52,7 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
       {slides[currentSlide].link ? (
         <Link href={slides[currentSlide].link!} className="block ">
           {/* Image Section */}
-          <div className="relative w-dvw h-[56.25dvw]">
+          <div className="relative w-full h-[56.25dvw]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}

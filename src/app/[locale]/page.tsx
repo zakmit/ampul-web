@@ -132,14 +132,14 @@ export default async function HomePage({ params }: HomePageProps) {
   ];
 
   return (
-    <div className="overflow-hidden max-w-400 mx-auto">
+    <div className="max-w-400 w-full mx-auto">
       {/* Hero Section with Carousel */}
       {/* Mobile */}
       <section className="lg:hidden">
         <HeroCarouselMobile slides={heroSlides} />
       </section>
       {/* Desktop */}
-      <section className="hidden lg:block relative lg:w-dvw lg:h-[42.86dvw] max-w-400 max-h-171.5">
+      <section className="hidden lg:block relative lg:w-full lg:h-[42.86dvw] max-w-400 max-h-171.5">
         <HeroCarousel slides={heroSlides} />
       </section>
 
@@ -275,7 +275,7 @@ export default async function HomePage({ params }: HomePageProps) {
 
       {/* The Bottle Section */}
       <section className="bg-white pt-12 lg:py-24">
-        <div className=" lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
+        <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
           {/* Left: Title and Description */}
           <div>
             <h2 className="text-3xl lg:text-5xl font-bold text-center mb-4">{t('bottleTitle')}</h2>

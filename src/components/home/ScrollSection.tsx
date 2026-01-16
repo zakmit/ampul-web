@@ -35,7 +35,7 @@ export default function ScrollSection({
     >
       <motion.div
         style={{ opacity }}
-        className="h-dvh sticky top-0 flex items-center justify-center"
+        className="h-dvh sticky top-0 flex items-center justify-center overflow-hidden"
       >
         {children}
       </motion.div>
