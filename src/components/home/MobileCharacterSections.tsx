@@ -57,7 +57,7 @@ export default function MobileCharacterSections({
       >
         <div className="w-full h-full text-gold">
           {/* Image positioned from right */}
-          <div className="absolute h-dvh left-40 w-[84.2dvh]" style={{ filter: 'drop-shadow(0 4px 4px oklch(0.2743 0.028 140.74))' }}>
+          <div className="absolute h-dvh left-40 sm:right-0 sm:left-auto w-[84.2dvh]" style={{ filter: 'drop-shadow(0 4px 4px oklch(0.2743 0.028 140.74))' }}>
             <Image
               src={characters[0].image}
               alt={characters[0].title}
@@ -68,8 +68,8 @@ export default function MobileCharacterSections({
 
           {/* Text content - left aligned */}
           <div className="h-full">
-            <h2 className="absolute top-24 text-lg font-bold w-60 italic left-7">{characters[0].quote}</h2>
-            <div className='absolute top-3/5 left-4 -translate-y-1/2 w-40 flex flex-col items-center'>
+            <h2 className="absolute top-24 text-lg font-bold w-60 italic left-7 md:right-[70dvh] md:left-auto">{characters[0].quote}</h2>
+            <div className='absolute top-3/5 left-4 -translate-y-1/2 md:right-[83dvh] md:left-auto w-40 flex flex-col items-center'>
               <span className="font-title italic text-sm w-40 mb-4">{characters[0].description}</span>
               <Link
                 href={`/${locale}/p/${characters[0].slug}`}
@@ -89,7 +89,7 @@ export default function MobileCharacterSections({
       >
         <div className="w-full h-full text-gold">
           {/* Image positioned from left */}
-          <div className="absolute h-dvh right-20 w-[84.2dvh]" style={{ filter: 'drop-shadow(0 4px 4px oklch(0.2743 0.028 140.74))' }}>
+          <div className="absolute h-dvh right-20 sm:left-0 sm:right-auto w-[84.2dvh]" style={{ filter: 'drop-shadow(0 4px 4px oklch(0.2743 0.028 140.74))' }}>
             <Image
               src={characters[1].image}
               alt={characters[1].title}
@@ -100,8 +100,8 @@ export default function MobileCharacterSections({
 
           {/* Text content - right aligned */}
           <div className="h-full">
-            <h2 className="absolute top-24 text-lg font-bold w-50 italic right-1">{characters[1].quote}</h2>
-            <div className='absolute top-1/2 right-4 w-40 flex flex-col items-center'>
+            <h2 className="absolute top-24 text-lg font-bold w-50 italic right-1 md:left-[80dvh] md:right-auto">{characters[1].quote}</h2>
+            <div className='absolute top-1/2 right-4 md:left-[85dvh] md:right-auto w-40 flex flex-col items-center'>
               <span className="font-title italic text-sm w-40 mb-4">{characters[1].description}</span>
               <Link
                 href={`/${locale}/p/${characters[1].slug}`}
@@ -121,7 +121,7 @@ export default function MobileCharacterSections({
       >
         <div className="w-full h-full text-gold">
           {/* Image positioned from right */}
-          <div className="absolute h-dvh left-34 w-[84.2dvh]" style={{ filter: 'drop-shadow(0 4px 4px oklch(0.2743 0.028 140.74))' }}>
+          <div className="absolute h-dvh left-34 md:right-0 md:left-auto w-[84.2dvh]" style={{ filter: 'drop-shadow(0 4px 4px oklch(0.2743 0.028 140.74))' }}>
             <Image
               src={characters[2].image}
               alt={characters[2].title}
@@ -132,8 +132,8 @@ export default function MobileCharacterSections({
 
           {/* Text content - left aligned */}
           <div className="h-full">
-            <h2 className="absolute top-20 text-lg font-bold w-55 italic left-0">{characters[2].quote}</h2>
-            <div className='absolute top-2/3 left-2 -translate-y-1/2 w-40 flex flex-col items-center'>
+            <h2 className="absolute top-20 text-lg font-bold w-55 italic left-0 md:right-[80dvh] md:left-auto">{characters[2].quote}</h2>
+            <div className='absolute top-2/3 left-2 -translate-y-1/2 md:right-[83dvh] md:left-auto w-40 flex flex-col items-center'>
               <span className="font-title italic text-sm w-40 mb-4">{characters[2].description}</span>
               <Link
                 href={`/${locale}/p/${characters[2].slug}`}
@@ -153,7 +153,7 @@ export default function MobileCharacterSections({
       >
         <div className="w-full h-full text-gold">
           {/* Image positioned from left */}
-          <div className="absolute h-dvh right-6 w-[84.2dvh]" style={{ filter: 'drop-shadow(0 4px 4px oklch(0.2743 0.028 140.74))' }}>
+          <div className="absolute h-dvh right-6 sm:left-0 sm:right-auto w-[84.2dvh]" style={{ filter: 'drop-shadow(0 4px 4px oklch(0.2743 0.028 140.74))' }}>
             <Image
               src={characters[3].image}
               alt={characters[3].title}
@@ -164,8 +164,8 @@ export default function MobileCharacterSections({
 
           {/* Text content - right aligned */}
           <div className="h-full">
-            <h2 className="absolute top-24 text-lg font-bold w-60 italic right-1">{characters[3].quote}</h2>
-            <div className='absolute top-1/3 right-1 w-40 flex flex-col items-center'>
+            <h2 className="absolute top-24 text-lg font-bold w-60 italic right-1 md:left-[76dvh] md:right-auto">{characters[3].quote}</h2>
+            <div className='absolute top-1/3 right-1 md:left-[85dvh] md:right-auto w-40 flex flex-col items-center'>
               <span className="font-title italic text-sm w-40 mb-4">{characters[3].description}</span>
               <Link
                 href={`/${locale}/p/${characters[3].slug}`}
