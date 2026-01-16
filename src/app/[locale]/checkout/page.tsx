@@ -310,7 +310,10 @@ export default function CheckoutPage() {
                         {/* Right Column */}
                         <div className="space-y-6">
                           <div>
-                            <label className="block text-base font-title italic mb-2">{t('address')}</label>
+                            <div className="mb-2 flex flex-row">
+                              <label className="block text-base font-title italic">{t('address')}</label>
+                              <span className="text-xs leading-none italic text-gray-500">{t('demoAddressNotice')}</span>
+                            </div>
                             <div className="space-y-4">
                               <div>
                                 <input
@@ -697,7 +700,10 @@ export default function CheckoutPage() {
                     </div>
 
                     <div>
-                      <label className="block text-base italic mb-2">{t('address')}</label>
+                      <div className="mb-2">
+                        <label className="block text-base italic">{t('address')}</label>
+                        <span className="text-xs leading-none italic text-gray-500">{t('demoAddressNotice')}</span>
+                      </div>
                       <div className="space-y-3">
                         <div>
                           <input

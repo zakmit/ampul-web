@@ -18,18 +18,18 @@ export default function UserLayoutClient({
     <div className="min-h-screen bg-white">
       {/* Mobile Header */}
       <div className="lg:hidden">
-        <div className="flex justify-between items-end mx-4 px-2 py-4 border-b border-gray-500">
+        <div className="flex justify-between items-end mx-4 py-4 border-b border-gray-500">
           {isProfilePage ? (
             <>
-              <h1 className="text-xl font-bold">{t('myInformation')}</h1>
-              <Link href={`/${locale}/u/orders`} className="text-sm italic font-title hover:underline hover:text-gray-700">
+              <h1 className="text-lg font-bold">{t('myInformation')}</h1>
+              <Link href={`/${locale}/u/orders`} className="text-xs italic font-title hover:underline hover:text-gray-700">
                 →{t('myOrders')}
               </Link>
             </>
           ) : (
             <>
-              <h1 className="text-xl font-bold">{t('myOrders')}</h1>
-              <Link href={`/${locale}/u/profile`} className="text-sm italic font-title hover:underline hover:text-gray-700">
+              <h1 className="text-lg font-bold">{t('myOrders')}</h1>
+              <Link href={`/${locale}/u/profile`} className="text-xs italic font-title hover:underline hover:text-gray-700">
                 →{t('myInformation')}
               </Link>
             </>

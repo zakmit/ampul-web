@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import Link from 'next/link';
+
 
 interface FooterSectionProps {
   title: string;
@@ -33,9 +35,15 @@ function FooterSection({ title, links }: FooterSectionProps) {
         }`}
       >
         {links.map((link, index) => (
-          <a key={index} href={link.href}>
-            {link.label}
-          </a>
+          link.href != "#" ? (
+            <Link key={index} className="hover:text-gray-500 hover:underline" href={link.href}>
+              {link.label}
+            </Link>
+          ):(
+            <span key={index} className="hover:text-gray-500 hover:underline">
+              {link.label}
+            </span>
+          )
         ))}
       </nav>
     </section>
@@ -44,6 +52,7 @@ function FooterSection({ title, links }: FooterSectionProps) {
 
 export default function Footer() {
   const t = useTranslations('Footer.sections');
+  const locale = useLocale();
 
   const sections = [
     {
@@ -69,15 +78,14 @@ export default function Footer() {
       title: t('about.title'),
       links: [
         { label: t('about.heritage'), href: '#' },
-        { label: t('about.story'), href: '#' },
       ],
     },
     {
       title: t('legal.title'),
       links: [
-        { label: t('legal.terms'), href: '#' },
-        { label: t('legal.privacy'), href: '#' },
-        { label: t('legal.cookies'), href: '#' },
+        { label: t('legal.terms'), href: `/${locale}/legal` },
+        { label: t('legal.privacy'), href: `/${locale}/legal` },
+        { label: t('legal.cookies'), href: `/${locale}/legal` },
       ],
     },
   ];

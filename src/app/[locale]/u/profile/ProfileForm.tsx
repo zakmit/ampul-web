@@ -177,9 +177,12 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
         {/* Address */}
         <div className="mb-7">
-          <label className="block text-base font-title italic mb-3">
-            {t('fields.address')}
-          </label>
+          <div className="mb-3">
+            <label className="block text-base font-title italic">
+              {t('fields.address')}
+            </label>
+            <span className="text-xs leading-none italic text-gray-500">{t('demoAddressNotice')}</span>
+          </div>
           <div className="space-y-4">
             {/* Address Line 1 */}
             <div>
@@ -211,7 +214,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
             {/* City, Region, Postal Code */}
             <div className='flex flex-row gap-2 lg:gap-4'>
-              <div className="flex-1">
+              <div className="">
                 <input
                   type="text"
                   name="city"
@@ -223,7 +226,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                 />
                 {renderFieldError('city')}
               </div>
-              <div className="flex-1">
+              <div className="">
                 <input
                   type="text"
                   name="region"
@@ -235,7 +238,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                 />
                 {renderFieldError('region')}
               </div>
-              <div className="w-full lg:max-w-40">
+              <div className="">
                 <input
                   type="text"
                   name="postalCode"
