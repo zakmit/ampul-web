@@ -28,6 +28,37 @@
       "fragrance": "Fragrance",
       "about": "About"
     },
+    "exploreGreekMythology": "Explore Greek Mythology Collection",
+    "greekMythologyCollection": "Greek Mythology Collection",
+    "badge": {
+      "new": "NEW"
+    },
+    "productTitles": {
+      "cassandre": "Cassandra",
+      "narcisse": "Narcissus",
+      "icare": "Icarus",
+      "antigone": "Antigone"
+    },
+    "productDescriptions": {
+      "cassandre": "A floral scent on the ritual, Laurel and incense reveal the tragedy foreseen, Charred wood reveal the fall of Troy.",
+      "narcisse": "Narcissus perfume on still lake, Reeds bring the freshness of water, Plane tree is always there.",
+      "icare": "Sea water choked in the nose, the warmness of burning sun, Hot melting wax flowing on the skin.",
+      "antigone": "Rust and dust floating in the air, Myrrh permeates the forbidden burial, Incense smoke drifts from the sealed tomb."
+    },
+    "aboutSections": {
+      "concept": {
+        "title": "Concept",
+        "description": "From the concept of ampoules—a small vessel preserving what remains of a life. What was the scent of the decisive moment in their life?"
+      },
+      "bottle": {
+        "title": "Bottle",
+        "description": "Inspired by the shape of an ampoule, the cap evokes a candle flame. Each fragrance is a sample to their lives."
+      },
+      "box": {
+        "title": "Box",
+        "description": "A pillar candle, a lamp awaiting light. To open it is to begin a ritual."
+      }
+    },
     "search": "Search",
     "user": "User",
     "shoppingBag": "Shopping Bag",
@@ -108,12 +139,15 @@
     "pagination": {
       "previous": "Previous",
       "next": "Next"
-    }
+    },
+    "noOrders": "No orders found"
   },
   "OrderCard": {
     "total": "TOTAL",
     "orderId": "Order ID",
     "shipTo": "SHIP TO",
+    "payment": "PAYMENT",
+    "cardEndingIn": "Card ending in {last4}",
     "tracking": "TRACKING",
     "trackingNotAvailable": "Processing",
     "cancelOrder": "Cancel the order",
@@ -247,5 +281,30 @@
     "orderNumber": "Order Number",
     "viewOrders": "View My Orders",
     "signInPrompt": "Sign in to view your order"
+  },
+  "SearchModal": {
+    "searchPlaceholder": "Search",
+    "searching": "Searching...",
+    "noResults": "No results found",
+    "searchPrompt": "Type and press Enter to search",
+    "collection": "Collection"
+  },
+  "Metadata": {
+    "home": {
+      "title": "AMPUL",
+      "description": "Inspired by the traditional concept of ampoules—a small vessel preserving what remains of a life. What was the scent of the decisive moment in their life?"
+    },
+    "fragrances": {
+      "title": "Fragrances - AMPUL",
+      "description": "Inspired by memorable demises — what led to their inevitable destiny? What was the decisive moment in their lives?"
+    },
+    "greekMythology": {
+      "title": "Greek Mythology Collection - AMPUL",
+      "description": "Melted wax sinking into the sea, billowing smoke rising from burning Troy, narcissus blooms on an ethereal reflection, the faded scent of rust lingers in the barren land."
+    },
+    "checkout": "Checkout - AMPUL",
+    "checkoutSuccess": "Order Confirmed - AMPUL",
+    "profile": "My Profile - AMPUL",
+    "orders": "My Orders - AMPUL"
   }
 }

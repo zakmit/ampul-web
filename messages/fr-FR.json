@@ -28,6 +28,37 @@
       "fragrance": "Parfum",
       "about": "À propos"
     },
+    "exploreGreekMythology": "Explorez la Collection Mythologie Grecque",
+    "greekMythologyCollection": "Collection Mythologie Grecque",
+    "badge": {
+      "new": "NOUVEAU"
+    },
+    "productTitles": {
+      "cassandre": "Cassandre",
+      "narcisse": "Narcisse",
+      "icare": "Icare",
+      "antigone": "Antigone"
+    },
+    "productDescriptions": {
+      "cassandre": "Un parfum floral sur le rituel, Laurier et encens révèlent la tragédie entrevue, Bois calciné racontent la chute de Troie.",
+      "narcisse": "Parfum de narcisse sur le lac calme, Roseaux apportent la fraîcheur de l’eau, Platane est toujours là.",
+      "icare": "Eau de mer étouffée dans le nez, chaleur du soleil brûlant, Cire fondue coulant sur la peau.",
+      "antigone": "Poussière et rouille flottant dans l'air, Myrrhe imprègne l'enterrement interdit, Fumée d'encens dérive de la tombe scellée."
+    },
+    "aboutSections": {
+      "concept": {
+        "title": "Concept",
+        "description": "Du concept d'ampoules—un petit récipient préservant ce qui reste d'une vie. Quelle était l'odeur du moment décisif de leur vie?"
+      },
+      "bottle": {
+        "title": "Bouteille",
+        "description": "Inspiré par la forme d'une ampoule, le bouchon évoque une flamme de bougie. Chaque parfum est un hommage à leur vie."
+      },
+      "box": {
+        "title": "Boîte",
+        "description": "Une bougie pilier, une lampe en attente de lumière. L'ouvrir, c'est le commencement d'un rituel."
+      }
+    },
     "search": "Rechercher",
     "user": "Utilisateur",
     "shoppingBag": "Panier",
@@ -108,12 +139,15 @@
     "pagination": {
       "previous": "Précédent",
       "next": "Suivant"
-    }
+    },
+    "noOrders": "Aucune commande trouvée"
   },
   "OrderCard": {
     "total": "TOTAL",
     "orderId": "Commande ID",
     "shipTo": "EXPÉDIER À",
+    "payment": "PAIEMENT",
+    "cardEndingIn": "Carte se terminant par {last4}",
     "tracking": "SUIVI",
     "trackingNotAvailable": "Pas encore disponible",
     "cancelOrder": "Annuler la commande",
@@ -247,5 +281,30 @@
     "orderNumber": "Numéro de commande",
     "viewOrders": "Voir mes commandes",
     "signInPrompt": "Connectez-vous pour voir votre commande"
+  },
+  "SearchModal": {
+    "searchPlaceholder": "Rechercher",
+    "searching": "Recherche en cours...",
+    "noResults": "Aucun résultat trouvé",
+    "searchPrompt": "Tapez et appuyez sur Entrée pour rechercher",
+    "collection": "Collection"
+  },
+  "Metadata": {
+    "home": {
+      "title": "AMPUL",
+      "description": "Inspiré par le concept traditionnel d'ampoules—un petit récipient préservant ce qui reste d'une vie. Quelle était l'odeur du moment décisif de leur vie?"
+    },
+    "fragrances": {
+      "title": "Parfums - AMPUL",
+      "description": "Inspiré par des fins mémorables — qu'est-ce qui a conduit à leur destin inévitable? Quel a été le moment décisif de leur vie?"
+    },
+    "greekMythology": {
+      "title": "Collection Mythologie Grecque - AMPUL",
+      "description": "Gouttes de cire fondue coulant dans la mer, fumée ardente s'échappant de Troie en flammes, narcisse s'épanouissant sur le reflet éthéré, rouille fanée errant dans les terres sauvages."
+    },
+    "checkout": "Paiement - AMPUL",
+    "checkoutSuccess": "Commande Confirmée - AMPUL",
+    "profile": "Mon Profil - AMPUL",
+    "orders": "Mes Commandes - AMPUL"
   }
 }

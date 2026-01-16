@@ -7,7 +7,7 @@
     "heroDescription": "融化的蠟滴沉入大海中、黑煙自燃燒中的特洛伊飄出、水仙花香倒影在湖面、不得安息的鐵鏽味遊蕩在荒野中",
     "conceptTitle": "AMPUL 的概念",
     "conceptDescription": "發想自安瓿的初始概念——一個保存生命殘留的容器。什麼是他們人生的決定性瞬間？什麼走馬燈在他們眼前閃過？那一刻有著什麼氣味？從神話中的悲劇到文學中最動人的死亡。",
-    "bottleTitle": "香水瓶",
+    "bottleTitle": "外瓶",
     "bottleDescription": "採集自安瓿的形狀，瓶蓋如同燭火，每種氣味都取樣自他們的生命。",
     "exploreFragrances": "探索氣味",
     "characters": {
@@ -27,6 +27,37 @@
       "new": "新品",
       "fragrance": "氣味",
       "about": "關於"
+    },
+    "exploreGreekMythology": "探索希臘神話系列",
+    "greekMythologyCollection": "希臘神話系列",
+    "badge": {
+      "new": "新"
+    },
+    "productTitles": {
+      "cassandre": "卡珊德拉",
+      "narcisse": "納西瑟斯",
+      "icare": "伊卡洛斯",
+      "antigone": "安蒂岡妮"
+    },
+    "productDescriptions": {
+      "cassandre": "迷人的花香標誌著祭祀的開端，月桂葉和沉香預見著悲劇，燻木和皮革娓娓道來特洛伊的滅亡",
+      "narcisse": "水仙花的香氣在平靜湖水上，蘆葦夾帶著清新的水氣，懸鈴木始終在那",
+      "icare": "海藻和鹽如同即將墜入的海水、蠟的氣息在肌膚上流淌、丁香與琥珀帶來令人目眩的溫暖，如美麗炙熱的太陽",
+      "antigone": "撲面而來的塵土與殘留的鐵鏽味，被禁止的埋葬瀰漫著沒藥的氣息，沉香的煙霧從封死的墓穴飄出"
+    },
+    "aboutSections": {
+      "concept": {
+        "title": "概念",
+        "description": "發想自安瓿的概念——一個保存生命殘留的容器。他們人生中決定性瞬間的氣味是什麼？"
+      },
+      "bottle": {
+        "title": "外瓶",
+        "description": "採集自安瓿的形狀，瓶蓋如同燭火，每種氣味都取樣自他們的生命"
+      },
+      "box": {
+        "title": "外盒",
+        "description": "一根柱狀蠟燭，一盞尚未點亮的燈。打開它就是儀式的開端"
+      }
     },
     "search": "搜尋",
     "user": "用戶",
@@ -108,12 +139,15 @@
     "pagination": {
       "previous": "上一頁",
       "next": "下一頁"
-    }
+    },
+    "noOrders": "查無訂單"
   },
   "OrderCard": {
     "total": "總計",
     "orderId": "訂單編號",
     "shipTo": "收件地址",
+    "payment": "付款方式",
+    "cardEndingIn": "卡號末四碼 {last4}",
     "tracking": "追蹤號碼",
     "trackingNotAvailable": "處理中",
     "cancelOrder": "取消訂單",
@@ -247,5 +281,30 @@
     "orderNumber": "訂單編號",
     "viewOrders": "查看我的訂單",
     "signInPrompt": "登入以查看您的訂單"
+  },
+  "SearchModal": {
+    "searchPlaceholder": "搜尋",
+    "searching": "搜尋中...",
+    "noResults": "查無結果",
+    "searchPrompt": "輸入並按 Enter 開始搜尋",
+    "collection": "系列"
+  },
+  "Metadata": {
+    "home": {
+      "title": "AMPUL",
+      "description": "發想自安瓿的初始概念——一個保存生命殘留的容器。他們人生中決定性瞬間的氣味是什麼？"
+    },
+    "fragrances": {
+      "title": "氣味 - AMPUL",
+      "description": "那些令人難忘的謝幕——是什麼導向了他們不可避免的結局？他們生命中的決定性瞬間是什麼？"
+    },
+    "greekMythology": {
+      "title": "希臘神話系列 - AMPUL",
+      "description": "融化的蠟滴沉入大海中、黑煙自燃燒中的特洛伊飄出、水仙花香倒影在湖面 、不得安息的鐵鏽味遊蕩在荒野中"
+    },
+    "checkout": "結帳 - AMPUL",
+    "checkoutSuccess": "訂單確認 - AMPUL",
+    "profile": "我的資料 - AMPUL",
+    "orders": "我的訂單 - AMPUL"
   }
 }
