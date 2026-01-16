@@ -170,6 +170,7 @@
     "signInPrompt": "Sign in to view your information"
   },
   "ProfilePage": {
+    "demoAddressNotice": "*For demo purposes only — please use a fictional address.",
     "fields": {
       "name": "Name",
       "birthday": "Birthday",
@@ -247,6 +248,7 @@
     "maxQuantityMessage": "You cannot add more than 10 of the same item to your order."
   },
   "Checkout": {
+    "demoAddressNotice": "*For demo purposes only — please use a fictional address.",
     "title": "Checkout",
     "loading": "Loading...",
     "step1": "1. LOG IN",
@@ -305,6 +307,17 @@
     "checkout": "Checkout - AMPUL",
     "checkoutSuccess": "Order Confirmed - AMPUL",
     "profile": "My Profile - AMPUL",
-    "orders": "My Orders - AMPUL"
+    "orders": "My Orders - AMPUL",
+    "legal": "Notice - AMPUL"
+  },
+  "LegalPage": {
+    "title": "Notice",
+    "demoNotice": "This website is for demonstration purposes only.",
+    "noTransactions": "No real transactions are processed",
+    "noRealData": "Please do not enter real personal information (address, phone number)",
+    "dataStored": "Account data from Google sign-in and any information you enter is stored in a database",
+    "dataNotShared": "Your data is not shared with third parties",
+    "noCookies": "Only essential cookies are used for authentication",
+    "allRightsReserved": "All rights reserved."
   }
 }

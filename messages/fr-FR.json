@@ -170,6 +170,7 @@
     "signInPrompt": "Connectez-vous pour voir vos informations"
   },
   "ProfilePage": {
+    "demoAddressNotice": "*Démo uniquement — veuillez utiliser une adresse fictive.",
     "fields": {
       "name": "Nom",
       "birthday": "Date de naissance",
@@ -188,9 +189,9 @@
       "birthday": "JJ/MM/AAAA",
       "phone": "Entrez le numéro",
       "addressLine1": "Numéro et nom de rue, bâtiment, étage",
-      "addressLine2": "Appartement, suite, numéro d'unité (optionnel)",
-      "city": "Nom de la ville",
-      "region": "Région ou département (optionnel)",
+      "addressLine2": "(Optionnel) Appartement, suite, numéro d'unité",
+      "city": "Ville",
+      "region": "(Optionnel) Région ou département",
       "postalCode": "Code postal",
       "country": "Nom du pays"
     },
@@ -247,6 +248,7 @@
     "maxQuantityMessage": "Vous ne pouvez pas ajouter plus de 10 articles identiques à votre commande."
   },
   "Checkout": {
+    "demoAddressNotice": "*Démo uniquement — veuillez utiliser une adresse fictive.",
     "title": "Paiement",
     "loading": "Chargement...",
     "step1": "1. CONNEXION",
@@ -305,6 +307,17 @@
     "checkout": "Paiement - AMPUL",
     "checkoutSuccess": "Commande Confirmée - AMPUL",
     "profile": "Mon Profil - AMPUL",
-    "orders": "Mes Commandes - AMPUL"
+    "orders": "Mes Commandes - AMPUL",
+    "legal": "Avertissement - AMPUL"
+  },
+  "LegalPage": {
+    "title": "Avertissement",
+    "demoNotice": "Ce site web est uniquement à des fins de démonstration.",
+    "noTransactions": "Aucune transaction réelle n'est traitée",
+    "noRealData": "Veuillez ne pas entrer de vraies informations personnelles (adresse, numéro de téléphone)",
+    "dataStored": "Les données de compte de Google et toute information que vous saisissez sont stockées dans une base de données",
+    "dataNotShared": "Vos données ne sont pas partagées avec des tiers",
+    "noCookies": "Seuls les cookies essentiels sont utilisés pour l'authentification",
+    "allRightsReserved": "Tous droits réservés."
   }
 }

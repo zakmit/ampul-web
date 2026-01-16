@@ -170,6 +170,7 @@
     "signInPrompt": "登入以查看您的資料"
   },
   "ProfilePage": {
+    "demoAddressNotice": "*僅供展示用途 — 請使用虛構地址。",
     "fields": {
       "name": "姓名",
       "birthday": "生日",
@@ -247,6 +248,7 @@
     "maxQuantityMessage": "同一商品最多只能加入10件至您的訂單。"
   },
   "Checkout": {
+    "demoAddressNotice": "*僅供展示用途 — 請使用虛構地址。",
     "title": "結帳",
     "loading": "載入中...",
     "step1": "1. 登入",
@@ -305,6 +307,17 @@
     "checkout": "結帳 - AMPUL",
     "checkoutSuccess": "訂單確認 - AMPUL",
     "profile": "我的資料 - AMPUL",
-    "orders": "我的訂單 - AMPUL"
+    "orders": "我的訂單 - AMPUL",
+    "legal": "聲明 - AMPUL"
+  },
+  "LegalPage": {
+    "title": "聲明",
+    "demoNotice": "本網站僅供展示用途",
+    "noTransactions": "不包含任何真實交易",
+    "noRealData": "請勿輸入真實個人資料（地址、電話號碼）",
+    "dataStored": "透過 Google 登入的帳戶資料及您輸入的任何資訊將儲存於資料庫中",
+    "dataNotShared": "您的資料不會與第三方分享",
+    "noCookies": "僅使用必要的 Cookie 進行身份驗證",
+    "allRightsReserved": "版權所有。"
   }
 }
