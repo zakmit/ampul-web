@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { prisma } from '@/lib/prisma'
 import type { Locale } from '@/i18n/config'
 
@@ -43,8 +44,8 @@ export type FilterOptionsData = {
   }[]
 }
 
-// Fetch all products with filtering support
-export async function getAllProducts(locale: Locale = 'us'): Promise<ProductListData[]> {
+// Fetch all products with filtering support (cached per-request)
+export const getAllProducts = cache(async (locale: Locale = 'us'): Promise<ProductListData[]> => {
   try {
     // Convert short locale to database locale
     const dbLocale = localeToDbLocale[locale]
@@ -135,44 +136,42 @@ export async function getAllProducts(locale: Locale = 'us'): Promise<ProductList
     console.error('Error fetching all products:', error)
     throw error
   }
-}
+})
 
-// Fetch all filter options from database
-export async function getFilterOptions(locale: Locale = 'us'): Promise<FilterOptionsData> {
+// Fetch all filter options from database (cached per-request)
+export const getFilterOptions = cache(async (locale: Locale = 'us'): Promise<FilterOptionsData> => {
   try {
     // Convert short locale to database locale
     const dbLocale = localeToDbLocale[locale]
     const fallbackDbLocale = localeToDbLocale['us']
 
-    // Fetch all volumes
-    const volumes = await prisma.volume.findMany({
-      include: {
-        translations: true,
-      },
-      orderBy: {
-        value: 'asc',
-      },
-    })
-
-    // Fetch all collections
-    const collections = await prisma.collection.findMany({
-      include: {
-        translations: true,
-      },
-      orderBy: {
-        id: 'asc',
-      },
-    })
-
-    // Fetch all tags
-    const tags = await prisma.tag.findMany({
-      include: {
-        translations: true,
-      },
-      orderBy: {
-        slug: 'asc',
-      },
-    })
+    // Fetch all filter options in parallel
+    const [volumes, collections, tags] = await Promise.all([
+      prisma.volume.findMany({
+        include: {
+          translations: true,
+        },
+        orderBy: {
+          value: 'asc',
+        },
+      }),
+      prisma.collection.findMany({
+        include: {
+          translations: true,
+        },
+        orderBy: {
+          id: 'asc',
+        },
+      }),
+      prisma.tag.findMany({
+        include: {
+          translations: true,
+        },
+        orderBy: {
+          slug: 'asc',
+        },
+      }),
+    ])
 
     return {
       volumes: volumes.map(volume => {
@@ -213,4 +212,4 @@ export async function getFilterOptions(locale: Locale = 'us'): Promise<FilterOpt
     console.error('Error fetching filter options:', error)
     throw error
   }
-}
+})

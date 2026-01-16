@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { prisma } from '@/lib/prisma'
 import type { Locale } from '@/i18n/config'
 
@@ -54,8 +55,8 @@ export type CollectionProductData = {
   volume: string
 }
 
-// Fetch product by slug with all relations
-export async function getProductBySlug(slug: string, locale: Locale = 'us'): Promise<ProductDetailData | null> {
+// Fetch product by slug with all relations (cached per-request)
+export const getProductBySlug = cache(async (slug: string, locale: Locale = 'us'): Promise<ProductDetailData | null> => {
   try {
     // Convert short locale to database locale
     const dbLocale = localeToDbLocale[locale]
@@ -173,10 +174,10 @@ export async function getProductBySlug(slug: string, locale: Locale = 'us'): Pro
     console.error('Error fetching product by slug:', error)
     throw error
   }
-}
+})
 
-// Fetch all products in the same collection
-export async function getCollectionProducts(collectionId: number, currentProductId: string, locale: Locale = 'us'): Promise<CollectionProductData[]> {
+// Fetch all products in the same collection (cached per-request)
+export const getCollectionProducts = cache(async (collectionId: number, currentProductId: string, locale: Locale = 'us'): Promise<CollectionProductData[]> => {
   try {
     // Convert short locale to database locale
     const dbLocale = localeToDbLocale[locale]
@@ -225,10 +226,10 @@ export async function getCollectionProducts(collectionId: number, currentProduct
     console.error('Error fetching collection products:', error)
     throw error
   }
-}
+})
 
-// Generate static params for all products
-export async function getAllProductSlugs() {
+// Generate static params for all products (cached per-request)
+export const getAllProductSlugs = cache(async () => {
   try {
     const products = await prisma.product.findMany({
       select: {
@@ -241,4 +242,4 @@ export async function getAllProductSlugs() {
     console.error('Error fetching product slugs:', error)
     return []
   }
-}
+})
