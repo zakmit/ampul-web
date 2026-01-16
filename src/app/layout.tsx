@@ -25,6 +25,14 @@ const ziliaSlab = Zilla_Slab({
 export const metadata: Metadata = {
   title: "AMPUL",
   description: "Inspired by the traditional concept of ampoules—a small vessel preserving what remains of a life. What was the scent of the decisive moment in their life?",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 
