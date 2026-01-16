@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useShoppingBag } from '@/components/providers/ShoppingBagProvider'
+import { useLoadingOverlay } from '@/components/providers/LoadingOverlayProvider'
 import { getShoppingBagItems, getAvailableProductsForSample } from '@/app/actions/shoppingBag'
 import { getUserAddress, createOrder, type CheckoutAddress } from '@/app/actions/checkout'
 import type { ShoppingBagItemDetails } from '@/app/actions/shoppingBag'
@@ -26,11 +27,12 @@ export default function CheckoutPage() {
   const locale = params.locale as Locale
   const { data: session, status } = useSession()
   const { items: bagItems, selectedSample, clearBag, setSelectedSample } = useShoppingBag()
+  const { hideLoading } = useLoadingOverlay()
 
   const [currentStep, setCurrentStep] = useState<CheckoutStep>(1)
   const [items, setItems] = useState<ShoppingBagItemDetails[]>([])
   const [availableProducts, setAvailableProducts] = useState<Array<{ value: string; label: string }>>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [dataLoaded, setDataLoaded] = useState(false)
   const [isPending, startTransition] = useTransition()
 
   const [useProfileAddress, setUseProfileAddress] = useState(false)
@@ -51,7 +53,6 @@ export default function CheckoutPage() {
   // Load shopping bag items and available products
   useEffect(() => {
     async function loadData() {
-      setIsLoading(true)
       try {
         const [bagItemsData, productsData] = await Promise.all([
           getShoppingBagItems(bagItems, locale),
@@ -68,13 +69,14 @@ export default function CheckoutPage() {
       } catch (error) {
         console.error('Error loading checkout data:', error)
       } finally {
-        setIsLoading(false)
+        setDataLoaded(true)
+        hideLoading() // Hide global loading overlay when data is loaded
       }
     }
 
     loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bagItems, locale])
+  }, [bagItems, locale, hideLoading])
 
   // Load user address if logged in
   useEffect(() => {
@@ -95,10 +97,10 @@ export default function CheckoutPage() {
 
   // Redirect if bag is empty
   useEffect(() => {
-    if (!isLoading && items.length === 0) {
+    if (dataLoaded && items.length === 0) {
       router.push(`/${locale}`)
     }
-  }, [items, isLoading, router, locale])
+  }, [items, dataLoaded, router, locale])
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const total = subtotal
@@ -205,14 +207,6 @@ export default function CheckoutPage() {
       <p className="mt-1 text-sm text-red-700">
         {t(`errors.${errorKey}`)}
       </p>
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg">{t('loading')}</p>
-      </div>
     )
   }
 

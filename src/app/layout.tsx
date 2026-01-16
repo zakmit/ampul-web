@@ -4,6 +4,7 @@ import { Zilla_Slab } from 'next/font/google';
 import './globals.css';
 import SessionProvider from '@/components/providers/SessionProvider';
 import { ShoppingBagProvider } from '@/components/providers/ShoppingBagProvider';
+import { LoadingOverlayProvider } from '@/components/providers/LoadingOverlayProvider';
 import { auth } from '@/auth';
 
 const aSLibre = Averia_Serif_Libre({
@@ -40,7 +41,9 @@ export default async function RootLayout({
       >
         <SessionProvider session={session}>
           <ShoppingBagProvider>
-            {children}
+            <LoadingOverlayProvider>
+              {children}
+            </LoadingOverlayProvider>
           </ShoppingBagProvider>
         </SessionProvider>
       </body>

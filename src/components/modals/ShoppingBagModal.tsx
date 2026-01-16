@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { ShoppingBagItemDetails } from '@/app/actions/shoppingBag'
+import { useLoadingOverlay } from '@/components/providers/LoadingOverlayProvider'
 
 interface ShoppingBagModalProps {
   isOpen: boolean
@@ -40,6 +41,7 @@ export default function ShoppingBagModal({
   const tCommon = useTranslations('Common')
   const router = useRouter()
   const params = useParams()
+  const { showLoading } = useLoadingOverlay()
 
   const handleQuantityInput = (productId: string, volumeId: number, value: string) => {
     const numValue = parseInt(value, 10)
@@ -54,6 +56,7 @@ export default function ShoppingBagModal({
   }
 
   const handleCheckout = () => {
+    showLoading()
     onClose()
     router.push(`/${params.locale}/checkout`)
   }
