@@ -5,6 +5,7 @@ import AddToBagButton from '@/components/AddToBagButton';
 import { prisma } from '@/lib/prisma';
 import type { Locale } from '@/i18n/config';
 import { getTranslations } from 'next-intl/server';
+import type { Metadata } from 'next';
 
 // Map short locale codes to database locale codes
 const localeToDbLocale: Record<Locale, string> = {
@@ -51,6 +52,16 @@ interface CollectionPageProps {
   params: Promise<{
     locale: Locale;
   }>;
+}
+
+export async function generateMetadata({ params }: CollectionPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+  return {
+    title: t('greekMythology.title'),
+    description: t('greekMythology.description'),
+  };
 }
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
@@ -215,92 +226,60 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           {/* Mobile Layout - Side by side grid */}
           <div className="lg:hidden">
             <div
-              className="grid grid-cols-2 bg-gray-100"
+              className="grid grid-cols-2 bg-none"
               style={{ height: 'calc(50vw * 1.618)' }}
             >
-              {index % 2 === 0 ? (
-                <>
-                  {/* Image first (left) */}
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={item.imageMobile}
-                      alt={item.title}
-                      fill
-                      className="object-cover object-center"
-                    />
+              {/* Image*/}
+              <div className="w-full absolute col-span-2" style={{ height: 'calc(50vw * 1.618)' }}>
+                <Image
+                  src={item.imageDesktop}
+                  alt={item.title}
+                  fill
+                  className="object-cover object-center"
+                />
+              </div>
+              {/* Content */}
+              <div className={`relative w-full h-full flex items-center justify-center px-6 ${
+                item.alignment === 'right' ? 'col-start-2' : 'col-start-1'}`}
+              >
+                <div className={`bg-gray-800/20 -my-3 py-3 -mx-3 px-3 rounded-md backdrop-blur-sm text-left ${
+                  item.textColor === 'light' ? 'text-gray-100' : 'text-gray-900'}`}
+                >
+                  <h2 className="text-xl font-bold mb-2">{item.title}</h2>
+                  <p className="italic text-sm mb-4 text-balance">{item.description}</p>
+                  <p className={`italic font-light text-xs mb-3 text-right`}
+                  >{item.sideNote}</p>
+                  {item.price && item.volume && (
+                    <p className="text-xs text-center mb-3">{item.volume} · {item.price} {tCommon('currency')}</p>
+                  )}
+                  <div className="flex flex-col gap-2 px-2 mx-auto max-w-60">
+                    {(item.productSlug || item.relatedLink) && (
+                      <Link
+                        href={item.productSlug ? `/${locale}/p/${item.productSlug}` : item.relatedLink!}
+                        className={`inline-block border bg-gray-100/30 backdrop-blur-sm py-1.5 text-xs transition-colors text-center hover:bg-gray-700 hover:text-gray-100 hover:border-gray-700 ${
+                          item.textColor === 'light'
+                            ? 'border-gray-100 text-gray-100 '
+                            : 'border-gray-900 text-gray-900 '
+                        }`}
+                      >
+                        {t('checkDetail')}
+                      </Link>
+                    )}
+                    {item.price && item.productId && item.volumeId && (
+                      <AddToBagButton
+                        productId={item.productId}
+                        volumeId={item.volumeId}
+                        label={t('addToBag')}
+                        className={`py-1.5 text-xs hover:bg-gray-700 transition-colors ${
+                          item.textColor === 'light'
+                            ? 'bg-gray-100 text-gray-900 hover:text-gray-100'
+                            : 'bg-gray-900 text-gray-100'
+                        }`}
+                      />
+                    )}
                   </div>
-                  {/* Content second (right) */}
-                  <div className="relative w-full h-full flex items-center justify-center px-6">
-                    <div className="text-left">
-                      <h2 className="text-xl font-bold mb-2">{item.title}</h2>
-                      <p className="italic text-sm mb-4 text-balance">{item.description}</p>
-                      <p className="italic font-light text-xs text-right mb-3">{item.sideNote}</p>
-                      {item.price && item.volume && (
-                        <p className="text-xs text-center mb-3">{item.volume} · {item.price} {tCommon('currency')}</p>
-                      )}
-                      <div className="flex flex-col gap-2 px-2 mx-auto max-w-60">
-                        {(item.productSlug || item.relatedLink) && (
-                          <Link
-                            href={item.productSlug ? `/${locale}/p/${item.productSlug}` : item.relatedLink!}
-                            className="inline-block border border-gray-900  hover:bg-gray-700 hover:text-gray-100 py-1.5 text-xs transition-colors text-center"
-                          >
-                            {t('checkDetail')}
-                          </Link>
-                        )}
-                        {item.price && item.productId && item.volumeId && (
-                          <AddToBagButton
-                            productId={item.productId}
-                            volumeId={item.volumeId}
-                            label={t('addToBag')}
-                            className="bg-gray-700 text-gray-100 py-1.5 text-xs hover:bg-gray-900 transition-colors"
-                          />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  {/* Content first (left) */}
-                  <div className="relative w-full h-full flex items-center justify-center px-8">
-                    <div className="text-left">
-                      <h2 className="text-xl font-bold mb-2">{item.title}</h2>
-                      <p className="italic text-sm mb-4 text-balance">{item.description}</p>
-                      <p className="italic font-light text-xs text-right mb-3">{item.sideNote}</p>
-                      {item.price && item.volume && (
-                        <p className="text-xs text-center mb-3">{item.volume} · {item.price} {tCommon('currency')}</p>
-                      )}
-                      <div className="flex flex-col gap-2 px-2 mx-auto max-w-60">
-                        {(item.productSlug || item.relatedLink) && (
-                          <Link
-                            href={item.productSlug ? `/${locale}/p/${item.productSlug}` : item.relatedLink!}
-                            className="inline-block border border-gray-900  hover:bg-gray-700 hover:text-gray-100 py-1.5 text-xs transition-colors text-center"
-                          >
-                            {t('checkDetail')}
-                          </Link>
-                        )}
-                        {item.price && item.productId && item.volumeId && (
-                          <AddToBagButton
-                            productId={item.productId}
-                            volumeId={item.volumeId}
-                            label={t('addToBag')}
-                            className="bg-gray-700 text-gray-100 py-1.5 text-xs hover:bg-gray-900 transition-colors"
-                          />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  {/* Image second (right) */}
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={item.imageMobile}
-                      alt={item.title}
-                      fill
-                      className="object-cover object-center"
-                    />
-                  </div>
-                </>
-              )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -369,17 +348,17 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           <div className="flex gap-4 overflow-x-auto lg:hidden text-center pb-4 -mx-4 px-4">
             {collectionData.relatedProducts.map((product) => (
               <div key={product.slug} className="flex flex-col shrink-0 w-[calc(50vw-24px)] max-w-60">
-                <Link href={`/${locale}/p/${product.slug}`} className="block">
-                  <div className="aspect-square relative mb-3">
+                <Link href={`/${locale}/p/${product.slug}`} className="block group">
+                  <div className="aspect-square relative mb-3 overflow-hidden">
                     <Image
                       src={product.image}
                       alt={product.title}
                       fill
-                      className="object-cover"
+                      className="object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
 
-                  <h3 className="font-bold text-base mb-1">{product.title}</h3>
+                  <h3 className="font-bold text-base mb-1 hover:text-gray-500 hover:underline">{product.title}</h3>
                   <p className="content-start text-xs px-2 h-12 italic mb-2 line-clamp-3">
                     {product.description}
                   </p>
@@ -399,16 +378,16 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           <div className="hidden lg:grid lg:grid-cols-4 gap-8 text-center">
             {collectionData.relatedProducts.map((product) => (
               <div key={product.slug} className="flex flex-col">
-                <Link href={`/${locale}/p/${product.slug}`} className="block">
-                  <div className="aspect-square relative mb-4 overflow-hidden group">
+                <Link href={`/${locale}/p/${product.slug}`} className="block group">
+                  <div className="aspect-square relative mb-4 overflow-hidden">
                     <Image
                       src={product.image}
                       alt={product.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
-                <h3 className="font-bold  text-xl mb-2">{product.title}</h3>
+                <h3 className="font-bold text-xl mb-2 hover:text-gray-500 hover:underline">{product.title}</h3>
                 <p className="text-sm italic text-gray-700 mb-3 h-10 line-clamp-2">
                   {product.description}
                 </p>
