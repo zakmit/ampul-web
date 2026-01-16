@@ -6,7 +6,7 @@ import type { Locale } from '@/i18n/config';
 import { getTranslations } from 'next-intl/server';
 import HeroCarousel from '@/components/home/HeroCarousel';
 import HeroCarouselMobile from '@/components/home/HeroCarouselMobile';
-import BottleViewer from '@/components/home/BottleViewer';
+import BottleViewerWrapper from '@/components/home/BottleViewerWrapper';
 import MobileCharacterSections from '@/components/home/MobileCharacterSections';
 import DesktopCharacterSections from '@/components/home/DesktopCharacterSections';
 import type { Metadata } from 'next';
@@ -179,7 +179,7 @@ export default async function HomePage({ params }: HomePageProps) {
             <h2 className="text-3xl lg:text-5xl font-bold text-center mb-4">{t('bottleTitle')}</h2>
             {/* Mobile Bottle Viewer */}
             <div className="lg:hidden">
-              <BottleViewer isMobile={true} />
+              <BottleViewerWrapper isMobile={true} />
             </div>
             <p className="text-sm pt-4 italic px-6 lg:text-lg text-center mb-6">
               {t('bottleDescription')}
@@ -187,7 +187,7 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
           {/* Right: Desktop Bottle Viewer */}
           <div className="hidden lg:block">
-            <BottleViewer isMobile={false} />
+            <BottleViewerWrapper isMobile={false} />
           </div>
         </div>
       </section>
