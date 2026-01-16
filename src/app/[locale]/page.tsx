@@ -6,9 +6,9 @@ import type { Locale } from '@/i18n/config';
 import { getTranslations } from 'next-intl/server';
 import HeroCarousel from '@/components/home/HeroCarousel';
 import HeroCarouselMobile from '@/components/home/HeroCarouselMobile';
-import ScrollSection from '@/components/home/ScrollSection';
 import BottleViewer from '@/components/home/BottleViewer';
 import MobileCharacterSections from '@/components/home/MobileCharacterSections';
+import DesktopCharacterSections from '@/components/home/DesktopCharacterSections';
 import type { Metadata } from 'next';
 
 const localeToDbLocale: Record<Locale, string> = {
@@ -163,114 +163,12 @@ export default async function HomePage({ params }: HomePageProps) {
       </div>
 
       {/* Character Sections - Desktop (Paired) */}
-      <div className="hidden lg:block bg-olive-700 text-center">
-        {/* Cassandre (Right) & Narcisse (Left) */}
-        <ScrollSection className="h-dvh content-center" enableSticky={true}>
-          <div className="w-full h-full text-gold">
-            {/* Background Image */}
-            <div className="absolute h-dvh w-[84.2dvh] left-3/5 " style={{ filter: 'drop-shadow(0 4px 4px oklch(0.2743 0.028 140.74))' }}>
-                <Image
-                  src={characters[0].image}
-                  alt={characters[0].title}
-                  fill
-                  className="object-cover"
-                />
-            </div>
-            <div className="absolute h-dvh w-[84.2dvh] right-3/5 " style={{ filter: 'drop-shadow(0 4px 4px oklch(0.2743 0.028 140.74))' }}>
-                <Image
-                  src={characters[1].image}
-                  alt={characters[1].title}
-                  fill
-                  className="object-cover"
-                />
-            </div>
-
-
-            <div className="h-full">
-              {/* Cassandre - Right */}
-              <div className="">
-                <h2 className="absolute left-6/11 top-4 text-2xl italic w-75">{characters[0].quote}</h2>
-                <div className='absolute left-5/11 translate-x-1/5 top-28 w-50 flex flex-col items-center'>
-                  <span className="text-base font-title italic mb-4">{characters[0].description}</span>
-                  <Link
-                    href={`/${locale}/p/${characters[0].slug}`}
-                    className="inline-block border border-gold text-gold hover:bg-gold hover:text-olive-700 px-6 py-2 text-sm transition-colors"
-                  >
-                    {tGM('checkDetail')}
-                  </Link>
-                </div>
-              </div>
-
-              {/* Narcisse - Left */}
-              <div className="">
-                <h2 className="absolute left-1/3 top-1/2 text-2xl italic w-75">{characters[1].quote}</h2>
-                <div className='absolute left-2/5 translate-x-6 top-3/5 translate-y-6 w-53 flex flex-col items-center'>
-                  <span className="text-base font-title italic mb-4">{characters[1].description}</span>
-                  <Link
-                    href={`/${locale}/p/${characters[1].slug}`}
-                    className="inline-block border border-gold text-gold hover:bg-gold hover:text-olive-700 px-6 py-2 text-sm transition-colors"
-                  >
-                    {tGM('checkDetail')}
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ScrollSection>
-
-        {/* Icarus (Right) & Antigone (Left) */}
-        <ScrollSection className="h-dvh content-center" enableSticky={true}>
-          <div className="w-full h-full text-gold">
-            {/* Background Image - Icarus */}
-            <div className="absolute h-dvh w-[84.2dvh] left-3/5 " style={{ filter: 'drop-shadow(0 4px 4px oklch(0.2743 0.028 140.74))' }}>
-                <Image
-                  src={characters[2].image}
-                  alt={characters[2].title}
-                  fill
-                  className="object-cover"
-                />
-            </div>
-            <div className="absolute h-dvh w-[84.2dvh] right-3/5 " style={{ filter: 'drop-shadow(0 4px 4px oklch(0.2743 0.028 140.74))' }}>
-                <Image
-                  src={characters[3].image}
-                  alt={characters[3].title}
-                  fill
-                  className="object-cover"
-                />
-            </div>
-
-
-            <div className="relative h-full max-w-7xl mx-auto">
-              {/* Icarus - Right */}
-              <div className="">
-                <h2 className="absolute left-3/11 translate-x-1/6 top-12 text-2xl italic w-75">{characters[2].quote}</h2>
-                <div className='absolute left-3/11 translate-x-30 top-40 w-60 flex flex-col items-center'>
-                  <span className="text-base font-title italic mb-4">{characters[2].description}</span>
-                  <Link
-                    href={`/${locale}/p/${characters[2].slug}`}
-                    className="inline-block border border-gold text-gold hover:bg-gold hover:text-olive-700 px-6 py-2 text-sm transition-colors"
-                  >
-                    {tGM('checkDetail')}
-                  </Link>
-                </div>
-              </div>
-
-              {/* Antigone - Left */}
-              <div className="">
-                <h2 className="absolute left-3/11 translate-x-34 top-4/7 text-2xl italic w-54">{characters[3].quote}</h2>
-                <div className='absolute left-5/11 top-5/7 w-53 flex flex-col items-center'>
-                  <span className="text-base font-title italic mb-4">{characters[3].description}</span>
-                  <Link
-                    href={`/${locale}/p/${characters[3].slug}`}
-                    className="inline-block border border-gold text-gold hover:bg-gold hover:text-olive-700 px-6 py-2 text-sm transition-colors"
-                  >
-                    {tGM('checkDetail')}
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ScrollSection>
+      <div className="hidden lg:block">
+        <DesktopCharacterSections
+          characters={characters}
+          locale={locale}
+          checkDetailText={tGM('checkDetail')}
+        />
       </div>
 
       {/* The Bottle Section */}
