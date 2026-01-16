@@ -81,7 +81,6 @@ export default function UsersClient({ initialUsers, serverActions }: UsersClient
   const [userOrders, setUserOrders] = useState<OrderTableItem[]>([]);
   const [userUpdateLoading, setUserUpdateLoading] = useState(false);
   const [userFieldErrors, setUserFieldErrors] = useState<Record<string, string>>({});
-  const [userGeneralError, setUserGeneralError] = useState<string | null>(null);
 
   // Handle Enter key to trigger search
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -302,7 +301,6 @@ export default function UsersClient({ initialUsers, serverActions }: UsersClient
     setCurrentUserId(userId);
     // Clear previous errors when opening modal
     setUserFieldErrors({});
-    setUserGeneralError(null);
 
     if (serverActions) {
       // Fetch full user data from server
@@ -350,7 +348,6 @@ export default function UsersClient({ initialUsers, serverActions }: UsersClient
 
     // Clear previous errors
     setUserFieldErrors({});
-    setUserGeneralError(null);
 
     if (serverActions) {
       setUserUpdateLoading(true);
@@ -368,9 +365,6 @@ export default function UsersClient({ initialUsers, serverActions }: UsersClient
         const resultData = userResult.data as { fieldErrors?: Record<string, string> } | undefined;
         if (resultData?.fieldErrors) {
           setUserFieldErrors(resultData.fieldErrors);
-          setUserGeneralError('Please correct the errors below');
-        } else {
-          setUserGeneralError(userResult.error || 'Failed to update user');
         }
         return;
       }
@@ -399,9 +393,6 @@ export default function UsersClient({ initialUsers, serverActions }: UsersClient
           const addressResultData = addressResult.data as { fieldErrors?: Record<string, string> } | undefined;
           if (addressResultData?.fieldErrors) {
             setUserFieldErrors(addressResultData.fieldErrors);
-            setUserGeneralError('Please correct the errors below');
-          } else {
-            setUserGeneralError(addressResult.error || 'Failed to update address');
           }
           return;
         }
@@ -983,7 +974,6 @@ export default function UsersClient({ initialUsers, serverActions }: UsersClient
         onSave={handleSaveUserInfo}
         onUpdateUser={handleUpdateUserInfo}
         fieldErrors={userFieldErrors}
-        generalError={userGeneralError}
         isLoading={userUpdateLoading}
       />
 

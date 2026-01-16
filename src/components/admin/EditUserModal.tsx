@@ -36,7 +36,6 @@ interface EditUserModalProps {
   onSave: () => void;
   onUpdateUser: (updates: Partial<UserInfoData>) => void;
   fieldErrors?: FieldErrors;
-  generalError?: string | null;
   isLoading?: boolean;
 }
 
@@ -47,7 +46,6 @@ export function EditUserModal({
   onSave,
   onUpdateUser,
   fieldErrors = {},
-  generalError = null,
   isLoading = false,
 }: EditUserModalProps) {
   if (!isOpen || !user) return null;
@@ -75,13 +73,6 @@ export function EditUserModal({
         </button>
 
         <h2 className="text-2xl font-bold mb-6 text-center">Edit Information</h2>
-
-        {/* General Error */}
-        {generalError && (
-          <div className="mb-2 px-4 py-1 text-sm bg-red-100 border border-red-500 text-red-700 text-center">
-            {generalError}
-          </div>
-        )}
 
         <div className="space-y-3">
           {/* Name */}

@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
-import { OrderStatus } from '@/generated/prisma'
+import { OrderStatus, Prisma } from '@/generated/prisma'
 import { revalidatePath } from 'next/cache'
 import { addressUpdateSchema, type AddressUpdateData } from './validation'
 import { z } from 'zod'
@@ -510,7 +510,7 @@ export async function getRevenueChartData(
     const { startDate, endDate } = getDateRange(timeRange)
 
     // Get orders within time range
-    const whereClause: any = {
+    const whereClause: Prisma.OrderWhereInput = {
       createdAt: {
         gte: startDate,
         lte: endDate,
@@ -605,7 +605,7 @@ export async function getOrdersChartData(
     const { startDate, endDate } = getDateRange(timeRange)
 
     // Get orders within time range
-    const whereClause: any = {
+    const whereClause: Prisma.OrderWhereInput = {
       createdAt: {
         gte: startDate,
         lte: endDate,

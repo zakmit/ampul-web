@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { OrderTable, type OrderTableItem, type OrderStatus } from './OrderTable';
 import { EditOrderModal, type OrderData } from './EditOrderModal';
-import { EditAddressModal, type AddressData } from './EditAddressModal';
+import { EditAddressModal, type AddressData, type AddressFieldErrors } from './EditAddressModal';
 
 // Import types for server actions
 import type {
@@ -52,6 +52,8 @@ export function UserOrdersModal({
   const [currentOrderData, setCurrentOrderData] = useState<OrderData | null>(null);
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
   const [statusUpdateError, setStatusUpdateError] = useState<string | null>(null);
+  const [addressFieldErrors, setAddressFieldErrors] = useState<AddressFieldErrors>({});
+  const [addressSaveLoading, setAddressSaveLoading] = useState(false);
 
   // Sync ordersList when orders prop changes
   useEffect(() => {
@@ -114,8 +116,29 @@ export function UserOrdersModal({
     }
   };
 
-  const handleModifyAddress = () => {
-    setModifyAddressModalOpen(true);
+  const handleModifyAddress = async (orderId?: string) => {
+    // If orderId is provided (called from OrderTable), fetch order data
+    // If not provided (called from EditOrderModal), use existing currentOrderData
+    if (orderId) {
+      setCurrentOrderId(orderId);
+
+      if (serverActions) {
+        // Fetch full order details from server
+        const result = await serverActions.fetchOrder(orderId);
+        if (result.success && result.data) {
+          setCurrentOrderData(result.data as OrderData);
+          setModifyAddressModalOpen(true);
+        } else {
+          alert(result.error || 'Failed to load order');
+        }
+      } else {
+        // Mock data behavior
+        setModifyAddressModalOpen(true);
+      }
+    } else {
+      // Called from EditOrderModal - currentOrderId and currentOrderData already set
+      setModifyAddressModalOpen(true);
+    }
   };
 
   const handleAcceptCancel = (orderId: string) => {
@@ -244,7 +267,24 @@ export function UserOrdersModal({
   const handleSaveAddress = async () => {
     if (!currentOrderId || !currentOrderData) return;
 
+    // Clear previous errors
+    setAddressFieldErrors({});
+
     if (serverActions) {
+      // Client-side validation for required fields
+      const errors: AddressFieldErrors = {};
+      if (!currentOrderData.recipientName) errors.recipientName = 'Recipient name is required';
+      if (!currentOrderData.shippingLine1) errors.shippingLine1 = 'Street address is required';
+      if (!currentOrderData.shippingCity) errors.shippingCity = 'City is required';
+      if (!currentOrderData.shippingPostal) errors.shippingPostal = 'Postal code is required';
+      if (!currentOrderData.shippingCountry) errors.shippingCountry = 'Country is required';
+
+      if (Object.keys(errors).length > 0) {
+        setAddressFieldErrors(errors);
+        return;
+      }
+
+      setAddressSaveLoading(true);
       // Merge updates with current data to ensure all required fields are present
       const addressData = {
         recipientName: currentOrderData.recipientName ?? '',
@@ -259,10 +299,17 @@ export function UserOrdersModal({
 
       // Use server action
       const result = await serverActions.updateOrderAddress(currentOrderId, addressData);
+      setAddressSaveLoading(false);
+
       if (result.success) {
+        setAddressFieldErrors({});
         setModifyAddressModalOpen(false);
       } else {
-        alert(result.error || 'Failed to update address');
+        // Handle server validation errors
+        const resultData = result.data as { fieldErrors?: Record<string, string> } | undefined;
+        if (resultData?.fieldErrors) {
+          setAddressFieldErrors(resultData.fieldErrors as AddressFieldErrors);
+        }
       }
     } else {
       // Mock data behavior - just close modal
@@ -333,9 +380,14 @@ export function UserOrdersModal({
       <EditAddressModal
         isOpen={modifyAddressModalOpen}
         address={getCurrentOrder()}
-        onClose={() => setModifyAddressModalOpen(false)}
+        onClose={() => {
+          setModifyAddressModalOpen(false);
+          setAddressFieldErrors({});
+        }}
         onSave={handleSaveAddress}
         onUpdateAddress={handleUpdateAddress}
+        fieldErrors={addressFieldErrors}
+        isLoading={addressSaveLoading}
       />
 
       <EditOrderModal
@@ -346,7 +398,7 @@ export function UserOrdersModal({
         onUpdateOrder={handleUpdateOrderStatus}
         onUpdateTrackingInput={setTrackingInput}
         onSaveTrackingCode={handleSaveTrackingCode}
-        onOpenAddressModal={handleModifyAddress}
+        onOpenAddressModal={() => handleModifyAddress()}
         onAcceptRequest={(type) => {
           if (type === 'cancel') {
             handleAcceptCancel(currentOrderId!);

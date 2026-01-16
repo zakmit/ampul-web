@@ -8,7 +8,7 @@ import { readProducts, readOrders, readOrder, updateTrackingCode, updateOrderSta
 import type { Order as FullOrder, OrderStatus } from './mockData';
 import { mockOrderItems } from './mockData';
 import { EditOrderModal, type OrderData } from '@/components/admin/EditOrderModal';
-import { EditAddressModal, type AddressData } from '@/components/admin/EditAddressModal';
+import { EditAddressModal, type AddressData, type AddressFieldErrors } from '@/components/admin/EditAddressModal';
 import { formatOrderDate } from '@/lib/formatters';
 
 // Type for table display (from _data/mockOrders.ts)
@@ -176,6 +176,8 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
   const [isLoadingOrder, setIsLoadingOrder] = useState(false);
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
   const [statusUpdateError, setStatusUpdateError] = useState<string | null>(null);
+  const [addressFieldErrors, setAddressFieldErrors] = useState<AddressFieldErrors>({});
+  const [addressSaveLoading, setAddressSaveLoading] = useState(false);
 
   // Fetch products on mount
   useEffect(() => {
@@ -805,15 +807,24 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
   const handleSaveAddress = async () => {
     if (!currentOrderId || !currentOrderData) return;
 
+    // Clear previous errors
+    setAddressFieldErrors({});
+
     if (serverActions) {
-      // Use server action for real data - validate required fields
-      if (!currentOrderData.recipientName || !currentOrderData.shippingLine1 ||
-          !currentOrderData.shippingCity || !currentOrderData.shippingPostal ||
-          !currentOrderData.shippingCountry) {
-        alert('Please fill in all required fields');
+      // Client-side validation for required fields
+      const errors: AddressFieldErrors = {};
+      if (!currentOrderData.recipientName) errors.recipientName = 'Recipient name is required';
+      if (!currentOrderData.shippingLine1) errors.shippingLine1 = 'Street address is required';
+      if (!currentOrderData.shippingCity) errors.shippingCity = 'City is required';
+      if (!currentOrderData.shippingPostal) errors.shippingPostal = 'Postal code is required';
+      if (!currentOrderData.shippingCountry) errors.shippingCountry = 'Country is required';
+
+      if (Object.keys(errors).length > 0) {
+        setAddressFieldErrors(errors);
         return;
       }
 
+      setAddressSaveLoading(true);
       const addressData = {
         recipientName: currentOrderData.recipientName,
         recipientPhone: currentOrderData.recipientPhone,
@@ -826,15 +837,22 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
       };
 
       const result = await serverActions.updateOrderAddress(currentOrderId, addressData);
+      setAddressSaveLoading(false);
+
       if (result.success) {
         // Refresh order data
         const orderResult = await serverActions.fetchOrder(currentOrderId);
         if (orderResult.success && orderResult.data) {
           setCurrentOrderData(orderResult.data);
         }
+        setAddressFieldErrors({});
         setModifyAddressModalOpen(false);
       } else {
-        alert(result.error || 'Failed to update address');
+        // Handle server validation errors
+        const resultData = result.data as { fieldErrors?: Record<string, string> } | undefined;
+        if (resultData?.fieldErrors) {
+          setAddressFieldErrors(resultData.fieldErrors as AddressFieldErrors);
+        }
       }
     } else {
       // Mock data behavior - address is already saved to state via form inputs
@@ -981,9 +999,14 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
       <EditAddressModal
         isOpen={modifyAddressModalOpen}
         address={getCurrentOrder()}
-        onClose={() => setModifyAddressModalOpen(false)}
+        onClose={() => {
+          setModifyAddressModalOpen(false);
+          setAddressFieldErrors({});
+        }}
         onSave={handleSaveAddress}
         onUpdateAddress={handleUpdateAddress}
+        fieldErrors={addressFieldErrors}
+        isLoading={addressSaveLoading}
       />
 
       <EditOrderModal
