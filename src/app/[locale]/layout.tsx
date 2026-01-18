@@ -65,7 +65,7 @@ export default async function LocaleLayout({
       {locale === 'tw' && (
         <link
           rel="stylesheet"
-          href="https://chinese-fonts-cdn.deno.dev/packages/hwmct/dist/汇文明朝体/result.css"
+          href="https://fontsapi.zeoseven.com/256/main/result.css"
         />
       )}
       <div
