@@ -223,7 +223,7 @@ export default function NavBar({ showBanner = true,
                 </svg>
               </button>
               <div className="flex grow lg:grow-0 h-10 w-36 relative">
-                  <Link href={`/${locale}/`} className="items-center py-auto">
+                  <Link href={`/${locale}/`} className="items-center py-auto cursor-pointer">
                     <span className="sr-only">AMPUL</span>
                     <Image
                         src="/AMPUL.png"
