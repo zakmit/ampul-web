@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, TouchEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { m, AnimatePresence } from 'framer-motion';
@@ -23,6 +23,27 @@ interface HeroCarouselMobileProps {
 export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: HeroCarouselMobileProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [timerKey, setTimerKey] = useState(0);
+  const touchStartX = useRef<number>(0);
+  const touchEndX = useRef<number>(0);
+
+  const handleTouchStart = (e: TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current - touchEndX.current > 50) {
+      // Swiped left - next slide
+      nextSlide();
+    }
+    if (touchEndX.current - touchStartX.current > 50) {
+      // Swiped right - previous slide
+      prevSlide();
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -50,7 +71,13 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
   return (
     <div className="relative w-full border-b border-gray-900">
       {slides[currentSlide].link ? (
-        <Link href={slides[currentSlide].link!} className="block ">
+        <Link
+          href={slides[currentSlide].link!}
+          className="block"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           {/* Image Section */}
           <div className="relative w-full h-[56.25dvw]">
             <AnimatePresence mode="wait">
@@ -99,7 +126,11 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
           </div>
         </Link>
       ) : (
-        <>
+        <div
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           {/* Image Section */}
           <div className="relative w-dvw h-[56.25dvw]">
             <AnimatePresence mode="wait">
@@ -146,7 +177,7 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
               </m.div>
             </AnimatePresence>
           </div>
-        </>
+        </div>
       )}
 
       {/* Navigation Arrows - Centered in text section */}
