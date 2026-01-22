@@ -325,15 +325,15 @@ export default function NavBar({ showBanner = true,
 
             {/* Dropdown Menu */}
             <div
-              className={`fixed hidden lg:block left-0 right-0 bg-white shadow-sm z-40 overflow-hidden transition-all duration-600 ease-in-out ${
+              className={`fixed hidden lg:flex lg:justify-center left-0 right-0 bg-white shadow-sm z-40 overflow-hidden transition-all duration-600 ease-in-out ${
                 isDropdownVisible
                   ? `top-14 opacity-100 max-h-lvh`
                   : `top-14 max-h-0`
               }`}
             >
-              <div className="max-w-360 mx-8">
+              <div className="w-full max-w-360 mx-8">
                 {activeDropdown && (
-                  <div className="py-8">
+                  <div className="py-8 w-full">
                     {menuItems.find(item => item.id === activeDropdown)?.content}
                   </div>
                 )}
