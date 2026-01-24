@@ -40,7 +40,7 @@
       "antigone": "Antigone"
     },
     "productDescriptions": {
-      "cassandre": "A floral scent on the ritual, Laurel and incense reveal the tragedy foreseen, Charred wood reveal the fall of Troy.",
+      "cassandre": "A floral scent on the ritual, Laurel and incense reveals the tragedy foreseen, Charred wood reveal the fall of Troy.",
       "narcisse": "Narcissus perfume on still lake, Reeds bring the freshness of water, Plane tree is always there.",
       "icare": "Sea water choked in the nose, the warmness of burning sun, Hot melting wax flowing on the skin.",
       "antigone": "Rust and dust floating in the air, Myrrh permeates the forbidden burial, Incense smoke drifts from the sealed tomb."
@@ -151,6 +151,7 @@
     "tracking": "TRACKING",
     "trackingNotAvailable": "Processing",
     "cancelOrder": "Cancel the order",
+    "cancelling": "Cancelling...",
     "freeSample": "Free Sample",
     "status": {
       "PENDING": "PENDING",
@@ -222,7 +223,7 @@
     "exploreCollection": "Explore the Collection",
     "sideNotes": {
       "antigone": "Rust, Dust, Myrrh, Incense",
-      "narcisse": "Narcisse, Reeds, Plane tree",
+      "narcisse": "Narcissus, Reeds, Plane tree",
       "icare": "Seaweed and salt, Cloves and amber, Melting wax",
       "cassandre": "Floral, Laurel and incense, Charred wood and leather"
     }
@@ -231,7 +232,7 @@
     "signIn": "Sign In",
     "signInWithGoogle": "Sign in with Google",
     "welcome": "Welcome",
-    "myOrder": "MY ORDER",
+    "myOrder": "MY ORDERS",
     "myInformation": "MY INFORMATION",
     "signOut": "Sign out"
   },
@@ -267,7 +268,7 @@
     "subtotal": "Subtotal",
     "shipTo": "SHIP TO",
     "payment": "PAYMENT",
-    "demoNotice": "*for demo purpose",
+    "demoNotice": "*for demo purposes",
     "errors": {
       "recipientNameRequired": "Recipient name is required",
       "addressLine1Required": "Street address is required",

@@ -40,7 +40,7 @@
       "antigone": "Antigone"
     },
     "productDescriptions": {
-      "cassandre": "Un parfum floral sur le rituel, Laurier et encens révèlent la tragédie entrevue, Bois calciné racontent la chute de Troie.",
+      "cassandre": "Un parfum floral du rituel, Laurier et encens révèlent la tragédie entrevue, Bois calciné racontent la chute de Troie.",
       "narcisse": "Parfum de narcisse sur le lac calme, Roseaux apportent la fraîcheur de l’eau, Platane est toujours là.",
       "icare": "Eau de mer étouffée dans le nez, chaleur du soleil brûlant, Cire fondue coulant sur la peau.",
       "antigone": "Poussière et rouille flottant dans l'air, Myrrhe imprègne l'enterrement interdit, Fumée d'encens dérive de la tombe scellée."
@@ -151,6 +151,7 @@
     "tracking": "SUIVI",
     "trackingNotAvailable": "Pas encore disponible",
     "cancelOrder": "Annuler la commande",
+    "cancelling": "Annulation...",
     "freeSample": "Échantillon gratuit",
     "status": {
       "PENDING": "EN ATTENTE",

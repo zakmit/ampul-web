@@ -151,6 +151,7 @@
     "tracking": "追蹤號碼",
     "trackingNotAvailable": "處理中",
     "cancelOrder": "取消訂單",
+    "cancelling": "取消中...",
     "freeSample": "免費樣品",
     "status": {
       "PENDING": "待處理",
