@@ -75,14 +75,13 @@
         "exclusiveOffers": "專屬優惠"
       },
       "connect": {
-        "title": "聯繫我們",
+        "title": "聯繫",
         "instagram": "Instagram",
-        "facebook": "Facebook",
-        "youtube": "Youtube",
+        "behance": "Behance",
         "linkedin": "Linkedin"
       },
       "about": {
-        "title": "關於我們",
+        "title": "關於",
         "heritage": "傳承",
         "concept": "概念"
       },
