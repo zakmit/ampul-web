@@ -7,7 +7,9 @@ A full-stack e-commerce website for a fictional fragrance brand, featuring inter
 ## Link
 
 [Live Demo](https://ampul.vercel.app)
+
 [Admin Dashboard](https://ampul.vercel.app/admin)
+
 [Behance]()
 
 ## About
@@ -48,6 +50,7 @@ Implemented a comprehensive i18n system featuring:
 - Server-side locale resolution with fallbacks
 - Database-level locale mapping for product translations
 - Middleware-based automatic language detection
+- Locale-specific font override for CJK support
 
 ### Authentication & Authorization
 - OAuth integration with Google provider via NextAuth.js
