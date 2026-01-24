@@ -10,7 +10,7 @@ A full-stack e-commerce website for a fictional fragrance brand, featuring inter
 
 [Admin Dashboard](https://ampul.vercel.app/admin)
 
-[Behance]()
+[Behance](https://www.behance.net/gallery/242458065/AMPUL-A-concept-driven-digital-experience)
 
 ## About
 
@@ -126,8 +126,6 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ## Screenshots
-
-<!-- Uncomment and add your screenshots -->
 
 ### Homepage
 ![Homepage](./readme/home.jpg)
