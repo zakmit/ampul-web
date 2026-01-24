@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import type { Locale } from '@/i18n/config';
+import { requestCancelOrder } from '@/app/[locale]/u/orders/actions';
 
 type OrderItem = {
   id: string;
@@ -48,8 +49,19 @@ export default function OrderCard({ order }: OrderCardProps) {
   const t = useTranslations('OrderCard');
   const params = useParams();
   const locale = params.locale as Locale;
+  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const [formattedDate, setFormattedDate] = useState('');
+  const [isPending, startTransition] = useTransition();
+
+  const handleCancelOrder = () => {
+    startTransition(async () => {
+      const result = await requestCancelOrder(order.id);
+      if (result.success) {
+        router.refresh();
+      }
+    });
+  };
 
   // Separate regular items from free samples
   const regularItems = order.items.filter(item => !item.isFreeSample);
@@ -220,10 +232,14 @@ export default function OrderCard({ order }: OrderCardProps) {
             </div>
 
             {/* Cancel Button */}
-            {order.status === 'PROCESSING' && (
+            {order.status === 'PENDING' && (
               <div className="flex justify-center">
-                <button className="bg-gray-700 text-white px-8 py-3 text-sm hover:bg-gray-800 transition-colors">
-                  {t('cancelOrder')}
+                <button
+                  onClick={handleCancelOrder}
+                  disabled={isPending}
+                  className="bg-gray-700 text-white px-8 py-3 text-sm hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isPending ? t('cancelling') : t('cancelOrder')}
                 </button>
               </div>
             )}
