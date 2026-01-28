@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Analytics } from "@vercel/analytics/next"
 import { Averia_Serif_Libre } from 'next/font/google';
 import { Zilla_Slab } from 'next/font/google';
 import './globals.css';
@@ -53,6 +54,7 @@ export default async function RootLayout({
             <LoadingOverlayProvider>
               <FramerMotionProvider>
                 {children}
+                <Analytics />
               </FramerMotionProvider>
             </LoadingOverlayProvider>
           </ShoppingBagProvider>
