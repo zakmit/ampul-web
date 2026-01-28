@@ -68,9 +68,10 @@ export default function Footer() {
     {
       title: t('connect.title'),
       links: [
-        { label: t('connect.instagram'), href: 'https://www.instagram.com/kaaaiho12' },
-        { label: t('connect.behance'), href: 'https://www.behance.net/gallery/242458065/AMPUL-A-concept-driven-digital-experience' },
-        { label: t('connect.linkedin'), href: 'https://www.linkedin.com/in/kai-chih-ho-819b853a7/' },
+        { label: "Instagram", href: 'https://www.instagram.com/kaaaiho12' },
+        { label: "Behance", href: 'https://www.behance.net/gallery/242458065/AMPUL-A-concept-driven-digital-experience' },
+        { label: "Linkedin", href: 'https://www.linkedin.com/in/kai-chih-ho-819b853a7/' },
+        { label: "Github", href: 'https://www.linkedin.com/in/kai-chih-ho-819b853a7/' },
       ],
     },
     {
