@@ -53,7 +53,7 @@ Implemented a comprehensive i18n system featuring:
 - Locale-specific font override for CJK support
 
 ### Authentication & Authorization
-- OAuth integration with Google provider via NextAuth.js
+- OAuth integration with Google provider via Auth.js
 - Role-based access control (admin/user)
 - Mock data in admin for visitors (no login required to explore)
 - Login tracking with throttling
