@@ -36,9 +36,15 @@ function FooterSection({ title, links }: FooterSectionProps) {
       >
         {links.map((link, index) => (
           link.href != "#" ? (
-            <Link key={index} className="hover:text-gray-500 hover:underline" href={link.href}>
-              {link.label}
-            </Link>
+            link.href.startsWith('https')? (
+              <a key={index} className="hover:text-gray-500 hover:underline" href={link.href}>
+                {link.label}
+              </a>
+            ) : (
+              <Link key={index} className="hover:text-gray-500 hover:underline" href={link.href}>
+                {link.label}
+              </Link>
+            )
           ):(
             <span key={index} className="hover:text-gray-500 hover:underline">
               {link.label}
@@ -71,7 +77,7 @@ export default function Footer() {
         { label: "Instagram", href: 'https://www.instagram.com/kaaaiho12' },
         { label: "Behance", href: 'https://www.behance.net/gallery/242458065/AMPUL-A-concept-driven-digital-experience' },
         { label: "Linkedin", href: 'https://www.linkedin.com/in/kai-chih-ho-819b853a7/' },
-        { label: "Github", href: 'https://www.linkedin.com/in/kai-chih-ho-819b853a7/' },
+        { label: "Github", href: 'https://github.com/zakmit/ampul-web' },
       ],
     },
     {
