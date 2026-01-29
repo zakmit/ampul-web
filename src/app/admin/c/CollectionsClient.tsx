@@ -394,7 +394,7 @@ export default function CollectionsClient({
                   <ProductFilters sections={filterSections} />
                 </div>
 
-                {/* Right: Collections Grid */}
+                {/* Right: Collections List */}
                 <div className="flex-1 flex flex-col gap-6">
                   {sortedCollections.map((collection) => (
                     <button
@@ -413,6 +413,7 @@ export default function CollectionsClient({
                       <Image
                         src={collection.coverImage16x9}
                         alt={collection.translations['en-US'].name}
+                        sizes="90vw"
                         fill
                         className="object-cover"
                       />
@@ -447,6 +448,7 @@ export default function CollectionsClient({
                     <Image
                       src={collection.coverImage16x9}
                       alt={collection.translations['en-US'].name}
+                      sizes="98vw"
                       fill
                       className="object-cover"
                     />

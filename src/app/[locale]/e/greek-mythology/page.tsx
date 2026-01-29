@@ -188,6 +188,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
         <Image
           src={collectionData.heroImageMobile}
           alt={collectionData.title}
+          sizes="(max-width: 1440px) 100vw, 1440px"
           fill
           className="object-cover object-center"
           priority
@@ -206,6 +207,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
         <Image
           src={collectionData.heroImageDesktop}
           alt={collectionData.title}
+          sizes="(max-width: 1440px) 100vw, 1440px"
           fill
           className="object-cover object-center"
           priority
@@ -234,6 +236,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                 <Image
                   src={item.imageDesktop}
                   alt={item.title}
+                  sizes="(max-width: 1440px) 100vw, 1440px"
                   fill
                   className="object-cover object-center"
                 />
@@ -288,6 +291,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
             <Image
               src={item.imageDesktop}
               alt={item.title}
+              sizes="(max-width: 1440px) 100vw, 1440px"
               fill
               className="object-cover object-center"
             />
@@ -353,6 +357,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                     <Image
                       src={product.image}
                       alt={product.title}
+                      sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-300"
                     />
@@ -383,6 +388,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                     <Image
                       src={product.image}
                       alt={product.title}
+                      sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-300"
                     />

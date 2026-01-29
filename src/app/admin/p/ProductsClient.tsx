@@ -518,7 +518,7 @@ export default function ProductsClient({
                   <ProductFilters sections={filterSections} />
                 </div>
 
-                {/* Right: Products Grid */}
+                {/* Right: Products List */}
                 <div className="flex-1 flex flex-col gap-6">
                   {sortedProducts.map((product) => (
                     <button
@@ -535,6 +535,7 @@ export default function ProductsClient({
                       <Image
                         src={product.coverImage16x9}
                         alt={product.translations['en-US'].name}
+                        sizes="90vw"
                         fill
                         className="object-cover"
                       />
@@ -565,6 +566,7 @@ export default function ProductsClient({
                     <Image
                       src={product.coverImage16x9}
                       alt={product.translations['en-US'].name}
+                      sizes="98vw"
                       fill
                       className="object-cover"
                     />

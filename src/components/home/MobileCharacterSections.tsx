@@ -190,6 +190,7 @@ export default function MobileCharacterSections({
                 <Image
                   src={character.image}
                   alt={character.title}
+                  sizes="100vw"
                   fill
                   className="object-cover"
                 />

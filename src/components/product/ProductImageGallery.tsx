@@ -72,6 +72,7 @@ export default function ProductImageGallery({ images, productName }: ProductImag
           src={images[currentImageIndex]}
           alt={`${productName} - Image ${currentImageIndex + 1}`}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw"
           className="object-cover"
           priority={currentImageIndex === 0}
         />

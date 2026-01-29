@@ -92,6 +92,7 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
                 <Image
                   src={slides[currentSlide].image}
                   alt={slides[currentSlide].alt}
+                  sizes="100vw"
                   fill
                   className="object-cover object-center"
                   priority={currentSlide === 0}
@@ -145,6 +146,7 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
                 <Image
                   src={slides[currentSlide].image}
                   alt={slides[currentSlide].alt}
+                  sizes="100vw"
                   fill
                   className="object-cover object-center"
                   priority={currentSlide === 0}

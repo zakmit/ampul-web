@@ -202,6 +202,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                     src={relatedProduct.image}
                     alt={relatedProduct.name}
                     fill
+                    sizes="(max-width: 768px) 40vw, (max-width: 1280px) 33vw, 25vw"
                     className="object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>

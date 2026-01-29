@@ -108,6 +108,7 @@ export default function DesktopCharacterSections({
               <Image
                 src={characters[0].image}
                 alt={characters[0].title}
+                sizes="70vw"
                 fill
                 className="object-cover"
               />
@@ -116,6 +117,7 @@ export default function DesktopCharacterSections({
               <Image
                 src={characters[1].image}
                 alt={characters[1].title}
+                sizes="70vw"
                 fill
                 className="object-cover"
               />
@@ -171,6 +173,7 @@ export default function DesktopCharacterSections({
               <Image
                 src={characters[2].image}
                 alt={characters[2].title}
+                sizes="70vw"
                 fill
                 className="object-cover"
               />
@@ -179,6 +182,7 @@ export default function DesktopCharacterSections({
               <Image
                 src={characters[3].image}
                 alt={characters[3].title}
+                sizes="70vw"
                 fill
                 className="object-cover"
               />

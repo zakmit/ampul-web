@@ -63,6 +63,7 @@ export default function HeroCarousel({ slides, autoPlayInterval = 10000 }: HeroC
               <Image
                 src={slides[currentSlide].image}
                 alt={slides[currentSlide].alt}
+                sizes="(max-width: 1600px) 100vw, 1600px"
                 fill
                 className="object-cover object-center"
                 priority={currentSlide === 0}

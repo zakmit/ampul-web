@@ -223,13 +223,15 @@ export default function NavBar({ showBanner = true,
                 </svg>
               </button>
               <div className="flex grow lg:grow-0 h-10 w-36 relative">
-                  <Link href={`/${locale}/`} className="items-center py-auto cursor-pointer">
+                  <Link href={`/${locale}/`} className="items-center w-full relative py-auto cursor-pointer">
                     <span className="sr-only">AMPUL</span>
                     <Image
                         src="/AMPUL.png"
                         fill
+                        sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
                         className="object-contain"
                         alt="AMPUL"
+                        priority={true}
                     />
                   </Link>
               </div>
