@@ -78,6 +78,7 @@ export default function Footer() {
         { label: "Behance", href: 'https://www.behance.net/gallery/242458065/AMPUL-A-concept-driven-digital-experience' },
         { label: "Linkedin", href: 'https://www.linkedin.com/in/kai-chih-ho-819b853a7/' },
         { label: "Github", href: 'https://github.com/zakmit/ampul-web' },
+        { label: "Figma", href: 'https://www.figma.com/design/abDRQowVnEgn9bKCJhXxhI/AMPUL' },
       ],
     },
     {
