@@ -28,6 +28,7 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
 
   const handleTouchStart = (e: TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = e.touches[0].clientX; // Reset the touchEnd, to make click won't be considered as move
   };
 
   const handleTouchMove = (e: TouchEvent) => {
