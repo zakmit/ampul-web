@@ -61,6 +61,9 @@ export async function generateMetadata({ params }: CollectionPageProps): Promise
   return {
     title: t('greekMythology.title'),
     description: t('greekMythology.description'),
+    openGraph: {
+      images: [{ url: '/promo/collection-gm-sq.jpg' }],
+    },
   };
 }
 

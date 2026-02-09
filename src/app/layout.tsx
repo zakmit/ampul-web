@@ -34,6 +34,15 @@ export const metadata: Metadata = {
     ],
     apple: '/apple-touch-icon.png',
   },
+  openGraph: {
+    images: [
+      {
+        url: '/og-default.jpg',
+        width: 1200,
+        height: 630,
+      }
+    ],
+  },
 };
 
 

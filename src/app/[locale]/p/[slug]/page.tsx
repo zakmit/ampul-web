@@ -30,6 +30,9 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
   return {
     title: `${productData.name} - ${productData.category.name} - AMPUL`,
     description: productData.sensations,
+    openGraph: {
+      images: [{ url: productData.images.productImage }],
+    },
   };
 }
 

@@ -24,6 +24,9 @@ export async function generateMetadata({ params }: CollectionPageProps): Promise
   return {
     title: `${collectionData.name} - AMPUL`,
     description: collectionData.description,
+    openGraph: {
+      images: [{ url: collectionData.coverImage16x9 }],
+    },
   };
 }
 
