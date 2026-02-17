@@ -46,13 +46,13 @@ export default function MobileNavBarPanel({isOpen, onClose}: MobileNavBarPanelPr
       id: 'new',
       label: t('menu.new'),
       content: (
-        <div className="h-full flex flex-col justify-between">
-          <div>
+        <div className="h-full flex flex-col justify-between overflow-y-scroll">
+          <div className="mb-8">
             <Link href={`/${locale}/e/greek-mythology`} onClick={onClose}>
               <div className={`text-base font-medium mb-2`}>{t('exploreGreekMythology')}</div>
             </Link>
           </div>
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col mb-12 w-full items-center">
             <MenuCard title={t('productTitles.narcisse')} description={t('productDescriptions.narcisse')} image="/products/narcisse-bottle.jpg" href={`/${locale}/p/narcisse`} badge={t('badge.new')} onLinkClick={onClose}></MenuCard>
           </div>
         </div>
@@ -62,11 +62,11 @@ export default function MobileNavBarPanel({isOpen, onClose}: MobileNavBarPanelPr
       id: 'fragrance',
       label: t('menu.fragrance'),
       content: (
-        <div className="h-full flex flex-col justify-between">
-          <div className="">
+        <div className="h-full flex flex-col justify-between overflow-y-scroll">
+          <div className="mb-8">
             <MenuList title={t('greekMythologyCollection')} titleLink={`/${locale}/c/greek-mythology`} items={fragItems} onLinkClick={onClose}></MenuList>
           </div>
-          <div className="flex flex-col gap-6 w-full items-center">
+          <div className="flex flex-col mb-12 w-full items-center">
             <MenuCard title={t('productTitles.antigone')} description={t('productDescriptions.antigone')} image="/products/antigone-bottle.jpg" href={`/${locale}/p/antigone`} badge={t('badge.new')} onLinkClick={onClose}></MenuCard>
           </div>
         </div>
