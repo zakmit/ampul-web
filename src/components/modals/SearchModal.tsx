@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { X } from 'lucide-react'
@@ -31,6 +31,7 @@ export default function SearchModal({ isOpen, showBanner, isAtTop, isNavVisible,
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined> (undefined);
 
   const handleClose = () => {
     setSearchInput('')
@@ -66,10 +67,14 @@ export default function SearchModal({ isOpen, showBanner, isAtTop, isNavVisible,
     }
   }
 
-  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      performSearch(searchInput)
-    }
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout (()=> {
+      performSearch(value)
+      debounceTimer.current = undefined;
+    }, 1000)
   }
 
   // Calculate top position based on NavBar visibility
@@ -130,8 +135,7 @@ export default function SearchModal({ isOpen, showBanner, isAtTop, isNavVisible,
                     type="text"
                     placeholder={t('searchPlaceholder')}
                     value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    onKeyDown={handleSearchKeyDown}
+                    onChange={handleSearchChange}
                     className="w-full text-right h-8 pl-10 pr-4 py-1 border rounded-sm border-gray-500 text-sm placeholder:italic focus:outline-none focus:ring-1 focus:ring-gray-900"
                   />
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'square', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}
