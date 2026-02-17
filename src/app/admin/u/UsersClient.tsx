@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '@/components/shadcn/dropdown-menu';
 import { ChevronLeft, ChevronRight, Plus, Minus, MoreHorizontal, X, MoveDown, MoveUp } from 'lucide-react';
@@ -22,6 +22,8 @@ import type {
   acceptRefundRequest,
   UserFilters,
 } from './actions';
+import { clearTimeout } from 'timers';
+import { Value } from '@radix-ui/react-select';
 
 const INPUT_STYLE = "w-full max-w-40 sm:max-w-80 lg:max-w-42 text-sm px-2 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
 
@@ -67,6 +69,7 @@ export default function UsersClient({ initialUsers, serverActions }: UsersClient
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<'Last Log In' | 'Last Order' | null>('Last Log In');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // User management state
   const [users, setUsers] = useState<User[]>(initialUsers);
@@ -81,12 +84,16 @@ export default function UsersClient({ initialUsers, serverActions }: UsersClient
   const [userUpdateLoading, setUserUpdateLoading] = useState(false);
   const [userFieldErrors, setUserFieldErrors] = useState<Record<string, string>>({});
 
-  // Handle Enter key to trigger search
-  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      setSearchQuery(searchInput);
+  // Debounce search input
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout (()=>{
+      setSearchQuery(value);
       setCurrentPage(1);
-    }
+      debounceTimer.current = undefined;
+    }, 1000);
   };
 
   // Last Log In filter (temporary values before apply)
@@ -823,10 +830,9 @@ export default function UsersClient({ initialUsers, serverActions }: UsersClient
                 <div className="relative flex-1">
                   <input
                     type="text"
-                    placeholder="Press Enter to Search"
+                    placeholder="Search..."
                     value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    onKeyDown={handleSearchKeyDown}
+                    onChange={handleSearchChange}
                     className="w-full pl-10 pr-4 py-1 border rounded-2xl border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900"
                   />
                   <svg

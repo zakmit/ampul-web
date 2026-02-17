@@ -157,7 +157,7 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
   const [searchInput, setSearchInput] = useState(''); // Temporary input value before Enter
   const [activeStatuses, setActiveStatuses] = useState<OrderStatus[]>([]);
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
-
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   // Modal states
   const [modifyOrderModalOpen, setModifyOrderModalOpen] = useState(false);
   const [modifyAddressModalOpen, setModifyAddressModalOpen] = useState(false);
@@ -189,12 +189,16 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
     fetchProducts();
   }, []);
 
-  // Handle Enter key to trigger search
-  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      setSearchQuery(searchInput);
+  // Debounce search input
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      setSearchQuery(value);
       setCurrentPage(1);
-    }
+      debounceTimer.current = undefined;
+    }, 1000);
   };
   const [visibleColumns, setVisibleColumns] = useState(['Order ID', 'Date', 'Costumer', 'Status', 'Total']);
   const [currentPage, setCurrentPage] = useState(1);
@@ -1482,10 +1486,9 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
                   <div className="relative flex-1">
                     <input
                       type="text"
-                      placeholder="Press Enter to Search"
+                      placeholder="Search..."
                       value={searchInput}
-                      onChange={(e) => setSearchInput(e.target.value)}
-                      onKeyDown={handleSearchKeyDown}
+                      onChange={handleSearchChange}
                       className="w-full pl-10 pr-4 py-1 border rounded-2xl border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900"
                     />
                     <svg
