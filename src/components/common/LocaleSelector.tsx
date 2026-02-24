@@ -26,6 +26,9 @@ export default function LocaleSelector() {
   const handleLocaleChange = (newLocale: Locale) => {
     if (newLocale === currentLocale) return;
 
+    // Save locale preference so the root page can redirect accordingly
+    document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=${60 * 60 * 24 * 365}`;
+
     startTransition(() => {
       // Remove current locale from pathname if it exists
       let path = pathname;
