@@ -1,14 +1,32 @@
 'use client';
 
-import { Suspense, useRef } from 'react';
+import { Suspense, useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, useGLTF, Environment } from '@react-three/drei';
-import type { Group } from 'three';
+import { OrbitControls, useGLTF, Environment, MeshTransmissionMaterial } from '@react-three/drei';
+import { FrontSide } from 'three';
+import type { Group, Mesh } from 'three';
 import Image from 'next/image';
 
 function BottleModel() {
   const groupRef = useRef<Group>(null);
-  const { scene } = useGLTF('/models/Bottle.glb');
+  const { nodes } = useGLTF('/models/Bottle.glb') as unknown as {
+    nodes: {
+      Bottle: Group;
+      Mesh: Mesh;
+      Mesh_1: Mesh;
+      Cap: Mesh;
+      Icare: Mesh;
+      Stamp: Mesh;
+      Straw: Mesh;
+    };
+  };
+
+  useEffect(() => {
+    if (nodes.Stamp.material) {
+      const mats = Array.isArray(nodes.Stamp.material) ? nodes.Stamp.material : [nodes.Stamp.material];
+      mats.forEach((m) => { m.side = FrontSide; });
+    }
+  }, [nodes.Stamp]);
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -17,8 +35,39 @@ function BottleModel() {
   });
 
   return (
-    <group ref={groupRef} position={[0, 0, 0]}>
-      <primitive object={scene} scale={10} />
+    <group ref={groupRef} scale={10} position={[0, -0.2, 0]}>
+      {/* Outer glass */}
+      <mesh geometry={nodes.Mesh.geometry} renderOrder={0}>
+        <MeshTransmissionMaterial
+          backside
+          samples={16}
+          thickness={0}
+          roughness={0}
+          transmission={1}
+          chromaticAberration={0.02}
+          anisotropy={0.1}
+          distortion={0}
+          distortionScale={0.1}
+          temporalDistortion={0.02}
+          color="#e6f5ea"
+        />
+      </mesh>
+      {/* Inner liquid */}
+      <mesh geometry={nodes.Mesh_1.geometry}>
+        <meshStandardMaterial
+          color="#d4fbff"
+          transparent
+          opacity={0.1}
+          roughness={0.05}
+          metalness={0}
+        />
+      </mesh>
+      {/* Stamp keeps original material, offset to avoid z-fighting */}
+      <primitive object={nodes.Stamp}  />
+      {/* Other parts keep their original materials */}
+      <primitive object={nodes.Cap} />
+      <primitive object={nodes.Icare} />
+      <primitive object={nodes.Straw} />
     </group>
   );
 }
@@ -48,7 +97,7 @@ function BottleCanvas() {
         maxPolarAngle={Math.PI / 1.5}
         target={[0, 0, 0]}
       />
-      <Environment preset="city" environmentIntensity={2} />
+      <Environment preset="city" environmentIntensity={2.4} />
     </Canvas>
   );
 }
