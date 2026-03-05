@@ -4,29 +4,38 @@ import { Suspense, useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Environment, MeshTransmissionMaterial } from '@react-three/drei';
 import { FrontSide } from 'three';
-import type { Group, Mesh } from 'three';
+import type { Group, Mesh, MeshStandardMaterial } from 'three';
 import Image from 'next/image';
+
+type GLTFNodes = {
+  Mesh: Mesh;
+  Mesh_1: Mesh;
+  Cap: Mesh;
+  Icare: Mesh;
+  Stamp: Mesh;
+  Straw: Mesh;
+};
 
 function BottleModel() {
   const groupRef = useRef<Group>(null);
-  const { nodes } = useGLTF('/models/Bottle.glb') as unknown as {
-    nodes: {
-      Bottle: Group;
-      Mesh: Mesh;
-      Mesh_1: Mesh;
-      Cap: Mesh;
-      Icare: Mesh;
-      Stamp: Mesh;
-      Straw: Mesh;
-    };
+  const { nodes, materials } = useGLTF('/models/Bottle.glb') as unknown as {
+    nodes: GLTFNodes;
+    materials: Record<string, MeshStandardMaterial>;
   };
 
   useEffect(() => {
-    if (nodes.Stamp.material) {
-      const mats = Array.isArray(nodes.Stamp.material) ? nodes.Stamp.material : [nodes.Stamp.material];
-      mats.forEach((m) => { m.side = FrontSide; });
+    // Stamp: only render front face to avoid bleed-through
+    const stampMat = materials['Stamp'];
+    if (stampMat) { stampMat.side = FrontSide; }
+
+    // Cap: boost metalness for a gold metal look
+    const capMat = materials['Cap'];
+    if (capMat) {
+      capMat.metalness = 0.8;
+      capMat.roughness = 0.4;
+      capMat.needsUpdate = true;
     }
-  }, [nodes.Stamp]);
+  }, [materials]);
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -35,39 +44,47 @@ function BottleModel() {
   });
 
   return (
-    <group ref={groupRef} scale={10} position={[0, -0.2, 0]}>
-      {/* Outer glass */}
-      <mesh geometry={nodes.Mesh.geometry} renderOrder={0}>
-        <MeshTransmissionMaterial
-          backside
-          samples={16}
-          thickness={0}
-          roughness={0}
-          transmission={1}
-          chromaticAberration={0.02}
-          anisotropy={0.1}
-          distortion={0}
-          distortionScale={0.1}
-          temporalDistortion={0.02}
-          color="#e6f5ea"
-        />
-      </mesh>
-      {/* Inner liquid */}
-      <mesh geometry={nodes.Mesh_1.geometry}>
-        <meshStandardMaterial
-          color="#d4fbff"
-          transparent
-          opacity={0.1}
-          roughness={0.05}
-          metalness={0}
-        />
-      </mesh>
-      {/* Stamp keeps original material, offset to avoid z-fighting */}
-      <primitive object={nodes.Stamp}  />
-      {/* Other parts keep their original materials */}
-      <primitive object={nodes.Cap} />
-      <primitive object={nodes.Icare} />
-      <primitive object={nodes.Straw} />
+    <group ref={groupRef} scale={10} position={[0, -0.1, 0]}>
+      <group position={[0, -0.02, 0]}>
+        {/* Outer glass */}
+        <mesh geometry={nodes.Mesh.geometry} renderOrder={0}>
+          <MeshTransmissionMaterial
+            backside
+            samples={16}
+            thickness={0}
+            roughness={0}
+            transmission={1}
+            chromaticAberration={0.02}
+            anisotropy={0.1}
+            distortion={0}
+            distortionScale={0.5}
+            temporalDistortion={0.02}
+            color="#effdf3"
+          />
+        </mesh>
+        {/* Inner liquid — keep original Glass Icare material */}
+        <mesh geometry={nodes.Mesh_1.geometry}>
+          <meshStandardMaterial
+            color="#cefaff"
+            transparent
+            opacity={0.1}
+            roughness={0.05}
+            metalness={0}
+          />
+        </mesh>
+        <mesh geometry={nodes.Cap.geometry} material={materials['Cap']} position={[0, 0.074, 0]} />
+        <mesh geometry={nodes.Icare.geometry} material={materials['TagIcarus']} position={[0, 0.005, 0]} />
+        <mesh geometry={nodes.Stamp.geometry} material={materials['Stamp']} position={[0, 0.005, 0]} renderOrder={1} />
+        <mesh geometry={nodes.Straw.geometry} position={[0, 0.014, 0]}>
+          <meshStandardMaterial
+            color="#cefaff"
+            transparent
+            opacity={0.1}
+            roughness={0.05}
+            metalness={0}
+          />
+        </mesh>
+      </group>
     </group>
   );
 }
