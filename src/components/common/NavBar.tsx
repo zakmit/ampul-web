@@ -160,20 +160,20 @@ export default function NavBar({ showBanner = true,
     return(
       <div>
         <div className={`relative block content-center transition-all duration-600 items-center z-50 gap-x-6 h-4 lg:h-6 ${isDropdownVisible ? "bg-gray-600" : "bg-gray-200"}`}>
-          <div className="block items-center gap-x-4 gap-y-2">
+          <header role="banner" className="block items-center gap-x-4 gap-y-2">
             <h4 className={`text-center text-xs lg:text-base ${isDropdownVisible ? "text-gray-100": "text-gray-900"}`}>
               {t('banner')}
             </h4>
-          </div>
+          </header>
         </div>        
-        <header className={`bg-white top-0 left-0 right-0 w-full z-50 transition-all duration-300 ease-in-out ${getNavPosition()} ${getNavTopPosition()} ${
+        <div className={`bg-white top-0 left-0 right-0 w-full z-50 transition-all duration-300 ease-in-out ${getNavPosition()} ${getNavTopPosition()} ${
           isDropdownVisible
             ? `shadow-none`
             : `shadow-sm`
         }
 
         `}>
-          <nav aria-label="Global" className="mx-auto flex min-w-2xs w-full max-w-360 z-50 items-center px-2 lg:px-4 h-14">
+          <nav role="navigation" aria-label="Global" className="mx-auto flex min-w-2xs w-full max-w-360 z-50 items-center px-2 lg:px-4 h-14">
               <div className="flex lg:hidden">
                   {/* Mobile menu button */}
                   <button
@@ -342,7 +342,7 @@ export default function NavBar({ showBanner = true,
                 )}
               </div>
             </div>
-          </header>
+          </div>
           <MobileNavBarPanel
             isOpen={isMobileNavVisible}
             onClose={() => setIsMobileNavVisible(false)}

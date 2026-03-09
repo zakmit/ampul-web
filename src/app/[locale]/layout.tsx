@@ -69,7 +69,9 @@ export default async function LocaleLayout({
       >
         <NextIntlClientProvider messages={messages} locale={locale}>
           <NavBar showBanner={true} />
-          {children}
+          <div role="main">
+            {children}
+          </div>
           <Footer/>
           <LocaleSelector />
         </NextIntlClientProvider>
