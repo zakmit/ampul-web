@@ -3,6 +3,7 @@
 import { useParams, usePathname as useNextPathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { type Locale, defaultLocale, locales } from '@/i18n/config';
 
 // Locale options
@@ -19,6 +20,7 @@ export default function LocaleSelector() {
   const router = useRouter();
   const pathname = useNextPathname();
   const [isPending, startTransition] = useTransition();
+  const t = useTranslations('Common');
 
   // Get locale from URL params, fallback to default
   const currentLocale = (params.locale as Locale) || defaultLocale;
@@ -48,11 +50,17 @@ export default function LocaleSelector() {
 
   return (
     <div className="w-full bg-gray-100 pb-10 flex justify-center">
+      <label htmlFor="locale-selector" className="sr-only">
+        {t('selectLanguage')}
+      </label>
       <select
+        id="locale-selector"
         value={currentLocale}
         onChange={(e) => handleLocaleChange(e.target.value as Locale)}
         className={SELECT_STYLE}
         disabled={isPending}
+        aria-label={t('selectLanguage')}
+        aria-busy={isPending}
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg fill='%23000000' height='24px' width='24px' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 28.769 28.769' xml:space='preserve'%3E%3Cg%3E%3Cg id='c106_arrow'%3E%3Cpath d='M28.678,5.798L14.713,23.499c-0.16,0.201-0.495,0.201-0.658,0L0.088,5.798C-0.009,5.669-0.027,5.501,0.04,5.353 C0.111,5.209,0.26,5.12,0.414,5.12H28.35c0.16,0,0.31,0.089,0.378,0.233C28.798,5.501,28.776,5.669,28.678,5.798z'/%3E%3C/g%3E%3Cg id='Capa_1_26_'%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           backgroundRepeat: 'no-repeat',

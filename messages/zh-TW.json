@@ -1,6 +1,7 @@
 {
   "Common": {
-    "currency": "NT$"
+    "currency": "NT$",
+    "selectLanguage": "選擇語言"
   },
   "HomePage": {
     "heroTitle": "探索希臘神話系列",

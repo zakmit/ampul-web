@@ -1,6 +1,7 @@
 {
   "Common": {
-    "currency": "$"
+    "currency": "$",
+    "selectLanguage": "Select language"
   },
   "HomePage": {
     "heroTitle": "Explore the Greek Mythology Collection",

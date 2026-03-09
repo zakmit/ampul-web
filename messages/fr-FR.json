@@ -1,6 +1,7 @@
 {
   "Common": {
-    "currency": "€"
+    "currency": "€",
+    "selectLanguage": "Choisir la langue"
   },
   "HomePage": {
     "heroTitle": "Explorez la Collection Mythologie Grecque",
