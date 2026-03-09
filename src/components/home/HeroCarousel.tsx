@@ -67,6 +67,7 @@ export default function HeroCarousel({ slides, autoPlayInterval = 10000 }: HeroC
                 fill
                 className="object-cover object-center"
                 priority={currentSlide === 0}
+                fetchPriority={currentSlide === 0 ? 'high' : 'auto'}
               />
             </m.div>
           </AnimatePresence>

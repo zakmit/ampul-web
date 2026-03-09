@@ -231,7 +231,8 @@ export default function NavBar({ showBanner = true,
                         sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
                         className="object-contain"
                         alt="AMPUL"
-                        priority={true}
+                        priority
+                        fetchPriority="high"
                     />
                   </Link>
               </div>

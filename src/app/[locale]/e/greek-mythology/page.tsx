@@ -195,6 +195,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           fill
           className="object-cover object-center"
           priority
+          fetchPriority="high"
         />
       </div>
       <div className="lg:hidden w-full inset-0 flex flex-col text-center px-6">
@@ -214,6 +215,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           fill
           className="object-cover object-center"
           priority
+          fetchPriority="high"
         />
         <div className="absolute inset-0 flex flex-col items-center justify-end text-center px-6 mb-6">
           <h1 className="text-5xl font-bold text-gray-900 mb-4">

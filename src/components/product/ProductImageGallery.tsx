@@ -75,6 +75,7 @@ export default function ProductImageGallery({ images, productName }: ProductImag
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 65vw"
           className="object-cover"
           priority={currentImageIndex === 0}
+          fetchPriority={currentImageIndex === 0 ? 'high' : 'auto'}
         />
       </div>
 

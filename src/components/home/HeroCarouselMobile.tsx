@@ -97,6 +97,7 @@ export default function HeroCarouselMobile({ slides, autoPlayInterval = 5000 }: 
                   fill
                   className="object-cover object-center"
                   priority={currentSlide === 0}
+                  fetchPriority={currentSlide === 0 ? 'high' : 'auto'}
                 />
               </m.div>
             </AnimatePresence>
