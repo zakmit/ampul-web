@@ -280,6 +280,18 @@
       "emptyBag": "Your shopping bag is empty"
     }
   },
+  "OrderEmail": {
+    "preview": "Order {orderNumber} confirmed — thank you for your order.",
+    "greeting": "Hello {name},",
+    "greetingGuest": "Hello,",
+    "body": "Your order has been placed successfully. We'll notify you when it's on its way.",
+    "orderId": "Order ID: {orderNumber}",
+    "freeSample": "Free Sample",
+    "total": "TOTAL",
+    "shipTo": "SHIP TO",
+    "viewOrder": "VIEW ORDER",
+    "footer": "This is a demo store. No real transactions are processed."
+  },
   "CheckoutSuccess": {
     "title": "Order Placed Successfully",
     "orderNumber": "Order Number",

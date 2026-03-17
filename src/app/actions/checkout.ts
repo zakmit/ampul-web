@@ -5,6 +5,7 @@ import { auth } from '@/auth'
 import { getTranslations } from 'next-intl/server'
 import type { Locale } from '@/i18n/config'
 import { localeToMessageFile } from '@/i18n/config'
+import { sendOrderConfirmationEmail } from '@/lib/email'
 
 function getDbLocale(locale: Locale): string {
   return localeToMessageFile[locale] || 'en-US'
@@ -285,6 +286,35 @@ export async function createOrder(
         data: { lastOrderAt: new Date() }
       })
     }
+
+    // Send confirmation email (non-blocking — failure does not affect order result)
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
+    const orderUrl = `${baseUrl}/${locale}/checkout/success?orderId=${order.id}`
+    sendOrderConfirmationEmail(email, {
+      orderNumber: order.orderNumber,
+      orderId: order.id,
+      customerName: user?.name ?? null,
+      recipientName: address.recipientName,
+      recipientPhone: address.recipientPhone || null,
+      shippingLine1: address.addressLine1,
+      shippingLine2: address.addressLine2 || null,
+      shippingCity: address.city,
+      shippingRegion: address.region || null,
+      shippingPostal: address.postalCode,
+      shippingCountry: address.country,
+      items: orderItemsData.map((item) => ({
+        productName: item.productName,
+        productImage: item.productImage,
+        productCategory: item.productCategory,
+        productVolume: item.productVolume ?? null,
+        quantity: item.quantity,
+        price: item.price,
+        isFreeSample: item.isFreeSample,
+      })),
+      total,
+      currency,
+      orderUrl,
+    }, locale)
 
     return { success: true, orderId: order.id, orderNumber: order.orderNumber }
   } catch (error) {

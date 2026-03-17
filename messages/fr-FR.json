@@ -280,6 +280,18 @@
       "emptyBag": "Votre panier est vide"
     }
   },
+  "OrderEmail": {
+    "preview": "Commande {orderNumber} confirmée — merci pour votre commande.",
+    "greeting": "Bonjour {name},",
+    "greetingGuest": "Bonjour,",
+    "body": "Votre commande a été passée avec succès. Nous vous informerons dès qu'elle sera en route.",
+    "orderId": "Commande : {orderNumber}",
+    "freeSample": "Échantillon gratuit",
+    "total": "TOTAL",
+    "shipTo": "EXPÉDIER À",
+    "viewOrder": "VOIR LA COMMANDE",
+    "footer": "Ceci est une boutique de démonstration. Aucune transaction réelle n'est traitée."
+  },
   "CheckoutSuccess": {
     "title": "Commande passée avec succès",
     "orderNumber": "Numéro de commande",

@@ -280,6 +280,18 @@
       "emptyBag": "您的購物袋是空的"
     }
   },
+  "OrderEmail": {
+    "preview": "訂單 {orderNumber} 已確認 — 感謝您的訂購。",
+    "greeting": "您好 {name}，",
+    "greetingGuest": "您好，",
+    "body": "您的訂單已成功送出。我們將在出貨時通知您。",
+    "orderId": "訂單編號：{orderNumber}",
+    "freeSample": "免費樣品",
+    "total": "總計",
+    "shipTo": "收件地址",
+    "viewOrder": "查看訂單",
+    "footer": "本商店為展示用途，不進行實際交易。"
+  },
   "CheckoutSuccess": {
     "title": "訂單已成功送出",
     "orderNumber": "訂單編號",
