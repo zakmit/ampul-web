@@ -1368,7 +1368,7 @@ export default function OrdersClient({ initialOrders, serverActions }: OrdersCli
                     </button>
                     <button
                       onClick={handleApplyFilters}
-                      className="w-36 bg-white text-sm text-gray-900 my-4 py-2 px-4 font-semibold border border-gray-700 hover:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+                      className="w-36 bg-white text-sm text-gray-900 my-4 py-2 px-4 font-semibold border border-gray-700 hover:bg-gray-700 hover:text-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-900"
                     >
                       RESET
                     </button>
