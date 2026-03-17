@@ -311,7 +311,7 @@ export default function NavBar({ showBanner = true,
                       <path d="M8,11.2c0.001,-9.598 8.004,-9.598 8,0" style={{fill: 'none', strokeWidth: '1px', strokeLinecap: 'round'}} />
                   </svg>
                   {totalItems > 0 && (
-                    <span className="absolute top-4.5 right-3.5 lg:top-[21px] lg:right-4.5 bg-gray-900 text-white text-xs font-semibold rounded-full w-3 h-3 flex items-end justify-center">
+                    <span className="absolute top-4.5 right-3.5 lg:top-5.25 lg:right-4.5 bg-gray-900 text-white text-xs font-semibold rounded-full w-3 h-3 flex items-end justify-center">
                       {totalItems}
                     </span>
                   )}
