@@ -246,12 +246,16 @@
     "maxQuantityMessage": "You cannot add more than 10 of the same item to your order."
   },
   "Checkout": {
-    "demoAddressNotice": "*For demo purposes only — please use a fictional address.",
+    "demoAddressNotice": "*For demo purposes only.",
     "title": "Checkout",
     "loading": "Loading...",
     "step1": "1. LOG IN",
     "step2": "2. SHIPPING ADDRESS",
     "step3": "3. REVIEW & PAYMENT",
+    "continueAsGuest": "Continue as Guest",
+    "guestEmail": "Email Address",
+    "guestEmailPlaceholder": "your@email.com",
+    "guestEmailRequired": "Email address is required",
     "useProfileAddress": "Use the address in my information",
     "recipientName": "Recipient Name",
     "phoneNumber": "Phone Number",
@@ -265,7 +269,7 @@
     "subtotal": "Subtotal",
     "shipTo": "SHIP TO",
     "payment": "PAYMENT",
-    "demoNotice": "*for demo purposes",
+    "demoNotice": "*For demo purposes",
     "errors": {
       "recipientNameRequired": "Recipient name is required",
       "addressLine1Required": "Street address is required",

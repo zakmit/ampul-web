@@ -252,6 +252,10 @@
     "step1": "1. 登入",
     "step2": "2. 配送地址",
     "step3": "3. 確認訂單與付款",
+    "continueAsGuest": "以訪客身分繼續",
+    "guestEmail": "電子郵件地址",
+    "guestEmailPlaceholder": "your@email.com",
+    "guestEmailRequired": "電子郵件地址為必填欄位",
     "useProfileAddress": "使用我的資料中的地址",
     "recipientName": "收件人姓名",
     "phoneNumber": "電話號碼",
@@ -272,7 +276,7 @@
       "cityRequired": "城市為必填欄位",
       "postalCodeRequired": "郵遞區號為必填欄位",
       "countryRequired": "國家為必填欄位",
-      "addressValidation": "請檢查您的配送地址並修正錯誤。",
+      "addressValidation": "請檢查您的配送地址並修正錯誤",
       "emptyBag": "您的購物袋是空的"
     }
   },

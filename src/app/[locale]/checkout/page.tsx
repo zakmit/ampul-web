@@ -47,6 +47,9 @@ export default function CheckoutPage() {
     country: '',
   })
 
+  const [guestEmail, setGuestEmail] = useState('')
+  const [guestEmailError, setGuestEmailError] = useState<string | null>(null)
+
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [generalError, setGeneralError] = useState<string | null>(null)
 
@@ -153,6 +156,15 @@ export default function CheckoutPage() {
     return Object.keys(errors).length === 0
   }
 
+  const handleContinueAsGuest = () => {
+    if (!guestEmail.trim()) {
+      setGuestEmailError(t('guestEmailRequired'))
+      return
+    }
+    setGuestEmailError(null)
+    setCurrentStep(2)
+  }
+
   const handleNextFromAddress = () => {
     setGeneralError(null)
     if (validateAddress()) {
@@ -178,7 +190,7 @@ export default function CheckoutPage() {
     }
 
     startTransition(async () => {
-      const result = await createOrder(bagItems, selectedSample, address, locale)
+      const result = await createOrder(bagItems, selectedSample, address, locale, guestEmail || undefined)
 
       if (result.fieldErrors) {
         setFieldErrors(result.fieldErrors)
@@ -219,25 +231,56 @@ export default function CheckoutPage() {
           <h1 className="text-4xl font-bold font-title mb-12">{t('title')}</h1>
           <div className="px-4">
             {generalError && (
-              <div className="mb-6 p-4 bg-red-100 border border-red-200 text-red-700 rounded">
+              <div className="mb-6 p-4 bg-red-100 border border-red-200 text-red-700">
                 {generalError}
               </div>
             )}
 
             {/* Step 1: LOG IN */}
-            <div className="mb-8">
+            <div
+              className={`mb-8 ${status !== 'authenticated' && currentStep > 1 ? 'cursor-pointer' : ''}`}
+              onClick={() => status !== 'authenticated' && currentStep > 1 && setCurrentStep(1)}
+            >
               <h2 className="text-2xl font-bold mb-3">{t('step1')}</h2>
               <div
-                className={`border-gray-500 transition-all ${currentStep === 1 ? 'border' : 'border-t'}`}
+                className={`border-gray-500 overflow-hidden transition-all duration-500 ease-in-out ${currentStep === 1 ? 'border' : 'border-t'}`}
               >
-                {currentStep === 1 ? (
-                  <div className="p-8">
-                    <SignInForm />
-                  </div>
-                ) : (
-                  <div>
-                  </div>
-                )}
+                <AnimatePresence initial={false}>
+                  {currentStep === 1 && (
+                    <m.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.5, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-8">
+                        <SignInForm />
+                        <div className="mt-8 pt-8 border-t border-gray-300">
+                          <div className="space-y-3">
+                            <label className="block text-base font-title italic">{t('guestEmail')}</label>
+                            <input
+                              type="email"
+                              value={guestEmail}
+                              onChange={(e) => { setGuestEmail(e.target.value); setGuestEmailError(null) }}
+                              placeholder={t('guestEmailPlaceholder')}
+                              className={guestEmailError ? INPUT_ERROR_STYLE : INPUT_STYLE}
+                            />
+                            {guestEmailError && <p className="text-sm text-red-700">{guestEmailError}</p>}
+                            <div className="flex justify-center pt-2">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleContinueAsGuest() }}
+                                className="px-16 py-3 font-medium bg-gray-700 text-white hover:bg-gray-900 transition-colors disabled:opacity-50"
+                              >
+                                {t('continueAsGuest')}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </m.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 
@@ -257,18 +300,20 @@ export default function CheckoutPage() {
                       className="overflow-hidden"
                     >
                       <div className="p-8">
-                        <div className="flex items-center gap-2 mb-4">
-                          <input
-                            type="checkbox"
-                            id="use-profile-address"
-                            checked={useProfileAddress}
-                            onChange={(e) => handleUseProfileAddress(e.target.checked)}
-                            className="w-5 h-5 cursor-pointer accent-gray-900"
-                          />
-                          <label htmlFor="use-profile-address" className="text-base cursor-pointer">
-                            {t('useProfileAddress')}
-                          </label>
-                        </div>
+                        {status === 'authenticated' && (
+                          <div className="flex items-center gap-2 mb-4">
+                            <input
+                              type="checkbox"
+                              id="use-profile-address"
+                              checked={useProfileAddress}
+                              onChange={(e) => handleUseProfileAddress(e.target.checked)}
+                              className="w-5 h-5 cursor-pointer accent-gray-900"
+                            />
+                            <label htmlFor="use-profile-address" className="text-base cursor-pointer">
+                              {t('useProfileAddress')}
+                            </label>
+                          </div>
+                        )}
 
                       <div className="grid grid-cols-2 gap-10">
                         {/* Left Column */}
@@ -306,7 +351,7 @@ export default function CheckoutPage() {
                           <div>
                             <div className="mb-2 flex flex-row">
                               <label className="block text-base font-title italic">{t('address')}</label>
-                              <span className="text-xs leading-none italic text-gray-500">{t('demoAddressNotice')}</span>
+                              <span className="pl-2 pt-1 text-xs leading-none italic text-gray-500">{t('demoAddressNotice')}</span>
                             </div>
                             <div className="space-y-4">
                               <div>
@@ -614,26 +659,57 @@ export default function CheckoutPage() {
           </h1>
 
           {generalError && (
-            <div className="mb-6 p-3 bg-red-100 border border-red-200 text-red-700 text-sm rounded">
+            <div className="mb-6 p-3 bg-red-100 border border-red-200 text-red-700 text-sm">
               {generalError}
             </div>
           )}
 
           {/* Step 1: LOG IN */}
-          <div className="mb-6">
+          <div
+            className={`mb-6 ${status !== 'authenticated' && currentStep > 1 ? 'cursor-pointer' : ''}`}
+            onClick={() => status !== 'authenticated' && currentStep > 1 && setCurrentStep(1)}
+          >
             <h2 className="text-lg font-bold mb-3">{t('step1')}</h2>
 
             <div
-              className={`border-gray-500 transition-all ${currentStep === 1 ? 'border' : 'border-t'}`}
+              className={`border-gray-500 overflow-hidden transition-all duration-500 ease-in-out ${currentStep === 1 ? 'border' : 'border-t'}`}
             >
-              {currentStep === 1 ? (
-                <div className="p-6">
-                  <SignInForm />
-                </div>
-              ) : (
-                <div>
-                </div>
-              )}
+              <AnimatePresence initial={false}>
+                {currentStep === 1 && (
+                  <m.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.5, ease: 'easeInOut' }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-6">
+                      <SignInForm />
+                      <div className="mt-6 pt-6 border-t border-gray-300">
+                        <div className="space-y-3">
+                          <label className="block text-base italic">{t('guestEmail')}</label>
+                          <input
+                            type="email"
+                            value={guestEmail}
+                            onChange={(e) => { setGuestEmail(e.target.value); setGuestEmailError(null) }}
+                            placeholder={t('guestEmailPlaceholder')}
+                            className={guestEmailError ? INPUT_ERROR_STYLE : INPUT_STYLE}
+                          />
+                          {guestEmailError && <p className="text-sm text-red-700">{guestEmailError}</p>}
+                          <div className="flex justify-center pt-2">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleContinueAsGuest() }}
+                              className="px-12 py-3 font-medium bg-gray-700 text-white hover:bg-gray-900 transition-colors disabled:opacity-50"
+                            >
+                              {t('continueAsGuest')}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </m.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
@@ -654,18 +730,20 @@ export default function CheckoutPage() {
                 >
                   <div className="p-6">
 
-                  <div className="flex items-center gap-2 mb-6">
-                    <input
-                      type="checkbox"
-                      id="use-profile-address-mobile"
-                      checked={useProfileAddress}
-                      onChange={(e) => handleUseProfileAddress(e.target.checked)}
-                      className="w-4 h-4 cursor-pointer accent-gray-900"
-                    />
-                    <label htmlFor="use-profile-address-mobile" className="text-sm cursor-pointer">
-                      {t('useProfileAddress')}
-                    </label>
-                  </div>
+                  {status === 'authenticated' && (
+                    <div className="flex items-center gap-2 mb-6">
+                      <input
+                        type="checkbox"
+                        id="use-profile-address-mobile"
+                        checked={useProfileAddress}
+                        onChange={(e) => handleUseProfileAddress(e.target.checked)}
+                        className="w-4 h-4 cursor-pointer accent-gray-900"
+                      />
+                      <label htmlFor="use-profile-address-mobile" className="text-sm cursor-pointer">
+                        {t('useProfileAddress')}
+                      </label>
+                    </div>
+                  )}
 
                   <div className="space-y-4">
                     <div>
