@@ -84,7 +84,7 @@ model Address {
 model Order {
   id              String      @id @default(cuid())
   orderNumber     String      @unique @default(cuid())
-  userId          String
+  userId          String?
   customerEmail   String
   customerName    String?
   recipientName   String
@@ -104,7 +104,7 @@ model Order {
   lastFour        String?     @db.Char(4)
   paymentMethod   String      @default("demo")
   currency        String      @default("NT$")
-  user            User        @relation(fields: [userId], references: [id])
+  user            User?       @relation(fields: [userId], references: [id])
   items           OrderItem[]
 
   @@index([createdAt])

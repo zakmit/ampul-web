@@ -1,9 +1,7 @@
-import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getTranslations } from 'next-intl/server'
 import OrderCard from '@/components/product/OrderCard'
-import SignInForm from '@/components/modals/SignInForm'
 import type { Metadata } from 'next'
 
 interface SuccessPageProps {
@@ -27,21 +25,7 @@ export async function generateMetadata({ params }: SuccessPageProps): Promise<Me
 export default async function CheckoutSuccessPage({ params, searchParams }: SuccessPageProps) {
   const { locale } = await params
   const searchParamsData = await searchParams
-  const session = await auth()
   const t = await getTranslations({ locale, namespace: 'CheckoutSuccess' })
-
-  if (!session?.user?.email) {
-    return (
-      <div className="min-h-screen flex items-center justify-center ">
-        <div className="w-full max-w-md lg:max-w-2xl p-8">
-          <h1 className="text-2xl lg:text-4xl font-bold font-title mb-6 pb-2 lg:pb-4 text-center border-b border-gray-900">
-            {t('signInPrompt')}
-          </h1>
-          <SignInForm />
-        </div>
-      </div>
-    )
-  }
 
   if (!searchParamsData.orderId) {
     redirect(`/${locale}/checkout`)
@@ -56,7 +40,7 @@ export default async function CheckoutSuccessPage({ params, searchParams }: Succ
     },
   })
 
-  if (!order || order.customerEmail !== session.user.email) {
+  if (!order) {
     redirect(`/${locale}/checkout`)
   }
 
@@ -105,10 +89,10 @@ export default async function CheckoutSuccessPage({ params, searchParams }: Succ
 
         <div className="text-center">
           <a
-            href={`/${locale}/u/orders`}
+            href={`/${locale}`}
             className="inline-block px-8 py-3 bg-gray-700 text-white hover:bg-gray-900 transition-colors"
           >
-            {t('viewOrders')}
+            {t('continueShopping')}
           </a>
         </div>
       </div>
