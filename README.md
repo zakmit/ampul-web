@@ -28,6 +28,7 @@ AMPUL is a fictional fragrance brand inspired by the concept of ampoules—small
 | **Authentication** | Auth.js (OAuth) |
 | **UI Components** | Hand-crafted components, shadcn/ui |
 | **i18n** | next-intl (EN, FR, ZH-TW) |
+| **Email** | Resend, React Email |
 
 ## Key Features
 
@@ -36,6 +37,8 @@ AMPUL is a fictional fragrance brand inspired by the concept of ampoules—small
 - **Multi-Language Support** - Full internationalization for English, French, and Traditional Chinese
 - **Responsive Design** - Mobile-first approach with distinct mobile/desktop experiences
 - **Multi-Step Checkout** - Animated checkout flow with address validation and locale-specific formatting
+- **Guest Checkout** - Purchase without creating an account; orders linked to account automatically on sign-in
+- **Order Confirmation Email** - Transactional emails via Resend with React Email templates, sent to both guests and registered users
 
 ### Admin Dashboard
 - **Analytics Dashboard** - Revenue and order charts with Recharts
@@ -101,6 +104,7 @@ src/
 - Node.js 18+
 - PostgreSQL database
 - Google OAuth credentials (for authentication)
+- Resend API key (for order confirmation emails)
 
 ### Installation
 
