@@ -283,7 +283,7 @@
   "CheckoutSuccess": {
     "title": "Commande passée avec succès",
     "orderNumber": "Numéro de commande",
-    "viewOrders": "Voir mes commandes",
+    "continueShopping": "Continuer les achats",
     "signInPrompt": "Connectez-vous pour voir votre commande"
   },
   "SearchModal": {

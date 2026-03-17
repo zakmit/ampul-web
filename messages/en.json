@@ -283,7 +283,7 @@
   "CheckoutSuccess": {
     "title": "Order Placed Successfully",
     "orderNumber": "Order Number",
-    "viewOrders": "View My Orders",
+    "continueShopping": "Continue Shopping",
     "signInPrompt": "Sign in to view your order"
   },
   "SearchModal": {

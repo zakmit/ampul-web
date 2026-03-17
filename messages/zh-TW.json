@@ -283,7 +283,7 @@
   "CheckoutSuccess": {
     "title": "訂單已成功送出",
     "orderNumber": "訂單編號",
-    "viewOrders": "查看我的訂單",
+    "continueShopping": "繼續購物",
     "signInPrompt": "登入以查看您的訂單"
   },
   "SearchModal": {
