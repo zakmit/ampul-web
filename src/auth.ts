@@ -12,6 +12,7 @@ declare module "next-auth" {
   interface User {
     role: string
     lastLoginAt: Date | null
+    lastOrderAt: Date | null
   }
 }
 
@@ -19,6 +20,7 @@ declare module "@auth/core/adapters" {
   interface AdapterUser {
     role: string
     lastLoginAt: Date | null
+    lastOrderAt: Date | null
   }
 }
 
@@ -54,10 +56,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       // Link any guest orders placed with this email to the now-authenticated user
-      await prisma.order.updateMany({
+      const guestOrders = await prisma.order.findMany({
         where: { customerEmail: user.email!, userId: null },
-        data: { userId: user.id },
+        select: { id: true, createdAt: true },
       })
+
+      if (guestOrders.length > 0) {
+        await prisma.order.updateMany({
+          where: { id: { in: guestOrders.map((o) => o.id) } },
+          data: { userId: user.id },
+        })
+
+        const latestOrderAt = guestOrders.reduce((latest, o) =>
+          o.createdAt > latest ? o.createdAt : latest,
+          guestOrders[0].createdAt
+        )
+
+        if (!user.lastOrderAt || latestOrderAt > user.lastOrderAt) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { lastOrderAt: latestOrderAt },
+          })
+        }
+      }
 
       return session
     },
