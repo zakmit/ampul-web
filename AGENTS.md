@@ -54,8 +54,11 @@ src/
 │   └── request.ts          # Per-request locale resolution + message loading
 ├── lib/
 │   ├── prisma.ts           # Prisma client singleton with PrismaPg adapter
+│   ├── email.ts            # sendOrderConfirmationEmail() via Resend
 │   ├── formatters.ts       # Data formatters
 │   └── utils.ts            # Utility helpers
+├── emails/
+│   └── OrderConfirmation.tsx  # React Email order confirmation template
 ├── types/                  # Shared TypeScript types
 ├── generated/prisma/       # Generated Prisma client (do not edit)
 └── auth.ts                 # NextAuth config
@@ -190,7 +193,7 @@ import { useRouter, usePathname, Link } from '@/i18n/routing';
 | `Category` / `CategoryTranslation` | Product categories with translations |
 | `Volume` / `VolumeTranslation` | Size variants with translations |
 | `Tag` / `TagTranslation` | Product tags with translations |
-| `Order` | Orders with status enum (PENDING→DELIVERED/CANCELLED etc.) |
+| `Order` | Orders with status enum (PENDING→DELIVERED/CANCELLED etc.); `userId` is optional (guest orders have `userId: null`) |
 
 Dynamic content (products, collections, categories) stores translations in separate `*Translation` tables keyed by locale strings `en-US`, `fr-FR`, `zh-TW` — **not** the URL locale codes.
 
@@ -203,6 +206,7 @@ Server actions live in `actions.ts` files co-located with their feature:
 | File | Actions |
 |------|---------|
 | [src/app/actions/auth.ts](src/app/actions/auth.ts) | `handleSignIn()`, `handleSignOut()` |
+| [src/app/actions/checkout.ts](src/app/actions/checkout.ts) | `getUserAddress()`, `createOrder()` (supports guest checkout via `guestEmail` param) |
 | [src/app/admin/actions.ts](src/app/admin/actions.ts) | `readRecentOrders()`, address updates |
 | [src/app/admin/p/actions.ts](src/app/admin/p/actions.ts) | Product CRUD |
 | [src/app/admin/u/actions.ts](src/app/admin/u/actions.ts) | User management |
@@ -224,6 +228,20 @@ Message keys are organized by namespace in the JSON files:
 | `UserLayout` | User account layout |
 | `SearchModal` | Search modal + API route |
 | `Metadata` | SEO metadata (title, description) |
+| `OrderEmail` | Order confirmation email template (`src/emails/OrderConfirmation.tsx`) |
+
+---
+
+## Guest Checkout
+
+- `createOrder()` in [src/app/actions/checkout.ts](src/app/actions/checkout.ts) accepts an optional `guestEmail` param. When no session exists, the order is created with `userId: null`.
+- On sign-in, [src/auth.ts](src/auth.ts) JWT callback links guest orders (matching email, `userId: null`) to the newly authenticated user.
+- `Order.userId` is nullable in the schema — never assume it's set.
+
+## Email
+
+- [src/lib/email.ts](src/lib/email.ts) exports `sendOrderConfirmationEmail()` — uses Resend + React Email. Requires `RESEND_API_KEY` env var (silently skipped if absent).
+- Template: [src/emails/OrderConfirmation.tsx](src/emails/OrderConfirmation.tsx). Translations live in the `OrderEmail` namespace.
 
 ---
 
