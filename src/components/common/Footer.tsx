@@ -46,7 +46,7 @@ function FooterSection({ title, links }: FooterSectionProps) {
               </Link>
             )
           ):(
-            <span key={index} className="hover:text-gray-500 hover:underline">
+            <span key={index} className="">
               {link.label}
             </span>
           )
@@ -74,8 +74,9 @@ export default function Footer() {
     {
       title: t('connect.title'),
       links: [
-        { label: "Behance", href: 'https://www.behance.net/gallery/242458065/AMPUL-A-concept-driven-digital-experience' },
-        { label: "Linkedin", href: 'https://www.linkedin.com/in/kai-chih-ho-819b853a7/' },
+        // { label: "Behance", href: 'https://www.behance.net/gallery/242458065/AMPUL-A-concept-driven-digital-experience' },
+        // { label: "Linkedin", href: 'https://www.linkedin.com/in/kai-chih-ho-819b853a7/' },
+        { label: "Dashboard", href: '/admin' },
         { label: "Github", href: 'https://github.com/zakmit/ampul-web' },
         { label: "Figma", href: 'https://www.figma.com/design/abDRQowVnEgn9bKCJhXxhI/AMPUL' },
       ],

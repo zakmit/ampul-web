@@ -1,15 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import LanguageSelector, { type Locale } from '@/components/common/LanguageSelector';
+import { INPUT_STYLE, INPUT_ERROR_STYLE } from '@/lib/styles';
 
 // Style constants
-export const INPUT_STYLE = "w-full text-sm px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic";
-export const INPUT_STYLE_ERROR = "w-full text-sm px-4 py-2 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 placeholder:italic";
+export { INPUT_STYLE, INPUT_ERROR_STYLE };
 export const SUBMIT_BUTTON = "max-w-30 bg-gray-900 text-white px-3 py-2 text-base hover:bg-gray-700 transition-colors disabled:opacity-50";
 export const CANCEL_BUTTON = "max-w-30 bg-white text-gray-900 px-3 py-2 text-base border border-gray-900 hover:bg-gray-300 transition-colors disabled:opacity-50";
 export const DELETE_BUTTON = "max-w-30 bg-red-700 text-red-100 px-3 py-2 text-base border border-red-900 hover:bg-red-900 transition-colors disabled:opacity-50";
+
+// Animated expand/collapse wrapper: height 0 <-> auto with a fade.
+// Keep vertical padding on children, not on this wrapper, so the height tween doesn't jump.
+function Expandable({ show, className = '', children }: { show: boolean; className?: string; children: ReactNode }) {
+  const reduceMotion = useReducedMotion();
+  return (
+    <AnimatePresence initial={false}>
+      {show && (
+        <m.div
+          initial={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+          animate={reduceMotion ? { opacity: 1 } : { height: 'auto', opacity: 1 }}
+          exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+          className={`overflow-hidden ${className}`}
+        >
+          {children}
+        </m.div>
+      )}
+    </AnimatePresence>
+  );
+}
 
 // Type definitions
 export type Category = {
@@ -72,10 +94,10 @@ export function CategorySection({
             {categories.length > 1 ? `${categories.length} categories` : `${categories.length} category`}
           </span>
         </div>
-        <ChevronDown className={`w-6 h-6 transition-transform ${expanded ? '' : '-rotate-90'}`} />
+        <ChevronDown className={`w-6 h-6 transition-transform duration-300 ${expanded ? '' : '-rotate-90'}`} />
       </button>
 
-      {expanded && (
+      <Expandable show={expanded}>
         <div className="border-t border-gray-500">
           <div className="mx-4 mb-4 lg:mb-10">
             {/* Mobile */}
@@ -94,7 +116,7 @@ export function CategorySection({
             </div>
             <div className="flex flex-col gap-4 lg:gap-6">
               {/* New Category Form */}
-              {isCreating && (
+              <Expandable show={isCreating}>
                 <div>
                   <button
                     className="w-full px-6 py-6 flex items-center justify-between bg-gray-700 text-white"
@@ -113,7 +135,7 @@ export function CategorySection({
                     />
                   </div>
                 </div>
-              )}
+              </Expandable>
 
               {categories.map((category) => (
                 <div key={category.id}>
@@ -130,12 +152,12 @@ export function CategorySection({
                     }`}
                   >
                     <span className="text-2xl font-title">{category.translations['en-US'].name}</span>
-                    <ChevronRight className={`w-6 h-6 transition-transform ${editingId === category.id ? 'rotate-90' : ''}`} />
+                    <ChevronRight className={`w-6 h-6 transition-transform duration-300 ${editingId === category.id ? 'rotate-90' : ''}`} />
                   </button>
 
                   {/* Mobile Edit Form */}
-                  {editingId === category.id && (
-                    <div className="lg:hidden bg-gray-100 p-6">
+                  <Expandable show={editingId === category.id} className="lg:hidden">
+                    <div className="bg-gray-100 p-6">
                       <CategoryEditForm
                         category={category}
                         onCancel={() => onEdit(null)}
@@ -144,13 +166,13 @@ export function CategorySection({
                         isPending={isPending}
                       />
                     </div>
-                  )}
+                  </Expandable>
                 </div>
               ))}
             </div>
           </div>
         </div>
-      )}
+      </Expandable>
     </div>
   );
 }
@@ -197,10 +219,10 @@ export function TagSection({
             {tags.length > 1 ? `${tags.length} tags` : `${tags.length} tag`}
           </span>
         </div>
-        <ChevronRight className={`w-6 h-6 transition-transform ${expanded ? 'rotate-90' : ''}`} />
+        <ChevronRight className={`w-6 h-6 transition-transform duration-300 ${expanded ? 'rotate-90' : ''}`} />
       </button>
 
-      {expanded && (
+      <Expandable show={expanded}>
         <div className="border-t border-gray-500">
           <div className="mx-4 mb-4 lg:mb-10">
             {/* Mobile */}
@@ -219,7 +241,7 @@ export function TagSection({
             </div>
             <div className="flex flex-col gap-4 lg:gap-6">
               {/* New Tag Form */}
-              {isCreating && (
+              <Expandable show={isCreating}>
                 <div>
                   <button
                     className="w-full px-6 py-6 flex items-center justify-between bg-gray-700 text-white"
@@ -238,7 +260,7 @@ export function TagSection({
                     />
                   </div>
                 </div>
-              )}
+              </Expandable>
 
               {tags.map((tag) => (
                 <div key={tag.id}>
@@ -255,12 +277,12 @@ export function TagSection({
                     }`}
                   >
                     <span className="text-2xl font-title">{tag.translations['en-US'].name}</span>
-                    <ChevronRight className={`w-6 h-6 transition-transform ${editingId === tag.id ? 'rotate-90' : ''}`} />
+                    <ChevronRight className={`w-6 h-6 transition-transform duration-300 ${editingId === tag.id ? 'rotate-90' : ''}`} />
                   </button>
 
                   {/* Mobile Edit Form */}
-                  {editingId === tag.id && (
-                    <div className="lg:hidden bg-gray-100 p-6">
+                  <Expandable show={editingId === tag.id} className="lg:hidden">
+                    <div className="bg-gray-100 p-6">
                       <TagEditForm
                         tag={tag}
                         onCancel={() => onEdit(null)}
@@ -269,13 +291,13 @@ export function TagSection({
                         isPending={isPending}
                       />
                     </div>
-                  )}
+                  </Expandable>
                 </div>
               ))}
             </div>
           </div>
         </div>
-      )}
+      </Expandable>
     </div>
   );
 }
@@ -322,10 +344,10 @@ export function VolumeSection({
             {volumes.length > 1 ? `${volumes.length} volumes` : `${volumes.length} volume`}
           </span>
         </div>
-        <ChevronRight className={`w-6 h-6 transition-transform ${expanded ? 'rotate-90' : ''}`} />
+        <ChevronRight className={`w-6 h-6 transition-transform duration-300 ${expanded ? 'rotate-90' : ''}`} />
       </button>
 
-      {expanded && (
+      <Expandable show={expanded}>
         <div className="border-t border-gray-500">
           <div className="mx-4 mb-4 lg:mb-10">
             {/* Mobile */}
@@ -344,7 +366,7 @@ export function VolumeSection({
             </div>
             <div className="flex flex-col gap-4 lg:gap-6">
               {/* New Volume Form */}
-              {isCreating && (
+              <Expandable show={isCreating}>
                 <div>
                   <button
                     className="w-full px-6 py-6 flex items-center justify-between bg-gray-700 text-white"
@@ -363,7 +385,7 @@ export function VolumeSection({
                     />
                   </div>
                 </div>
-              )}
+              </Expandable>
 
               {volumes.map((volume) => (
                 <div key={volume.id}>
@@ -380,12 +402,12 @@ export function VolumeSection({
                     }`}
                   >
                     <span className="text-2xl font-title">{volume.translations['en-US'].displayName}</span>
-                    <ChevronRight className={`w-6 h-6 transition-transform ${editingId === volume.id ? 'rotate-90' : ''}`} />
+                    <ChevronRight className={`w-6 h-6 transition-transform duration-300 ${editingId === volume.id ? 'rotate-90' : ''}`} />
                   </button>
 
                   {/* Mobile Edit Form */}
-                  {editingId === volume.id && (
-                    <div className="lg:hidden bg-gray-100 p-6">
+                  <Expandable show={editingId === volume.id} className="lg:hidden">
+                    <div className="bg-gray-100 p-6">
                       <VolumeEditForm
                         volume={volume}
                         onCancel={() => onEdit(null)}
@@ -394,13 +416,13 @@ export function VolumeSection({
                         isPending={isPending}
                       />
                     </div>
-                  )}
+                  </Expandable>
                 </div>
               ))}
             </div>
           </div>
         </div>
-      )}
+      </Expandable>
     </div>
   );
 }
@@ -478,7 +500,7 @@ export function CategoryEditForm({
               }
             }}
             placeholder="Address bar will be /c/name"
-            className={validationErrors.slug ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={validationErrors.slug ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending}
           />
         </div>
@@ -514,7 +536,7 @@ export function CategoryEditForm({
               }
             }}
             placeholder="Name appears on the site"
-            className={selectedLocale === 'en-US' && validationErrors.name ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={selectedLocale === 'en-US' && validationErrors.name ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending}
           />
         </div>
@@ -540,7 +562,7 @@ export function CategoryEditForm({
             }}
             placeholder="Description appears below the product"
             rows={4}
-            className={selectedLocale === 'en-US' && validationErrors.description ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={selectedLocale === 'en-US' && validationErrors.description ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending}
           />
         </div>
@@ -649,7 +671,7 @@ export function TagEditForm({
               }
             }}
             placeholder="Unique identifier"
-            className={validationErrors.slug ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={validationErrors.slug ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending}
           />
         </div>
@@ -684,7 +706,7 @@ export function TagEditForm({
               }
             }}
             placeholder="Name appears on the site"
-            className={selectedLocale === 'en-US' && validationErrors.name ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={selectedLocale === 'en-US' && validationErrors.name ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending}
           />
         </div>
@@ -793,7 +815,7 @@ export function VolumeEditForm({
               }
             }}
             placeholder="e.g., 50ml"
-            className={validationErrors.value ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={validationErrors.value ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending}
           />
         </div>
@@ -828,7 +850,7 @@ export function VolumeEditForm({
               }
             }}
             placeholder="Display name for this locale"
-            className={selectedLocale === 'en-US' && validationErrors.displayName ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={selectedLocale === 'en-US' && validationErrors.displayName ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending}
           />
         </div>

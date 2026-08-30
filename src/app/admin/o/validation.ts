@@ -1,4 +1,17 @@
 import { z } from 'zod'
+import type { OrderStatus } from '@/generated/prisma'
+
+// Orders in these states are historical records - reopening one would ship stock
+// that has already been restored, so all edits are blocked.
+export const TERMINAL_ORDER_STATUSES: OrderStatus[] = ['CANCELLED', 'REFUNDED']
+
+export function isOrderLocked(status: OrderStatus): boolean {
+  return TERMINAL_ORDER_STATUSES.includes(status)
+}
+
+export function orderLockedError(status: OrderStatus): string {
+  return `Order is ${status.toLowerCase()} and can no longer be edited`
+}
 
 export const addressUpdateSchema = z.object({
   recipientName: z.string().min(1, 'Recipient name is required').max(100, 'Name is too long'),

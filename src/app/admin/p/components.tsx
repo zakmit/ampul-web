@@ -4,10 +4,12 @@ import { useState, useRef, useEffect } from 'react';
 import { Eye, X } from 'lucide-react';
 import LanguageSelector, { type Locale } from '@/components/common/LanguageSelector';
 import Image from 'next/image';
+import { inputStyle, inputErrorStyle } from '@/lib/styles';
 
 // Style constants
-export const INPUT_STYLE = "min-h-8 w-full lg:w-60 text-sm px-4 py-1 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic";
-export const INPUT_STYLE_ERROR = "min-h-8 w-full lg:w-60 text-sm px-4 py-1 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 placeholder:italic";
+const INPUT_SIZE = "min-h-8 lg:w-60 py-1";
+export const INPUT_STYLE = inputStyle(INPUT_SIZE);
+export const INPUT_ERROR_STYLE = inputErrorStyle(INPUT_SIZE);
 export const SELECT_STYLE = "w-full h-8 lg:w-60 text-sm px-4 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 appearance-none pr-10";
 export const SELECT_STYLE_ERROR = "w-full h-8 lg:w-60 text-sm px-4 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 appearance-none pr-10";
 export const SUBMIT_BUTTON = "max-w-30 bg-gray-900 text-white px-3 py-2 text-base hover:bg-gray-700 transition-colors disabled:opacity-50";
@@ -168,8 +170,9 @@ export type Product = {
   translations: Record<Locale, { name: string; concept: string; sensations: string }>;
   volumes: {
     volumeId: number;
-    prices: Record<Locale, { price: number; stock: number | null }>;
+    prices: Record<Locale, { price: number; stock: number }>;
   }[];
+  sampleInventory: Record<Locale, number>;
   tagIds: number[];
 };
 
@@ -221,11 +224,14 @@ export function ProductEditForm({
       'zh-TW': { name: '', concept: '', sensations: '' },
     }
   );
-  const [volumePrices, setVolumePrices] = useState<Record<number, Record<Locale, { price: number; stock: number | null }>>>(
+  const [volumePrices, setVolumePrices] = useState<Record<number, Record<Locale, { price: number; stock: number }>>>(
     product?.volumes.reduce((acc, v) => {
       acc[v.volumeId] = v.prices;
       return acc;
-    }, {} as Record<number, Record<Locale, { price: number; stock: number | null }>>) || {}
+    }, {} as Record<number, Record<Locale, { price: number; stock: number }>>) || {}
+  );
+  const [sampleInventory, setSampleInventory] = useState<Record<Locale, number>>(
+    product?.sampleInventory || { 'en-US': 30, 'fr-FR': 30, 'zh-TW': 30 }
   );
   const [validationErrors, setValidationErrors] = useState({
     slug: false,
@@ -300,9 +306,9 @@ export function ProductEditForm({
         setVolumePrices({
           ...volumePrices,
           [volumeId]: {
-            'en-US': { price: 0, stock: null },
-            'fr-FR': { price: 0, stock: null },
-            'zh-TW': { price: 0, stock: null },
+            'en-US': { price: 0, stock: 30 },
+            'fr-FR': { price: 0, stock: 30 },
+            'zh-TW': { price: 0, stock: 30 },
           },
         });
       }
@@ -361,11 +367,12 @@ export function ProductEditForm({
       volumes: selectedVolumes.map(volumeId => ({
         volumeId,
         prices: volumePrices[volumeId] || {
-          'en-US': { price: 0, stock: null },
-          'fr-FR': { price: 0, stock: null },
-          'zh-TW': { price: 0, stock: null },
+          'en-US': { price: 0, stock: 30 },
+          'fr-FR': { price: 0, stock: 30 },
+          'zh-TW': { price: 0, stock: 30 },
         },
       })),
+      sampleInventory,
       tagIds: selectedTags,
     });
   };
@@ -576,7 +583,7 @@ export function ProductEditForm({
               }
             }}
             placeholder="Address bar will be /p/name"
-            className={validationErrors.slug ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={validationErrors.slug ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending || isUploading !== null}
           />
         </div>
@@ -859,7 +866,7 @@ export function ProductEditForm({
               }
             }}
             placeholder="Name appears on the site"
-            className={selectedLocale === 'en-US' && validationErrors.name ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={selectedLocale === 'en-US' && validationErrors.name ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending || isUploading !== null}
           />
         </div>
@@ -885,7 +892,7 @@ export function ProductEditForm({
             }}
             placeholder="Description appears below the product"
             rows={3}
-            className={selectedLocale === 'en-US' && validationErrors.concept ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={selectedLocale === 'en-US' && validationErrors.concept ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending || isUploading !== null}
           />
         </div>
@@ -911,7 +918,7 @@ export function ProductEditForm({
             }}
             placeholder="How the costumer will feel?"
             rows={3}
-            className={selectedLocale === 'en-US' && validationErrors.sensations ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={selectedLocale === 'en-US' && validationErrors.sensations ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending || isUploading !== null}
           />
         </div>
@@ -959,6 +966,68 @@ export function ProductEditForm({
             </div>
           </div>
         )}
+
+        {selectedVolumes.length > 0 && (
+          <div className="mx-6 lg:mx-0 lg:flex lg:items-start lg:gap-4">
+            <label className="block lg:w-48 text-sm font-medium mb-2 lg:mb-0 lg:pt-2">
+              Inventory <span className="text-red-600">*</span>
+            </label>
+            <div className="space-y-2 lg:w-60">
+              {selectedVolumes.map(volumeId => {
+                const volume = volumes.find(v => v.id === volumeId);
+                if (!volume) return null;
+                return (
+                  <div key={volumeId} className="flex items-center gap-2 lg:justify-between">
+                    <div className="w-29 h-8 content-center text-sm font-medium bg-gray-200 border border-gray-500 rounded-md px-3 text-center">
+                      {volume.value}
+                    </div>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={volumePrices[volumeId]?.[selectedLocale]?.stock ?? (isNew ? 30 : 0)}
+                      onChange={(e) => {
+                        const stock = Number(e.target.value);
+                        setVolumePrices({
+                          ...volumePrices,
+                          [volumeId]: {
+                            ...volumePrices[volumeId],
+                            [selectedLocale]: {
+                              ...volumePrices[volumeId]?.[selectedLocale],
+                              stock,
+                            },
+                          },
+                        });
+                      }}
+                      aria-label={`${volume.value} inventory for ${selectedLocale}`}
+                      className="min-h-8 w-full lg:w-29 text-sm px-4 py-1 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900"
+                      disabled={isPending || isUploading !== null}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="mx-6 lg:mx-0 lg:flex lg:items-start lg:gap-4">
+          <label className="block lg:w-48 text-sm font-medium mb-2 lg:mb-0 lg:pt-2">
+            Sample inventory <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={sampleInventory[selectedLocale]}
+            onChange={(e) => setSampleInventory({
+              ...sampleInventory,
+              [selectedLocale]: Number(e.target.value),
+            })}
+            aria-label={`Sample inventory for ${selectedLocale}`}
+            className={INPUT_STYLE}
+            disabled={isPending || isUploading !== null}
+          />
+        </div>
 
         {/* Action Buttons */}
         <div className="flex justify-between gap-4 pt-4 px-6 lg:pt-0 lg:mx-0 border-t lg:border-0 border-gray-500">

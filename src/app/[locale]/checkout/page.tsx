@@ -10,11 +10,10 @@ import { useShoppingBag } from '@/components/providers/ShoppingBagProvider'
 import { useLoadingOverlay } from '@/components/providers/LoadingOverlayProvider'
 import { getShoppingBagItems, getAvailableProductsForSample } from '@/app/actions/shoppingBag'
 import { getUserAddress, createOrder, type CheckoutAddress } from '@/app/actions/checkout'
-import type { ShoppingBagItemDetails } from '@/app/actions/shoppingBag'
+import type { SampleOption, ShoppingBagItemDetails } from '@/app/actions/shoppingBag'
 import type { Locale } from '@/i18n/config'
 import SignInForm from '@/components/modals/SignInForm'
-const INPUT_STYLE = "w-full text-sm px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
-const INPUT_ERROR_STYLE = "w-full text-sm px-4 py-2 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 placeholder:italic"
+import { INPUT_STYLE, INPUT_ERROR_STYLE } from '@/lib/styles'
 
 type CheckoutStep = 1 | 2 | 3
 
@@ -31,7 +30,7 @@ export default function CheckoutPage() {
 
   const [currentStep, setCurrentStep] = useState<CheckoutStep>(1)
   const [items, setItems] = useState<ShoppingBagItemDetails[]>([])
-  const [availableProducts, setAvailableProducts] = useState<Array<{ value: string; label: string }>>([])
+  const [availableProducts, setAvailableProducts] = useState<SampleOption[]>([])
   const [dataLoaded, setDataLoaded] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -55,6 +54,7 @@ export default function CheckoutPage() {
 
   // Load shopping bag items and available products
   useEffect(() => {
+    let cancelled = false
     async function loadData() {
       try {
         const [bagItemsData, productsData] = await Promise.all([
@@ -62,22 +62,32 @@ export default function CheckoutPage() {
           getAvailableProductsForSample(locale),
         ])
 
+        if (cancelled) return
         setItems(bagItemsData)
         setAvailableProducts(productsData)
 
-        // Set default sample to first product if none selected
-        if (!selectedSample && productsData.length > 0) {
-          setSelectedSample(productsData[0].value)
+        const selectedOption = productsData.find((product) => product.value === selectedSample)
+        if (selectedOption?.disabled) {
+          setSelectedSample(null)
+          setGeneralError(t('errors.sampleUnavailable'))
+        } else if (!selectedSample) {
+          setSelectedSample(productsData.find((product) => !product.disabled)?.value ?? null)
         }
       } catch (error) {
+        if (cancelled) return
         console.error('Error loading checkout data:', error)
       } finally {
-        setDataLoaded(true)
-        hideLoading() // Hide global loading overlay when data is loaded
+        if (!cancelled) {
+          setDataLoaded(true)
+          hideLoading() // Hide global loading overlay when data is loaded
+        }
       }
     }
 
     loadData()
+    return () => {
+      cancelled = true
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bagItems, locale, hideLoading])
 
@@ -107,6 +117,9 @@ export default function CheckoutPage() {
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const total = subtotal
+  const hasInventoryIssues = items.some((item) => !item.isAvailable)
+  const needsSampleSelection = availableProducts.some((product) => !product.disabled) && !selectedSample
+  const checkoutBlocked = hasInventoryIssues || needsSampleSelection
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -189,6 +202,11 @@ export default function CheckoutPage() {
       return
     }
 
+    if (checkoutBlocked) {
+      setGeneralError(hasInventoryIssues ? t('errors.inventoryUnavailable') : t('errors.sampleUnavailable'))
+      return
+    }
+
     startTransition(async () => {
       const result = await createOrder(bagItems, selectedSample, address, locale, guestEmail || undefined)
 
@@ -197,7 +215,7 @@ export default function CheckoutPage() {
         setGeneralError(t('errors.addressValidation'))
         setCurrentStep(2)
       } else if (result.error) {
-        setGeneralError(result.error)
+        setGeneralError(result.error === 'inventoryUnavailable' ? t('errors.inventoryUnavailable') : result.error)
       } else if (result.success && result.orderId) {
         // Clear the shopping bag
         clearBag()
@@ -493,9 +511,19 @@ export default function CheckoutPage() {
                     <div className="col-span-1 space-y-6">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm italic">{t('freeSample')}</span>
-                        <span className="text-sm italic">
-                          {availableProducts.find((p) => p.value === selectedSample)?.label || t('noSample')}
-                        </span>
+                        <select
+                          value={selectedSample ?? ''}
+                          onChange={(event) => setSelectedSample(event.target.value || null)}
+                          className="text-sm bg-white border-b border-gray-500 focus:outline-none"
+                          aria-label={t('freeSample')}
+                        >
+                          <option value="">{t('noSample')}</option>
+                          {availableProducts.map((product) => (
+                            <option key={product.value} value={product.value} disabled={product.disabled}>
+                              {product.label}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div className="border-b mx-2">
                         <div className="flex justify-between text-base mb-2 -mx-2">
@@ -586,14 +614,14 @@ export default function CheckoutPage() {
                   <div className="flex justify-center gap-4 font-medium mt-8">
                     <button
                       onClick={() => setCurrentStep(2)}
-                      disabled={isPending}
+                      disabled={isPending || checkoutBlocked}
                       className="px-12 py-3 border border-gray-700 text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50"
                     >
                       {t('back')}
                     </button>
                     <button
                       onClick={handlePlaceOrder}
-                      disabled={isPending}
+                      disabled={isPending || checkoutBlocked}
                       className="px-12 py-3 bg-gray-700 text-white hover:bg-gray-900 transition-colors disabled:opacity-50"
                     >
                       {isPending ? t('processing') : t('placeOrder')}
@@ -633,7 +661,19 @@ export default function CheckoutPage() {
             <div className="flex justify-between items-center text-sm italic">
               <span>{t('freeSample')}</span>
               <span>
-                {availableProducts.find((p) => p.value === selectedSample)?.label || t('noSample')}
+                <select
+                  value={selectedSample ?? ''}
+                  onChange={(event) => setSelectedSample(event.target.value || null)}
+                  className="text-sm bg-white border-b border-gray-500 focus:outline-none"
+                  aria-label={t('freeSample')}
+                >
+                  <option value="">{t('noSample')}</option>
+                  {availableProducts.map((product) => (
+                    <option key={product.value} value={product.value} disabled={product.disabled}>
+                      {product.label}
+                    </option>
+                  ))}
+                </select>
               </span>
             </div>
           </div>
@@ -916,7 +956,19 @@ export default function CheckoutPage() {
                     <div className="flex justify-between items-center text-sm italic">
                       <span>{t('freeSample')}</span>
                       <span>
-                        {availableProducts.find((p) => p.value === selectedSample)?.label || t('noSample')}
+                        <select
+                          value={selectedSample ?? ''}
+                          onChange={(event) => setSelectedSample(event.target.value || null)}
+                          className="text-sm bg-white border-b border-gray-500 focus:outline-none"
+                          aria-label={t('freeSample')}
+                        >
+                          <option value="">{t('noSample')}</option>
+                          {availableProducts.map((product) => (
+                            <option key={product.value} value={product.value} disabled={product.disabled}>
+                              {product.label}
+                            </option>
+                          ))}
+                        </select>
                       </span>
                     </div>
                   </div>

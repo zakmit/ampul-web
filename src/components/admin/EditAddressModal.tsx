@@ -1,8 +1,9 @@
 'use client';
 import { X } from 'lucide-react'
+import { inputStyle, inputErrorStyle } from '@/lib/styles';
 
-const INPUT_STYLE = "w-full text-sm px-2 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic";
-const INPUT_ERROR_STYLE = "w-full text-sm px-2 py-2 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 placeholder:italic";
+const INPUT_STYLE = inputStyle("px-2");
+const INPUT_ERROR_STYLE = inputErrorStyle("px-2");
 
 export interface AddressData {
   recipientName?: string;

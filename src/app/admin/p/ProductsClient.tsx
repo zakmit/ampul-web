@@ -225,6 +225,7 @@ export default function ProductsClient({
         galleryImages: newProduct.galleryImages,
         translations,
         volumes,
+        sampleInventory: Object.entries(newProduct.sampleInventory).map(([locale, stock]) => ({ locale, stock })),
         tagIds: newProduct.tagIds,
       });
 
@@ -271,6 +272,7 @@ export default function ProductsClient({
         galleryImages: updatedProduct.galleryImages,
         translations,
         volumes,
+        sampleInventory: Object.entries(updatedProduct.sampleInventory).map(([locale, stock]) => ({ locale, stock })),
         tagIds: updatedProduct.tagIds,
       }, originalImages || undefined);
 

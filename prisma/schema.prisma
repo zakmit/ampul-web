@@ -82,30 +82,31 @@ model Address {
 }
 
 model Order {
-  id              String      @id @default(cuid())
-  orderNumber     String      @unique @default(cuid())
-  userId          String?
-  customerEmail   String
-  customerName    String?
-  recipientName   String
-  recipientPhone  String?
-  shippingLine1   String
-  shippingLine2   String?
-  shippingCity    String
-  shippingRegion  String?
-  shippingPostal  String
-  shippingCountry String
-  trackingCode    String?
-  total           Decimal     @db.Decimal(10, 2)
-  status          OrderStatus @default(PENDING)
-  notes           String?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  lastFour        String?     @db.Char(4)
-  paymentMethod   String      @default("demo")
-  currency        String      @default("NT$")
-  user            User?       @relation(fields: [userId], references: [id])
-  items           OrderItem[]
+  id                  String      @id @default(cuid())
+  orderNumber         String      @unique @default(cuid())
+  userId              String?
+  customerEmail       String
+  customerName        String?
+  recipientName       String
+  recipientPhone      String?
+  shippingLine1       String
+  shippingLine2       String?
+  shippingCity        String
+  shippingRegion      String?
+  shippingPostal      String
+  shippingCountry     String
+  trackingCode        String?
+  total               Decimal     @db.Decimal(10, 2)
+  status              OrderStatus @default(PENDING)
+  notes               String?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  lastFour            String?     @db.Char(4)
+  paymentMethod       String      @default("demo")
+  currency            String      @default("NT$")
+  inventoryRestoredAt DateTime?
+  user                User?       @relation(fields: [userId], references: [id])
+  items               OrderItem[]
 
   @@index([createdAt])
   @@index([customerEmail])
@@ -114,19 +115,21 @@ model Order {
 }
 
 model OrderItem {
-  id              String   @id @default(cuid())
-  orderId         String
-  productId       String?
-  productName     String
-  productImage    String?
-  productSlug     String
-  productCategory String
-  productVolume   String?
-  quantity        Int
-  price           Decimal  @db.Decimal(10, 2)
-  isFreeSample    Boolean  @default(false)
-  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product         Product? @relation(fields: [productId], references: [id])
+  id                String   @id @default(cuid())
+  orderId           String
+  productId         String?
+  productName       String
+  productImage      String?
+  productSlug       String
+  productCategory   String
+  productVolume     String?
+  quantity          Int
+  price             Decimal  @db.Decimal(10, 2)
+  isFreeSample      Boolean  @default(false)
+  inventoryLocale   String?
+  inventoryVolumeId Int?
+  order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product           Product? @relation(fields: [productId], references: [id])
 
   @@index([orderId])
   @@index([productId])
@@ -189,7 +192,7 @@ model ProductVolume {
   volumeId  Int
   locale    String
   price     Decimal @db.Decimal(10, 2)
-  stock     Int?
+  stock     Int     @default(30)
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   volume    Volume  @relation(fields: [volumeId], references: [id], onDelete: Cascade)
 
@@ -197,24 +200,34 @@ model ProductVolume {
 }
 
 model Product {
-  id             String               @id @default(cuid())
-  slug           String               @unique
-  categoryId     Int
-  collectionId   Int
-  coverImage1x1  String
-  coverImage16x9 String
-  productImage   String
-  boxImage       String
-  galleryImages  String[]             @default([])
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
-  isDeleted      Boolean              @default(false)
-  orderItems     OrderItem[]
-  category       Category             @relation(fields: [categoryId], references: [id])
-  collection     Collection           @relation(fields: [collectionId], references: [id])
-  tags           ProductTag[]
-  translations   ProductTranslation[]
-  volumes        ProductVolume[]
+  id              String                   @id @default(cuid())
+  slug            String                   @unique
+  categoryId      Int
+  collectionId    Int
+  coverImage1x1   String
+  coverImage16x9  String
+  productImage    String
+  boxImage        String
+  galleryImages   String[]                 @default([])
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  isDeleted       Boolean                  @default(false)
+  orderItems      OrderItem[]
+  category        Category                 @relation(fields: [categoryId], references: [id])
+  collection      Collection               @relation(fields: [collectionId], references: [id])
+  tags            ProductTag[]
+  translations    ProductTranslation[]
+  volumes         ProductVolume[]
+  sampleInventory ProductSampleInventory[]
+}
+
+model ProductSampleInventory {
+  productId String
+  locale    String
+  stock     Int     @default(30)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([productId, locale])
 }
 
 model ProductTranslation {

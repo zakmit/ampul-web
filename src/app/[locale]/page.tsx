@@ -132,14 +132,14 @@ export default async function HomePage({ params }: HomePageProps) {
   ];
 
   return (
-    <div className="max-w-400 w-full mx-auto">
+    <div className="max-w-600 w-full mx-auto">
       {/* Hero Section with Carousel */}
       {/* Mobile */}
       <section className="lg:hidden">
         <HeroCarouselMobile slides={heroSlides} />
       </section>
       {/* Desktop */}
-      <section className="hidden lg:block relative lg:w-full lg:h-[42.86dvw] max-w-400 max-h-171.5">
+      <section className="hidden lg:block relative lg:w-full lg:h-[42.86dvw] max-w-600 max-h-171.5">
         <HeroCarousel slides={heroSlides} />
       </section>
 

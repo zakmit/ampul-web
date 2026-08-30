@@ -1,8 +1,10 @@
 'use client';
 import { X } from 'lucide-react'
+import { inputStyle, inputErrorStyle } from '@/lib/styles';
 
-const INPUT_STYLE = "w-full text-sm sm:text-base px-2 py-1 sm:px-4 sm:py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic";
-const INPUT_ERROR_STYLE = "w-full text-sm sm:text-base px-2 py-1 sm:px-4 sm:py-2 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 placeholder:italic";
+const INPUT_SIZE = "sm:text-base px-2 py-1 sm:px-4 sm:py-2";
+const INPUT_STYLE = inputStyle(INPUT_SIZE);
+const INPUT_ERROR_STYLE = inputErrorStyle(INPUT_SIZE);
 
 export interface UserInfoData {
   name: string;

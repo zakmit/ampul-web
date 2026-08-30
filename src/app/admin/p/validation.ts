@@ -85,8 +85,12 @@ const ProductVolumeSchema = z.object({
     .number()
     .int('Stock must be an integer')
     .min(MIN_STOCK, `Stock must be at least ${MIN_STOCK}`)
-    .max(MAX_STOCK, `Stock must not exceed ${MAX_STOCK}`)
-    .nullable(),
+    .max(MAX_STOCK, `Stock must not exceed ${MAX_STOCK}`),
+})
+
+const ProductSampleInventorySchema = z.object({
+  locale: z.enum(SUPPORTED_LOCALES),
+  stock: z.number().int().min(MIN_STOCK).max(MAX_STOCK),
 })
 
 // Schema for image URL validation
@@ -166,6 +170,10 @@ export const CreateProductSchema = z.object({
       },
       'Duplicate volume-locale combinations are not allowed'
     ),
+  sampleInventory: z
+    .array(ProductSampleInventorySchema)
+    .length(SUPPORTED_LOCALES.length, 'Sample inventory is required for every locale')
+    .refine((rows) => new Set(rows.map((row) => row.locale)).size === rows.length, 'Duplicate sample locales are not allowed'),
   tagIds: z
     .array(z.number().int('Tag ID must be an integer').positive('Tag ID must be positive'))
     .max(20, 'Maximum 20 tags allowed')

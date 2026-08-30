@@ -4,11 +4,16 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { getTranslations } from 'next-intl/server'
 import type { Locale } from '@/i18n/config'
-import { localeToMessageFile } from '@/i18n/config'
 import { sendOrderConfirmationEmail } from '@/lib/email'
+import {
+  decrementRegularInventory,
+  decrementSampleInventory,
+  InventoryUnavailableError,
+  localeToDbLocale,
+} from '@/lib/inventory'
 
 function getDbLocale(locale: Locale): string {
-  return localeToMessageFile[locale] || 'en-US'
+  return localeToDbLocale[locale]
 }
 
 export interface CheckoutAddress {
@@ -95,6 +100,15 @@ export async function createOrder(
     return { error: 'Your shopping bag is empty' }
   }
 
+  const normalizedItems = Array.from(
+    items.reduce((acc, item) => {
+      const key = `${item.productId}:${item.volumeId}`
+      const existing = acc.get(key)
+      acc.set(key, { ...item, quantity: (existing?.quantity ?? 0) + item.quantity })
+      return acc
+    }, new Map<string, { productId: string; volumeId: number; quantity: number }>()).values()
+  )
+
   const dbLocale = getDbLocale(locale)
   const fallbackLocale = 'en-US'
 
@@ -103,194 +117,138 @@ export async function createOrder(
   const currency = tCommon('currency')
 
   try {
-    const user = session?.user?.email
-      ? await prisma.user.findUnique({ where: { email: session.user.email } })
-      : null
-
-    // Fetch product details
-    const productIds = items.map((item) => item.productId)
-    const products = await prisma.product.findMany({
-      where: {
-        id: { in: productIds },
-        isDeleted: false,
-      },
-      include: {
-        translations: {
-          where: {
-            locale: { in: [dbLocale, fallbackLocale] },
-          },
-        },
-        category: {
-          include: {
-            translations: {
-              where: {
-                locale: { in: [dbLocale, fallbackLocale] },
-              },
-            },
-          },
-        },
-        volumes: {
-          where: {
-            locale: { in: [dbLocale, fallbackLocale] },
-          },
-          include: {
-            volume: {
-              include: {
-                translations: {
-                  where: {
-                    locale: { in: [dbLocale, fallbackLocale] },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    })
-
-    // Calculate total and prepare order items
-    let total = 0
-    const orderItemsData: Array<{
-      productId: string
-      productName: string
-      productImage: string
-      productSlug: string
-      productCategory: string
-      productVolume?: string | null
-      quantity: number
-      price: number
-      isFreeSample: boolean
-    }> = []
-
-    for (const item of items) {
-      const product = products.find((p) => p.id === item.productId)
-      if (!product) continue
-
-      const translation =
-        product.translations.find((t) => t.locale === dbLocale) ||
-        product.translations.find((t) => t.locale === fallbackLocale)
-
-      const categoryTranslation =
-        product.category.translations.find((t) => t.locale === dbLocale) ||
-        product.category.translations.find((t) => t.locale === fallbackLocale)
-
-      let volumeData = product.volumes.find(
-        (v) => v.volumeId === item.volumeId && v.locale === dbLocale
-      )
-      if (!volumeData) {
-        volumeData = product.volumes.find(
-          (v) => v.volumeId === item.volumeId && v.locale === fallbackLocale
-        )
-      }
-
-      if (!translation || !volumeData) continue
-
-      const volumeTranslation =
-        volumeData.volume.translations.find((t) => t.locale === dbLocale) ||
-        volumeData.volume.translations.find((t) => t.locale === fallbackLocale)
-
-      const price = Number(volumeData.price)
-      total += price * item.quantity
-
-      orderItemsData.push({
-        productId: product.id,
-        productName: translation.name,
-        productImage: product.productImage,
-        productSlug: product.slug,
-        productCategory: categoryTranslation?.name || '',
-        productVolume: volumeTranslation?.displayName || volumeData.volume.value,
-        quantity: item.quantity,
-        price: price,
-        isFreeSample: false,
-      })
-    }
-
-    // Add free sample if selected
-    if (selectedSample) {
-      const sampleProduct = await prisma.product.findUnique({
-        where: { slug: selectedSample },
+    const result = await prisma.$transaction(async (tx) => {
+      const user = session?.user?.email
+        ? await tx.user.findUnique({ where: { email: session.user.email } })
+        : null
+      const productIds = [...new Set(normalizedItems.map((item) => item.productId))]
+      const products = await tx.product.findMany({
+        where: { id: { in: productIds }, isDeleted: false },
         include: {
-          translations: {
-            where: {
-              locale: { in: [dbLocale, fallbackLocale] },
-            },
-          },
-          category: {
-            include: {
-              translations: {
-                where: {
-                  locale: { in: [dbLocale, fallbackLocale] },
-                },
-              },
-            },
+          translations: { where: { locale: { in: [dbLocale, fallbackLocale] } } },
+          category: { include: { translations: { where: { locale: { in: [dbLocale, fallbackLocale] } } } } },
+          volumes: {
+            where: { locale: dbLocale },
+            include: { volume: { include: { translations: { where: { locale: { in: [dbLocale, fallbackLocale] } } } } } },
           },
         },
       })
 
-      if (sampleProduct) {
-        const translation =
-          sampleProduct.translations.find((t) => t.locale === dbLocale) ||
-          sampleProduct.translations.find((t) => t.locale === fallbackLocale)
+      let total = 0
+      const orderItemsData: Array<{
+        productId: string
+        productName: string
+        productImage: string
+        productSlug: string
+        productCategory: string
+        productVolume: string | null
+        quantity: number
+        price: number
+        isFreeSample: boolean
+        inventoryLocale: string
+        inventoryVolumeId: number | null
+      }> = []
 
-        const categoryTranslation =
-          sampleProduct.category.translations.find((t) => t.locale === dbLocale) ||
-          sampleProduct.category.translations.find((t) => t.locale === fallbackLocale)
-
-        if (translation) {
-          orderItemsData.push({
-            productId: sampleProduct.id,
-            productName: translation.name,
-            productImage: sampleProduct.productImage,
-            productSlug: sampleProduct.slug,
-            productCategory: categoryTranslation?.name || '',
-            productVolume: null,
-            quantity: 1,
-            price: 0,
-            isFreeSample: true,
-          })
+      for (const item of normalizedItems) {
+        const product = products.find((candidate) => candidate.id === item.productId)
+        const volumeData = product?.volumes.find((volume) => volume.volumeId === item.volumeId)
+        if (!product || !volumeData || item.quantity < 1 || item.quantity > 10) {
+          throw new InventoryUnavailableError([{
+            productId: item.productId,
+            volumeId: item.volumeId,
+            requested: item.quantity,
+            available: volumeData?.stock ?? 0,
+            isFreeSample: false,
+          }])
         }
-      }
-    }
 
-    // Create the order
-    const order = await prisma.order.create({
-      data: {
-        userId: user?.id,
-        customerEmail: email,
-        customerName: user?.name ?? null,
-        recipientName: address.recipientName,
-        recipientPhone: address.recipientPhone || null,
-        shippingLine1: address.addressLine1,
-        shippingLine2: address.addressLine2 || null,
-        shippingCity: address.city,
-        shippingRegion: address.region || null,
-        shippingPostal: address.postalCode,
-        shippingCountry: address.country,
-        paymentMethod: 'demo',
-        total: total,
-        currency: currency,
-        status: 'PENDING',
-        items: {
-          create: orderItemsData,
+        await decrementRegularInventory(tx, { ...item, locale: dbLocale })
+        const translation = product.translations.find((entry) => entry.locale === dbLocale)
+          ?? product.translations.find((entry) => entry.locale === fallbackLocale)
+        const categoryTranslation = product.category.translations.find((entry) => entry.locale === dbLocale)
+          ?? product.category.translations.find((entry) => entry.locale === fallbackLocale)
+        const volumeTranslation = volumeData.volume.translations.find((entry) => entry.locale === dbLocale)
+          ?? volumeData.volume.translations.find((entry) => entry.locale === fallbackLocale)
+        const price = Number(volumeData.price)
+        total += price * item.quantity
+        orderItemsData.push({
+          productId: product.id,
+          productName: translation?.name ?? product.slug,
+          productImage: product.productImage,
+          productSlug: product.slug,
+          productCategory: categoryTranslation?.name ?? '',
+          productVolume: volumeTranslation?.displayName ?? volumeData.volume.value,
+          quantity: item.quantity,
+          price,
+          isFreeSample: false,
+          inventoryLocale: dbLocale,
+          inventoryVolumeId: item.volumeId,
+        })
+      }
+
+      if (selectedSample) {
+        const sampleProduct = await tx.product.findUnique({
+          where: { slug: selectedSample, isDeleted: false },
+          include: {
+            translations: { where: { locale: { in: [dbLocale, fallbackLocale] } } },
+            category: { include: { translations: { where: { locale: { in: [dbLocale, fallbackLocale] } } } } },
+          },
+        })
+        if (!sampleProduct) {
+          throw new InventoryUnavailableError([{ productId: selectedSample, volumeId: null, requested: 1, available: 0, isFreeSample: true }])
+        }
+        await decrementSampleInventory(tx, { productId: sampleProduct.id, locale: dbLocale })
+        const translation = sampleProduct.translations.find((entry) => entry.locale === dbLocale)
+          ?? sampleProduct.translations.find((entry) => entry.locale === fallbackLocale)
+        const categoryTranslation = sampleProduct.category.translations.find((entry) => entry.locale === dbLocale)
+          ?? sampleProduct.category.translations.find((entry) => entry.locale === fallbackLocale)
+        orderItemsData.push({
+          productId: sampleProduct.id,
+          productName: translation?.name ?? sampleProduct.slug,
+          productImage: sampleProduct.productImage,
+          productSlug: sampleProduct.slug,
+          productCategory: categoryTranslation?.name ?? '',
+          productVolume: null,
+          quantity: 1,
+          price: 0,
+          isFreeSample: true,
+          inventoryLocale: dbLocale,
+          inventoryVolumeId: null,
+        })
+      }
+
+      const order = await tx.order.create({
+        data: {
+          userId: user?.id,
+          customerEmail: email,
+          customerName: user?.name ?? null,
+          recipientName: address.recipientName,
+          recipientPhone: address.recipientPhone || null,
+          shippingLine1: address.addressLine1,
+          shippingLine2: address.addressLine2 || null,
+          shippingCity: address.city,
+          shippingRegion: address.region || null,
+          shippingPostal: address.postalCode,
+          shippingCountry: address.country,
+          paymentMethod: 'demo',
+          total,
+          currency,
+          status: 'PENDING',
+          items: { create: orderItemsData },
         },
-      },
-      include: {
-        items: true,
-      },
+      })
+      if (user) {
+        await tx.user.update({ where: { id: user.id }, data: { lastOrderAt: new Date() } })
+      }
+      return { order, user, orderItemsData, total }
     })
 
-    // Update user's lastOrderAt timestamp (skip for guest orders)
-    if (user) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { lastOrderAt: new Date() }
-      })
-    }
+    const { order, user, orderItemsData, total } = result
 
     // Send confirmation email (non-blocking — failure does not affect order result)
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
     const orderUrl = `${baseUrl}/${locale}/checkout/success?orderId=${order.id}`
-    sendOrderConfirmationEmail(email, {
+    void sendOrderConfirmationEmail(email, {
       orderNumber: order.orderNumber,
       orderId: order.id,
       customerName: user?.name ?? null,
@@ -318,6 +276,9 @@ export async function createOrder(
 
     return { success: true, orderId: order.id, orderNumber: order.orderNumber }
   } catch (error) {
+    if (error instanceof InventoryUnavailableError) {
+      return { error: 'inventoryUnavailable', inventoryIssues: error.issues }
+    }
     console.error('Error creating order:', error)
     return { error: 'Failed to create order. Please try again.' }
   }

@@ -96,6 +96,12 @@
     "sensations": "Sensations",
     "freeSample": "*Un échantillon gratuit de votre choix avec chaque commande",
     "exploreCollection": "Explorez la collection",
+    "inventory": {
+      "inStock": "En stock",
+      "lowStock": "Plus que {count} en stock",
+      "outOfStock": "Rupture de stock",
+      "checkFailed": "Impossible de vérifier le stock. Veuillez réessayer."
+    },
     "infoSections": {
       "delivery": {
         "title": "Livraison",
@@ -237,6 +243,12 @@
     "title": "Panier",
     "emptyMessage": "Votre panier est vide.",
     "freeSample": "Échantillon gratuit",
+    "selectSample": "Choisir un échantillon",
+    "inventory": {
+      "inStock": "En stock",
+      "lowStock": "Plus que {count} en stock",
+      "outOfStock": "Rupture de stock"
+    },
     "subtotal": "Sous-total",
     "checkout": "PASSER À LA CAISSE"
   },
@@ -276,8 +288,10 @@
       "cityRequired": "La ville est requise",
       "postalCodeRequired": "Le code postal est requis",
       "countryRequired": "Le pays est requis",
-      "addressValidation": "Veuillez vérifier votre adresse de livraison et corriger les erreurs.",
-      "emptyBag": "Votre panier est vide"
+      "addressValidation": "Veuillez vérifier votre adresse",
+      "emptyBag": "Votre panier est vide",
+      "inventoryUnavailable": "Certains articles ne sont plus disponibles dans la quantité demandée. Modifiez votre panier et réessayez.",
+      "sampleUnavailable": "L’échantillon sélectionné n’est plus disponible. Veuillez en choisir un autre."
     }
   },
   "OrderEmail": {

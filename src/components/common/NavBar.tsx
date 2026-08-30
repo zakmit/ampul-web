@@ -179,12 +179,12 @@ export default function NavBar({ showBanner = true,
                   <button
                   type="button"
                   onClick={() => {
-                    setIsMobileNavVisible(true);
+                    setIsMobileNavVisible((prev) => !prev);
                     setIsSignInModalOpen(false);
                     setIsShoppingBagOpen(false);
                     setIsSearchModalOpen(false);
                   }}
-                  className="inline-flex items-center justify-center rounded-md p-1 text-gray-700"
+                  className="inline-flex items-center justify-center p-1 text-gray-700 cursor-pointer rounded-full hover:bg-gray-200/60"
                   >
                   <span className="sr-only">{t('openMenu')}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'round', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
@@ -206,11 +206,11 @@ export default function NavBar({ showBanner = true,
                   setIsMobileNavVisible(false);
                   setIsSignInModalOpen(false);
                   setIsShoppingBagOpen(false);
-                  setIsSearchModalOpen(true);
+                  setIsSearchModalOpen((prev) => !prev);
                 }}
                 onMouseEnter={() => setIsDropdownVisible(false)}
 
-                className="inline-flex lg:hidden items-center justify-center rounded-md p-1 text-gray-900"
+                className="inline-flex lg:hidden items-center justify-center p-1 text-gray-900 cursor-pointer rounded-full hover:bg-gray-200/60"
                 >
                 <span className="sr-only">{t('search')}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'square', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
@@ -256,10 +256,10 @@ export default function NavBar({ showBanner = true,
                     setIsMobileNavVisible(false);
                     setIsSignInModalOpen(false);
                     setIsShoppingBagOpen(false);
-                    setIsSearchModalOpen(true);
+                    setIsSearchModalOpen((prev) => !prev);
                   }}
                   onMouseEnter={() => setIsDropdownVisible(false)}
-                  className="hidden lg:inline-flex items-center justify-center rounded-md p-2 text-gray-900"
+                  className="hidden lg:inline-flex items-center justify-center m-1 p-1 text-gray-900 cursor-pointer rounded-full hover:bg-gray-200/60"
                   >
                     <span className="sr-only">{t('search')}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'square', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
@@ -277,11 +277,11 @@ export default function NavBar({ showBanner = true,
                   onClick={() => {
                     setIsMobileNavVisible(false);
                     setIsSearchModalOpen(false);
-                    setIsSignInModalOpen(true);
+                    setIsSignInModalOpen((prev) => !prev);
                     setIsShoppingBagOpen(false);
                   }}
                   onMouseEnter={() => setIsDropdownVisible(false)}
-                  className="inline-flex items-center justify-center rounded-md p-1 lg:p-2 text-gray-900"
+                  className="inline-flex items-center justify-center p-1 lg:m-1 lg:p-1 text-gray-900 cursor-pointer rounded-full hover:bg-gray-200/60"
                   >
                     <span className="sr-only">{t('user')}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={16} stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'round', strokeLinejoin: 'round', strokeMiterlimit: 1.5 }}>
@@ -297,13 +297,13 @@ export default function NavBar({ showBanner = true,
                   <button
                   type="button"
                   onClick={() => {
-                    setIsShoppingBagOpen(true);
+                    setIsShoppingBagOpen((prev) => !prev);
                     setIsMobileNavVisible(false);
                     setIsSignInModalOpen(false);
                     setIsSearchModalOpen(false);
                   }}
                   onMouseEnter={() => setIsDropdownVisible(false)}
-                  className="inline-flex items-center justify-center rounded-md p-1 lg:p-2 text-gray-900 relative"
+                  className="inline-flex items-center justify-center p-1 lg:m-1 lg:p-1 text-gray-900 relative cursor-pointer rounded-full hover:bg-gray-200/60"
                   >
                   <span className="sr-only">{t('shoppingBag')}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="size-8" style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeLinecap: 'square', strokeMiterlimit: 1.5 }}>

@@ -36,7 +36,7 @@ export type ProductDetailData = {
     value: string
     displayName: string
     price: number
-    stock: number | null
+    stock: number
   }[]
   tags: {
     id: number
@@ -114,13 +114,9 @@ export const getProductBySlug = cache(async (slug: string, locale: Locale = 'us'
     const currentCollectionTranslation = product.collection.translations.find(t => t.locale === dbLocale)
     const fallbackCollectionTranslation = product.collection.translations.find(t => t.locale === fallbackDbLocale)
 
-    // Transform volumes data
-    // First, get volumes for current locale, then fallback to en-US if needed
+    // Inventory and pricing are strict to the active locale.
     const currentLocaleVolumes = product.volumes.filter(pv => pv.locale === dbLocale)
-    const fallbackLocaleVolumes = product.volumes.filter(pv => pv.locale === fallbackDbLocale)
-
-    // Combine with current locale taking priority
-    const volumesToUse = currentLocaleVolumes.length > 0 ? currentLocaleVolumes : fallbackLocaleVolumes
+    const volumesToUse = currentLocaleVolumes
 
     const volumes = volumesToUse.map(pv => {
       const volumeTranslation = pv.volume.translations.find(t => t.locale === dbLocale)

@@ -96,6 +96,12 @@
     "sensations": "感受",
     "freeSample": "*每筆訂單均附贈您所選擇的免費樣品",
     "exploreCollection": "探索系列",
+    "inventory": {
+      "inStock": "有庫存",
+      "lowStock": "庫存僅剩 {count} 件",
+      "outOfStock": "缺貨",
+      "checkFailed": "無法確認庫存，請再試一次。"
+    },
     "infoSections": {
       "delivery": {
         "title": "配送",
@@ -237,6 +243,12 @@
     "title": "購物袋",
     "emptyMessage": "您的購物袋是空的。",
     "freeSample": "免費樣品",
+    "selectSample": "選擇樣品",
+    "inventory": {
+      "inStock": "有庫存",
+      "lowStock": "庫存僅剩 {count} 件",
+      "outOfStock": "缺貨"
+    },
     "subtotal": "小計",
     "checkout": "前往結帳"
   },
@@ -276,8 +288,10 @@
       "cityRequired": "城市為必填欄位",
       "postalCodeRequired": "郵遞區號為必填欄位",
       "countryRequired": "國家為必填欄位",
-      "addressValidation": "請檢查您的配送地址並修正錯誤",
-      "emptyBag": "您的購物袋是空的"
+      "addressValidation": "請檢查您的地址",
+      "emptyBag": "您的購物袋是空的",
+      "inventoryUnavailable": "部分商品已無法提供您選擇的數量，請更新購物袋後再試一次。",
+      "sampleUnavailable": "您選擇的樣品已缺貨，請選擇其他樣品。"
     }
   },
   "OrderEmail": {

@@ -1,9 +1,16 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { restoreOrderInventory } from '@/lib/inventory'
 import { auth } from '@/auth'
 import { Prisma, OrderStatus } from '@/generated/prisma'
-import { addressUpdateSchema, type AddressUpdateData } from './validation'
+import {
+  addressUpdateSchema,
+  isOrderLocked,
+  orderLockedError,
+  TERMINAL_ORDER_STATUSES,
+  type AddressUpdateData,
+} from './validation'
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 
@@ -11,6 +18,24 @@ type ActionResult<T = unknown> = {
   success: boolean
   data?: T
   error?: string
+}
+
+// Returns an error result when the order is missing or already finalized.
+async function assertOrderEditable(orderId: string): Promise<ActionResult | null> {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { status: true },
+  })
+
+  if (!order) {
+    return { success: false, error: 'Order not found' }
+  }
+
+  if (isOrderLocked(order.status)) {
+    return { success: false, error: orderLockedError(order.status) }
+  }
+
+  return null
 }
 
 export async function readProducts(): Promise<ActionResult<{ id: string; name: string }[]>> {
@@ -481,6 +506,10 @@ export async function updateTrackingCode(orderId: string, trackingCode: string):
       return { success: false, error: 'Order not found' }
     }
 
+    if (isOrderLocked(order.status)) {
+      return { success: false, error: orderLockedError(order.status) }
+    }
+
     // Update tracking code and change status to SHIPPED if currently PENDING
     const updateData: { trackingCode: string | null; status?: OrderStatus } = {
       trackingCode: trackingCode.trim() || null,
@@ -511,10 +540,29 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus): P
       return { success: false, error: 'Unauthorized' }
     }
 
-    await prisma.order.update({
-      where: { id: orderId },
-      data: { status },
+    const guard = await assertOrderEditable(orderId)
+    if (guard) return guard
+
+    const result = await prisma.$transaction(async (tx) => {
+      // Re-check the status as part of the write so a concurrent update cannot
+      // slip a terminal order past the guard above.
+      const updated = await tx.order.updateMany({
+        where: { id: orderId, status: { notIn: TERMINAL_ORDER_STATUSES } },
+        data: { status },
+      })
+
+      if (updated.count === 0) {
+        return { success: false, error: 'Order can no longer be edited' }
+      }
+
+      if (status === 'CANCELLED') {
+        await restoreOrderInventory(tx, orderId)
+      }
+
+      return { success: true }
     })
+
+    if (!result.success) return result
 
     revalidatePath('/admin/o')
     return { success: true }
@@ -534,6 +582,9 @@ export async function updateOrderAddress(
     if (!session || session.user.role !== 'admin') {
       return { success: false, error: 'Unauthorized' }
     }
+
+    const guard = await assertOrderEditable(orderId)
+    if (guard) return guard
 
     // Validate address data
     const validatedData = addressUpdateSchema.parse(addressData)

@@ -4,9 +4,10 @@ import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { updateProfile } from './actions'
 import type { ProfileFormData, FormErrors } from './validation'
+import { inputStyle, inputErrorStyle } from '@/lib/styles'
 
-export const INPUT_STYLE = "w-full text-base px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
-export const INPUT_ERROR_STYLE = "w-full text-base px-4 py-2 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 placeholder:italic"
+export const INPUT_STYLE = inputStyle("text-base")
+export const INPUT_ERROR_STYLE = inputErrorStyle("text-base")
 
 interface ProfileFormProps {
   initialData: {
