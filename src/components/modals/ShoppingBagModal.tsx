@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl'
 import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
 import { m, AnimatePresence } from 'framer-motion'
-import type { ShoppingBagItemDetails } from '@/app/actions/shoppingBag'
+import type { SampleOption, ShoppingBagItemDetails } from '@/app/actions/shoppingBag'
 import { useLoadingOverlay } from '@/components/providers/LoadingOverlayProvider'
 
 interface ShoppingBagModalProps {
@@ -13,7 +13,7 @@ interface ShoppingBagModalProps {
   isNavVisible: boolean
   onClose: () => void
   items: ShoppingBagItemDetails[]
-  availableProducts: Array<{ value: string; label: string }>
+  availableProducts: SampleOption[]
   selectedSample: string | null
   isLoading: boolean
   onQuantityChange: (productId: string, volumeId: number, delta: number) => void
@@ -64,6 +64,16 @@ export default function ShoppingBagModal({
   const total = subtotal // Can add tax/shipping later
 
   const hasItems = items.length > 0
+  const hasInventoryIssues = items.some((item) => !item.isAvailable)
+  const selectedSampleUnavailable = Boolean(
+    selectedSample && availableProducts.find((product) => product.value === selectedSample)?.disabled
+  )
+  const canCheckout = hasItems && !hasInventoryIssues && !selectedSampleUnavailable
+  const getInventoryMessage = (item: ShoppingBagItemDetails) => {
+    if (item.inventoryStatus === 'outOfStock') return t('inventory.outOfStock')
+    if (item.inventoryStatus === 'lowStock') return t('inventory.lowStock', { count: item.stock })
+    return t('inventory.inStock')
+  }
 
   // Calculate top position based on NavBar visibility
   const getTopPosition = () => {
@@ -173,6 +183,9 @@ export default function ShoppingBagModal({
                             </div>
                             <p className="text-sm">{item.productSubtitle}</p>
                             <p className="text-sm">{item.volumeDisplay}</p>
+                            <p className={`text-sm ${item.isAvailable ? 'text-gray-600' : 'text-red-700'}`} aria-live="polite">
+                              {getInventoryMessage(item)}
+                            </p>
                           </div>
 
                           <div className="flex justify-between items-center">
@@ -226,7 +239,7 @@ export default function ShoppingBagModal({
                       <select
                         id="free-sample"
                         value={selectedSample || ''}
-                        onChange={(e) => onSampleChange(e.target.value)}
+                        onChange={(e) => onSampleChange(e.target.value || null)}
                         style={{
                           backgroundImage: `url("data:image/svg+xml,%3Csvg fill='%23000000' height='24px' width='24px' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 28.769 28.769' xml:space='preserve'%3E%3Cg%3E%3Cg id='c106_arrow'%3E%3Cpath d='M28.678,5.798L14.713,23.499c-0.16,0.201-0.495,0.201-0.658,0L0.088,5.798C-0.009,5.669-0.027,5.501,0.04,5.353 C0.111,5.209,0.26,5.12,0.414,5.12H28.35c0.16,0,0.31,0.089,0.378,0.233C28.798,5.501,28.776,5.669,28.678,5.798z'/%3E%3C/g%3E%3Cg id='Capa_1_26_'%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
                           backgroundRepeat: 'no-repeat',
@@ -235,8 +248,9 @@ export default function ShoppingBagModal({
                         }}
                         className="w-40 px-4 py-3 pr-10 bg-gray-100 border-none appearance-none text-base cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-900"
                       >
+                        <option value="">{t('selectSample')}</option>
                         {availableProducts.map((product) => (
-                          <option key={product.value} value={product.value}>
+                          <option key={product.value} value={product.value} disabled={product.disabled}>
                             {product.label}
                           </option>
                         ))}
@@ -260,9 +274,9 @@ export default function ShoppingBagModal({
               <div className='px-8'>
                 <button
                   onClick={handleCheckout}
-                  disabled={!hasItems}
+                  disabled={!canCheckout}
                   className={`w-full py-4 px-6 transition-colors text-base font-medium ${
-                    hasItems
+                    canCheckout
                       ? 'bg-gray-700 hover:bg-gray-900 cursor-pointer text-white'
                       : 'bg-white border border-gray-700 text-gray-700 cursor-not-allowed'
                   }`}
@@ -323,6 +337,9 @@ export default function ShoppingBagModal({
                             </div>
                             <p className="text-xs">{item.productSubtitle}</p>
                             <p className="text-xs">{item.volumeDisplay}</p>
+                            <p className={`text-xs ${item.isAvailable ? 'text-gray-600' : 'text-red-700'}`} aria-live="polite">
+                              {getInventoryMessage(item)}
+                            </p>
                           </div>
                           <div className="flex justify-between items-center">
                             {/* Quantity Controls */}
@@ -377,7 +394,7 @@ export default function ShoppingBagModal({
                       <select
                         id="free-sample-mobile"
                         value={selectedSample || ''}
-                        onChange={(e) => onSampleChange(e.target.value)}
+                        onChange={(e) => onSampleChange(e.target.value || null)}
                         style={{
                           backgroundImage: `url("data:image/svg+xml,%3Csvg fill='%23000000' height='24px' width='24px' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 28.769 28.769' xml:space='preserve'%3E%3Cg%3E%3Cg id='c106_arrow'%3E%3Cpath d='M28.678,5.798L14.713,23.499c-0.16,0.201-0.495,0.201-0.658,0L0.088,5.798C-0.009,5.669-0.027,5.501,0.04,5.353 C0.111,5.209,0.26,5.12,0.414,5.12H28.35c0.16,0,0.31,0.089,0.378,0.233C28.798,5.501,28.776,5.669,28.678,5.798z'/%3E%3C/g%3E%3Cg id='Capa_1_26_'%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
                           backgroundRepeat: 'no-repeat',
@@ -386,8 +403,9 @@ export default function ShoppingBagModal({
                         }}
                         className="w-40 px-4 py-2 pr-10 bg-gray-100 border-none appearance-none text-sm cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-900"
                       >
+                        <option value="">{t('selectSample')}</option>
                         {availableProducts.map((product) => (
-                          <option key={product.value} value={product.value}>
+                          <option key={product.value} value={product.value} disabled={product.disabled}>
                             {product.label}
                           </option>
                         ))}
@@ -410,9 +428,9 @@ export default function ShoppingBagModal({
               <div className='flex content-center mb-4'>
                 <button
                   onClick={handleCheckout}
-                  disabled={!hasItems}
+                  disabled={!canCheckout}
                   className={`w-70 mx-auto py-4 px-6 transition-colors text-base font-medium ${
-                    hasItems
+                    canCheckout
                       ? 'bg-gray-700 hover:bg-gray-900 cursor-pointer text-white'
                       : 'bg-white border border-gray-700 text-gray-700 cursor-not-allowed'
                   }`}

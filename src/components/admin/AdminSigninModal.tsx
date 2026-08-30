@@ -125,7 +125,7 @@ export default function AdminSignInModal({ isOpen, isAtBottom, isNavVisible, onC
                       </button>
                     </div>
 
-                    <p className="text-xs text-gray-500 italic mt-2">Demo mode: some data will be read-only or mocked</p>
+                    <p className="text-xs text-gray-500 italic mt-2">Demo mode: Data will be read-only or mocked</p>
                   </div>
                 </>
               ) : (
@@ -144,7 +144,7 @@ export default function AdminSignInModal({ isOpen, isAtBottom, isNavVisible, onC
                       </button>
                     </div>
                     {user.role === "admin" ? (<></>) : (
-                      <p className="text-xs text-gray-500 italic mt-3">Demo mode: some data will be read-only or mocked</p>
+                      <p className="text-xs text-gray-500 italic mt-3">Demo mode: Data will be read-only or mocked</p>
                     )}
                   </div>
                 </>

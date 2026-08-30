@@ -4,10 +4,10 @@ import { useState, useRef } from 'react';
 import { Eye, X } from 'lucide-react';
 import LanguageSelector, { type Locale } from '@/components/common/LanguageSelector';
 import Image from 'next/image';
+import { INPUT_STYLE, INPUT_ERROR_STYLE } from '@/lib/styles';
 
 // Style constants
-export const INPUT_STYLE = "w-full text-sm px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic";
-export const INPUT_STYLE_ERROR = "w-full text-sm px-4 py-2 bg-white border border-red-700 rounded-md focus:outline-none focus:ring-1 focus:ring-red-700 placeholder:italic";
+export { INPUT_STYLE, INPUT_ERROR_STYLE };
 export const SUBMIT_BUTTON = "max-w-30 bg-gray-900 text-white px-3 py-2 text-base hover:bg-gray-700 transition-colors disabled:opacity-50";
 export const CANCEL_BUTTON = "max-w-30 bg-white text-gray-900 px-3 py-2 text-base border border-gray-900 hover:bg-gray-300 transition-colors disabled:opacity-50";
 export const DELETE_BUTTON = "max-w-30 bg-red-700 text-red-100 px-3 py-2 text-base border border-red-900 hover:bg-red-900 transition-colors disabled:opacity-50";
@@ -246,7 +246,7 @@ export function CollectionEditForm({
               }
             }}
             placeholder="Address bar will be /c/name"
-            className={validationErrors.slug ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={validationErrors.slug ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending || isUploading !== null}
           />
         </div>
@@ -390,7 +390,7 @@ export function CollectionEditForm({
               }
             }}
             placeholder="Name appears on the site"
-            className={selectedLocale === 'en-US' && validationErrors.name ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={selectedLocale === 'en-US' && validationErrors.name ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending || isUploading !== null}
           />
         </div>
@@ -416,7 +416,7 @@ export function CollectionEditForm({
             }}
             placeholder="Description appears below the product"
             rows={4}
-            className={selectedLocale === 'en-US' && validationErrors.description ? INPUT_STYLE_ERROR : INPUT_STYLE}
+            className={selectedLocale === 'en-US' && validationErrors.description ? INPUT_ERROR_STYLE : INPUT_STYLE}
             disabled={isPending || isUploading !== null}
           />
         </div>

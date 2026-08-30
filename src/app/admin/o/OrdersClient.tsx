@@ -10,6 +10,7 @@ import { mockOrderItems } from './mockData';
 import { EditOrderModal, type OrderData } from '@/components/admin/EditOrderModal';
 import { EditAddressModal, type AddressData, type AddressFieldErrors } from '@/components/admin/EditAddressModal';
 import { formatOrderDate } from '@/lib/formatters';
+import { inputStyle } from '@/lib/styles';
 
 // Type for table display (from _data/mockOrders.ts)
 interface Order {
@@ -22,7 +23,7 @@ interface Order {
   currency: string;
 }
 
-const INPUT_STYLE = "w-full max-w-40 sm:max-w-80 lg:max-w-42 text-sm px-2 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
+const INPUT_STYLE = inputStyle("max-w-40 sm:max-w-80 lg:max-w-42 px-2")
 
 // Searchable Dropdown Component for Products
 function ProductSearchableDropdown({

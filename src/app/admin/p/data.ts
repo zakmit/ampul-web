@@ -48,7 +48,7 @@ export type ProductWithRelations = {
     volumeId: number
     locale: string
     price: number
-    stock: number | null
+    stock: number
     volume: {
       id: number
       value: string
@@ -59,6 +59,7 @@ export type ProductWithRelations = {
       }[]
     }
   }[]
+  sampleInventory: { productId: string; locale: string; stock: number }[]
   tags: {
     productId: string
     tagId: number
@@ -99,6 +100,7 @@ export async function getProductsData() {
             },
           },
         },
+        sampleInventory: true,
         tags: {
           include: {
             tag: {
@@ -218,6 +220,7 @@ type ProductWithFullRelations = Prisma.ProductGetPayload<{
   include: {
     translations: true;
     volumes: true;
+    sampleInventory: true;
     tags: true;
   };
 }>;
@@ -279,13 +282,13 @@ export function transformProducts(prismaProducts: ProductWithFullRelations[]): P
     }, {} as Record<Locale, { name: string; concept: string; sensations: string }>);
 
     // Group volumes by volumeId
-    const volumesMap = new Map<number, { volumeId: number; prices: Record<Locale, { price: number; stock: number | null }> }>();
+    const volumesMap = new Map<number, { volumeId: number; prices: Record<Locale, { price: number; stock: number }> }>();
 
     product.volumes.forEach((pv) => {
       if (!volumesMap.has(pv.volumeId)) {
         volumesMap.set(pv.volumeId, {
           volumeId: pv.volumeId,
-          prices: {} as Record<Locale, { price: number; stock: number | null }>,
+          prices: {} as Record<Locale, { price: number; stock: number }>,
         });
       }
       const volumeEntry = volumesMap.get(pv.volumeId)!;
@@ -307,6 +310,10 @@ export function transformProducts(prismaProducts: ProductWithFullRelations[]): P
       galleryImages: product.galleryImages,
       translations,
       volumes: Array.from(volumesMap.values()),
+      sampleInventory: product.sampleInventory.reduce((acc, row) => {
+        acc[row.locale as Locale] = row.stock;
+        return acc;
+      }, { 'en-US': 0, 'fr-FR': 0, 'zh-TW': 0 } as Record<Locale, number>),
       tagIds: product.tags.map((pt) => pt.tagId),
     };
   });
@@ -323,6 +330,7 @@ export async function getAllAdminData() {
       include: {
         translations: true,
         volumes: true,
+        sampleInventory: true,
         tags: true,
       },
       orderBy: {

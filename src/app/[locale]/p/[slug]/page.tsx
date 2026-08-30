@@ -61,6 +61,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const firstVolume = productData.volumes[0];
   const volumeDisplay = firstVolume ? `${firstVolume.displayName}` : '';
   const price = firstVolume ? firstVolume.price : 0;
+  const stock = firstVolume?.stock ?? 0;
 
   const product = {
     name: productData.name,
@@ -128,13 +129,15 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </h3>
 
             {/* Volume and Add to Bag - Mobile: center, Desktop: right-aligned */}
-            <div className="flex items-center font-context justify-center gap-8 mb-8 lg:mb-8">
+            <div className="flex items-center font-context justify-center gap-4 mb-8 lg:gap-8">
               <span className="text-gray-700">{product.volume}</span>
               <AddToBagButton
                 productId={productData.id}
                 volumeId={firstVolume?.volumeId || 0}
                 label={`${t('addToBag')} · ${product.price} ${tCommon('currency')}`}
                 className="bg-gray-700 hover:bg-gray-900 text-gray-100 font-semibold px-5 lg:px-6 py-3 transition-colors cursor-pointer"
+                initialStock={stock}
+                showInventory
               />
             </div>
 

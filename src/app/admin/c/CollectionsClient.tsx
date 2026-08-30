@@ -17,6 +17,7 @@ import {
   type Collection,
 } from './components';
 import { ChevronRight, Plus } from 'lucide-react';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import ProductFilters, { FilterSection } from '@/components/product/ProductFilters';
 import MobileFilterPanel from '@/components/product/MobileFilterPanel';
@@ -52,6 +53,7 @@ export default function CollectionsClient({
 }) {
   const [collections, setCollections] = useState(transformCollections(initialCollections));
   const [isPending, startTransition] = useTransition();
+  const reduceMotion = useReducedMotion();
 
   const [editingCollection, setEditingCollection] = useState<number | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -330,9 +332,9 @@ export default function CollectionsClient({
         </div>
       )}
 
-      <div className={`lg:grid lg:grid-cols-12 lg:min-h-screen ${isEditing ? 'lg:grid-flow-col' : ''}`}>
+      <div className="lg:flex lg:min-h-[calc(100dvh-56px)]">
         {/* Collections Content Area */}
-        <div className={`border-gray-300 lg:overflow-y-auto lg:h-full transition-all ${isEditing ? 'lg:col-span-7 lg:border-r' : 'lg:col-span-12'}`}>
+        <div className={`border-gray-300 lg:overflow-y-auto lg:h-full lg:flex-1 lg:min-w-0 `}>
           {/* Header */}
           <div className="lg:mx-6 lg:mt-2 lg:mb-0">
             <div className="w-full flex items-center justify-center lg:justify-between p-6 lg:px-2 bg-white">
@@ -423,7 +425,7 @@ export default function CollectionsClient({
                       <span className="relative z-10 text-3xl font-title text-white">
                         {collection.translations['en-US'].name}
                       </span>
-                      <ChevronRight className={`relative z-10 w-8 h-8 text-white transition-transform ${editingCollection === collection.id ? 'rotate-90' : ''}`} />
+                      <ChevronRight className={`relative z-10 w-8 h-8 text-white transition-transform duration-300 ${editingCollection === collection.id ? 'rotate-90' : ''}`} />
                     </button>
                   ))}
                 </div>
@@ -456,7 +458,7 @@ export default function CollectionsClient({
                     <span className="relative z-10 text-2xl font-title text-white">
                       {collection.translations['en-US'].name}
                     </span>
-                    <ChevronRight className={`relative z-10 w-6 h-6 text-white transition-transform ${editingCollection === collection.id ? 'rotate-90' : ''}`} />
+                    <ChevronRight className={`relative z-10 w-6 h-6 text-white transition-transform duration-300 ${editingCollection === collection.id ? 'rotate-90' : ''}`} />
                   </button>
                 ))}
               </div>
@@ -465,31 +467,44 @@ export default function CollectionsClient({
         </div>
 
         {/* Right Panel - Edit Form (Desktop Only) */}
-        {isEditing && (
-          <div className="hidden lg:block lg:col-span-5 bg-gray-100 p-16 lg:overflow-y-auto lg:h-full">
-            {isCreating && (
-              <CollectionEditForm
-                key="new-collection"
-                collection={null}
-                onCancel={clearAllEditing}
-                onSubmit={handleSubmitNewCollection}
-                onImageUpload={handleImageUpload}
-                isPending={isPending}
-              />
-            )}
-            {!isCreating && editingCollection !== null && (
-              <CollectionEditForm
-                key={editingCollection}
-                collection={collections.find(c => c.id === editingCollection)!}
-                onCancel={clearAllEditing}
-                onSubmit={(updatedCollection) => handleUpdateCollection(editingCollection, updatedCollection)}
-                onDelete={() => setDeleteConfirmation(editingCollection)}
-                onImageUpload={handleImageUpload}
-                isPending={isPending}
-              />
-            )}
-          </div>
-        )}
+        <AnimatePresence initial={false}>
+          {isEditing && (
+            <m.div
+              key="edit-panel"
+              initial={reduceMotion ? { opacity: 0 } : { width: 0, opacity: 0 }}
+              animate={reduceMotion ? { opacity: 1 } : { width: 'auto', opacity: 1 }}
+              exit={reduceMotion ? { opacity: 0 } : { width: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.645, 0.045, 0.355, 1] }}
+              className="hidden lg:block shrink-0 overflow-hidden bg-gray-100 border-l border-gray-900"
+            >
+              {/* Fixed-width inner content (the panel's fully-open size, 5/12 of the
+                  layout container) so the form reveals instead of squishing */}
+              <div className="w-[calc(min(100vw,100rem)*5/12)] p-16">
+                {isCreating && (
+                  <CollectionEditForm
+                    key="new-collection"
+                    collection={null}
+                    onCancel={clearAllEditing}
+                    onSubmit={handleSubmitNewCollection}
+                    onImageUpload={handleImageUpload}
+                    isPending={isPending}
+                  />
+                )}
+                {!isCreating && editingCollection !== null && (
+                  <CollectionEditForm
+                    key={editingCollection}
+                    collection={collections.find(c => c.id === editingCollection)!}
+                    onCancel={clearAllEditing}
+                    onSubmit={(updatedCollection) => handleUpdateCollection(editingCollection, updatedCollection)}
+                    onDelete={() => setDeleteConfirmation(editingCollection)}
+                    onImageUpload={handleImageUpload}
+                    isPending={isPending}
+                  />
+                )}
+              </div>
+            </m.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

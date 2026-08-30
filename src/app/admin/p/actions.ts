@@ -108,7 +108,8 @@ export async function createProduct(
     boxImage: string
     galleryImages: string[]
     translations: { locale: string; name?: string; concept?: string; sensations?: string }[]
-    volumes: { volumeId: number; locale: string; price: number; stock: number | null }[]
+    volumes: { volumeId: number; locale: string; price: number; stock: number }[]
+    sampleInventory: { locale: string; stock: number }[]
     tagIds: number[]
   }
 ): Promise<ActionResult> {
@@ -143,6 +144,9 @@ export async function createProduct(
         },
         volumes: {
           create: validatedData.volumes,
+        },
+        sampleInventory: {
+          create: validatedData.sampleInventory,
         },
         tags: {
           create: validatedData.tagIds.map(tagId => ({
@@ -204,7 +208,8 @@ export async function updateProduct(
     boxImage?: string
     galleryImages?: string[]
     translations?: { locale: string; name?: string; concept?: string; sensations?: string }[]
-    volumes?: { volumeId: number; locale: string; price: number; stock: number | null }[]
+    volumes?: { volumeId: number; locale: string; price: number; stock: number }[]
+    sampleInventory?: { locale: string; stock: number }[]
     tagIds?: number[]
   },
   originalImages?: {
@@ -280,6 +285,13 @@ export async function updateProduct(
       updateData.volumes = {
         deleteMany: {},
         create: validatedData.volumes,
+      }
+    }
+
+    if (validatedData.sampleInventory) {
+      updateData.sampleInventory = {
+        deleteMany: {},
+        create: validatedData.sampleInventory,
       }
     }
 

@@ -57,16 +57,16 @@ export default function AdminNavBar() {
     <div className="left-0 right-0 flex w-full h-13 items-center justify-center">
       <nav className={`w-full max-w-3xl px-2 bottom-2 z-20 transition-all duration-300 ease-in-out ${getNavPosition()} ${getNavBottomPosition()}`}>
         <div className="bg-white p-1 text-sm text-center items-center rounded-full border border-gray-900 shadow-lg grid grid-cols-10 md:grid-cols-9 h-9 z-10">
-          <Link href="/admin" className="col-span-3 md:col-span-2 text-bold h-full flex items-center justify-center rounded-full hover:bg-gray-700 hover:text-gray-100 transition">
+          <Link href="/admin" className="col-span-3 md:col-span-2 text-bold h-full flex items-center justify-center rounded-full hover:bg-gray-200 transition">
             <h3>Dashboard</h3>
           </Link>
 
           <div
-            className="col-span-2 group text-bold h-full flex items-center justify-center relative hover:bg-gray-700 rounded-full"
+            className="col-span-2 group text-bold h-full flex items-center justify-center relative hover:bg-gray-200 rounded-full"
             onMouseEnter={() => setShowProductsMenu(true)}
             onMouseLeave={() => setShowProductsMenu(false)}
           >
-            <h3 className="cursor-pointer group-hover:text-gray-100 transition">Products</h3>
+            <h3 className="cursor-pointer transition">Products</h3>
             {showProductsMenu && (
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 pb-2 sm:w-41">
                 <div className="bg-white border border-gray-900 rounded-lg shadow-lg py-1 px-1">
@@ -101,10 +101,10 @@ export default function AdminNavBar() {
             )}
           </div>
 
-          <Link href="/admin/o" className="col-span-2 text-bold h-full flex items-center justify-center rounded-full hover:bg-gray-700 hover:text-gray-100 transition">
+          <Link href="/admin/o" className="col-span-2 text-bold h-full flex items-center justify-center rounded-full hover:bg-gray-200 transition">
             <h3>Orders</h3>
           </Link>
-          <Link href="/admin/u" className="col-span-2 text-bold h-full flex items-center justify-center rounded-full hover:bg-gray-700 hover:text-gray-100 transition">
+          <Link href="/admin/u" className="col-span-2 text-bold h-full flex items-center justify-center rounded-full hover:bg-gray-200 transition">
             <h3>Users</h3>
           </Link>
           <button

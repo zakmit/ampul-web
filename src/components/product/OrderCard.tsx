@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { Locale } from '@/i18n/config';
 import { requestCancelOrder } from '@/app/[locale]/u/orders/actions';
 
@@ -45,6 +46,9 @@ type OrderCardProps = {
   order: Order;
 };
 
+const expandEase: [number, number, number, number] = [0.25, 1, 0.5, 1];
+const expandTransition = { duration: 0.3, ease: expandEase };
+
 export default function OrderCard({ order }: OrderCardProps) {
   const t = useTranslations('OrderCard');
   const params = useParams();
@@ -53,6 +57,7 @@ export default function OrderCard({ order }: OrderCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [formattedDate, setFormattedDate] = useState('');
   const [isPending, startTransition] = useTransition();
+  const reduceMotion = useReducedMotion();
 
   const handleCancelOrder = () => {
     startTransition(async () => {
@@ -76,7 +81,7 @@ export default function OrderCard({ order }: OrderCardProps) {
       {/* Collapsed View */}
       <div
         className={`${
-          isExpanded ? 'bg-gray-700 text-white' : 'bg-gray-100'
+          isExpanded ? 'bg-gray-700 text-white hover:bg-gray-800' : 'bg-gray-100 hover:bg-gray-200'
         } cursor-pointer transition-all duration-300`}
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -96,32 +101,52 @@ export default function OrderCard({ order }: OrderCardProps) {
         </div>
 
         {/* Product thumbnails in collapsed state - only show regular items, not free samples */}
-        {!isExpanded && (
-          <div className="px-4 lg:px-8 pb-4">
-            <div className="flex gap-3 overflow-x-auto pb-2">
-              {regularItems.map((item) => (
-                <div key={item.id} className="shrink-0">
-                  <div className="w-28 h-28 lg:w-32 lg:h-32 bg-gray-300 relative">
-                    <Image
-                      src={item.productImage || '/placeholder.jpg'}
-                      alt={item.productName}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
+        <AnimatePresence initial={false}>
+          {!isExpanded && (
+            <m.div
+              key="thumbnails"
+              initial={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+              animate={reduceMotion ? { opacity: 1 } : { height: 'auto', opacity: 1 }}
+              exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+              transition={expandTransition}
+              className="overflow-hidden"
+            >
+              <div className="px-4 lg:px-8 pb-4">
+                <div className="flex gap-3 overflow-x-auto pb-2">
+                  {regularItems.map((item) => (
+                    <div key={item.id} className="shrink-0">
+                      <div className="w-28 h-28 lg:w-32 lg:h-32 bg-gray-300 relative">
+                        <Image
+                          src={item.productImage || '/placeholder.jpg'}
+                          alt={item.productName}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div className="text-right mt-2 lg:hidden">
-              <span className="text-sm italic">{t('total')}: {order.total}{order.currency}</span>
-            </div>
-          </div>
-        )}
+                <div className="text-right mt-2 lg:hidden">
+                  <span className="text-sm italic">{t('total')}: {order.total}{order.currency}</span>
+                </div>
+              </div>
+            </m.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Expanded View */}
-      {isExpanded && (
-        <div className="bg-gray-100 px-4 lg:px-8 py-6 lg:grid lg:grid-cols-3 lg:gap-2">
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <m.div
+            key="details"
+            initial={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            animate={reduceMotion ? { opacity: 1 } : { height: 'auto', opacity: 1 }}
+            exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={expandTransition}
+            className="overflow-hidden bg-gray-100"
+          >
+        <div className="px-4 lg:px-8 py-6 lg:grid lg:grid-cols-3 lg:gap-2">
           <div className='lg:col-span-2'>
             {/* Product List */}
             <h3 className="text-base lg:text-xl font-bold italic mb-4">{t('orderId')}: {order.orderNumber}</h3>
@@ -245,7 +270,9 @@ export default function OrderCard({ order }: OrderCardProps) {
             )}
           </div>
         </div>
-      )}
+          </m.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

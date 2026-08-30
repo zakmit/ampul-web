@@ -2,8 +2,9 @@
 
 import Image from 'next/image';
 import {X} from 'lucide-react';
+import { inputStyle } from '@/lib/styles';
 
-const INPUT_STYLE = "w-full text-sm px-2 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic";
+const INPUT_STYLE = inputStyle("px-2");
 
 const selectStyle = {
   backgroundImage: `url("data:image/svg+xml,%3Csvg fill='%23000000' height='24px' width='24px' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 28.769 28.769' xml:space='preserve'%3E%3Cg%3E%3Cg id='c106_arrow'%3E%3Cpath d='M28.678,5.798L14.713,23.499c-0.16,0.201-0.495,0.201-0.658,0L0.088,5.798C-0.009,5.669-0.027,5.501,0.04,5.353 C0.111,5.209,0.26,5.12,0.414,5.12H28.35c0.16,0,0.31,0.089,0.378,0.233C28.798,5.501,28.776,5.669,28.678,5.798z'/%3E%3C/g%3E%3Cg id='Capa_1_26_'%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -84,6 +85,10 @@ export function EditOrderModal({
 }: EditOrderModalProps) {
   if (!isOpen || !order) return null;
 
+  // Cancelled and refunded orders are historical records - no further edits.
+  const isLocked = order.status === 'CANCELLED' || order.status === 'REFUNDED';
+  const statusDisabled = statusUpdateLoading || isLocked;
+
   return (
     <div
       className="fixed inset-0 bg-gray-800/30 backdrop-blur-sm z-70 transition-all duration-500 flex items-center justify-center overflow-y-auto"
@@ -100,9 +105,9 @@ export function EditOrderModal({
             <select
               value={order.status}
               onChange={(e) => onUpdateOrder({ status: e.target.value as OrderStatus })}
-              disabled={statusUpdateLoading}
+              disabled={statusDisabled}
               style={selectStyle}
-              className={`my-1 px-3 py-1 pr-8 bg-gray-100 border-none appearance-none text-sm cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-900 ${statusUpdateLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`my-1 px-3 py-1 pr-8 bg-gray-100 border-none appearance-none text-sm cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-900 ${statusDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <option value="PENDING">PENDING</option>
               <option value="REQUESTED">REQUESTED</option>
@@ -117,6 +122,12 @@ export function EditOrderModal({
             </button>
           </div>
         </div>
+        {/* Locked notice */}
+        {isLocked && (
+          <div className="mx-4 mt-4 px-4 py-2 italic font-semibold bg-gray-200 text-gray-700 text-sm">
+            This order is {order.status.toLowerCase()} and can no longer be edited.
+          </div>
+        )}
         {/* Error notification */}
         {statusUpdateError && (
           <div className="mx-4 mt-4 px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -222,7 +233,8 @@ export function EditOrderModal({
               </div>
               <button
                 onClick={onOpenAddressModal}
-                className="mx-auto mt-3 px-4 py-2 border border-gray-700 text-sm hover:bg-gray-100"
+                disabled={isLocked}
+                className="mx-auto mt-3 px-4 py-2 border border-gray-700 text-sm transition-color hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
               >
                 Edit Address
               </button>
@@ -241,12 +253,14 @@ export function EditOrderModal({
                   placeholder="Tracking Code"
                   value={trackingInput}
                   onChange={(e) => onUpdateTrackingInput(e.target.value)}
-                  className={INPUT_STYLE}
+                  disabled={isLocked}
+                  className={`${INPUT_STYLE} disabled:opacity-50 disabled:cursor-not-allowed`}
                 />
                 <div className="w-full flex justify-center">
                   <button
                     onClick={onSaveTrackingCode}
-                    className="w-30 px-4 py-1 text-sm bg-gray-700 text-gray-100 hover:bg-gray-900"
+                    disabled={isLocked}
+                    className="w-30 px-4 py-1 text-sm bg-gray-700 text-gray-100 hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700"
                   >
                     SAVE
                   </button>

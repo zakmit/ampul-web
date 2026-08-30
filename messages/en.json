@@ -96,6 +96,12 @@
     "sensations": "Sensations",
     "freeSample": "*A free sample of your choice with every order",
     "exploreCollection": "Explore the Collection",
+    "inventory": {
+      "inStock": "In stock",
+      "lowStock": "Only {count} left in stock",
+      "outOfStock": "Out of stock",
+      "checkFailed": "Stock could not be checked. Please try again."
+    },
     "infoSections": {
       "delivery": {
         "title": "Delivery",
@@ -237,6 +243,12 @@
     "title": "Shopping Bag",
     "emptyMessage": "There's nothing in your shopping bag.",
     "freeSample": "Free Sample",
+    "selectSample": "Select a sample",
+    "inventory": {
+      "inStock": "In stock",
+      "lowStock": "Only {count} left in stock",
+      "outOfStock": "Out of stock"
+    },
     "subtotal": "Subtotal",
     "checkout": "CONTINUE TO CHECKOUT"
   },
@@ -276,8 +288,10 @@
       "cityRequired": "City is required",
       "postalCodeRequired": "Postal code is required",
       "countryRequired": "Country is required",
-      "addressValidation": "Please check your shipping address and fix any errors.",
-      "emptyBag": "Your shopping bag is empty"
+      "addressValidation": "Please check your shipping address",
+      "emptyBag": "Your shopping bag is empty",
+      "inventoryUnavailable": "Some items are no longer available in the requested quantity. Update your bag and try again.",
+      "sampleUnavailable": "Your selected sample is no longer available. Please choose another sample."
     }
   },
   "OrderEmail": {

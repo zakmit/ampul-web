@@ -2,11 +2,11 @@
 
 import { prisma } from '@/lib/prisma'
 import type { Locale } from '@/i18n/config'
-import { localeToMessageFile } from '@/i18n/config'
+import { getInventoryAvailability, localeToDbLocale, type InventoryStatus } from '@/lib/inventory'
 
 // Map URL locale to database locale
 function getDbLocale(locale: Locale): string {
-  return localeToMessageFile[locale] || 'en-US'
+  return localeToDbLocale[locale]
 }
 
 export interface ShoppingBagItemDetails {
@@ -19,6 +19,16 @@ export interface ShoppingBagItemDetails {
   volumeDisplay: string
   quantity: number
   price: number
+  stock: number
+  inventoryStatus: InventoryStatus
+  isAvailable: boolean
+}
+
+export type SampleOption = {
+  value: string
+  label: string
+  stock: number
+  disabled: boolean
 }
 
 export async function getShoppingBagItems(
@@ -58,9 +68,7 @@ export async function getShoppingBagItems(
       },
       volumes: {
         where: {
-          locale: {
-            in: [dbLocale, fallbackLocale],
-          },
+          locale: dbLocale,
         },
         include: {
           volume: {
@@ -96,18 +104,14 @@ export async function getShoppingBagItems(
       product.category.translations.find((t) => t.locale === dbLocale) ||
       product.category.translations.find((t) => t.locale === fallbackLocale)
 
-    // Get volume data for the requested locale with fallback
-    let volumeData = product.volumes.find((v) => v.volumeId === item.volumeId && v.locale === dbLocale)
-    if (!volumeData) {
-      volumeData = product.volumes.find((v) => v.volumeId === item.volumeId && v.locale === fallbackLocale)
-    }
+    const volumeData = product.volumes.find((v) => v.volumeId === item.volumeId && v.locale === dbLocale)
 
-    if (!translation || !volumeData) continue
+    if (!translation) continue
 
     // Get volume translation with fallback
-    const volumeTranslation =
-      volumeData.volume.translations.find((t) => t.locale === dbLocale) ||
-      volumeData.volume.translations.find((t) => t.locale === fallbackLocale)
+    const volumeTranslation = volumeData?.volume.translations.find((t) => t.locale === dbLocale) ||
+      volumeData?.volume.translations.find((t) => t.locale === fallbackLocale)
+    const availability = getInventoryAvailability(volumeData?.stock)
 
     bagItems.push({
       productId: product.id,
@@ -116,9 +120,12 @@ export async function getShoppingBagItems(
       productSubtitle: categoryTranslation?.name || '',
       productImage: product.productImage,
       volumeId: item.volumeId,
-      volumeDisplay: volumeTranslation?.displayName || volumeData.volume.value,
+      volumeDisplay: volumeTranslation?.displayName || volumeData?.volume.value || '',
       quantity: item.quantity,
-      price: Number(volumeData.price),
+      price: Number(volumeData?.price ?? 0),
+      stock: availability.stock,
+      inventoryStatus: availability.status,
+      isAvailable: Boolean(volumeData) && item.quantity <= availability.stock,
     })
   }
 
@@ -142,6 +149,10 @@ export async function getAvailableProductsForSample(locale: Locale) {
           },
         },
       },
+      sampleInventory: {
+        where: { locale: dbLocale },
+        select: { stock: true },
+      },
     },
     orderBy: {
       slug: 'asc',
@@ -153,9 +164,12 @@ export async function getAvailableProductsForSample(locale: Locale) {
       product.translations.find((t) => t.locale === dbLocale) ||
       product.translations.find((t) => t.locale === fallbackLocale)
 
+    const availability = getInventoryAvailability(product.sampleInventory[0]?.stock)
     return {
       value: product.slug,
       label: translation?.name || product.slug,
+      stock: availability.stock,
+      disabled: !availability.canPurchase,
     }
   })
 }

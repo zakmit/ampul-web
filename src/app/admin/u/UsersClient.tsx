@@ -23,8 +23,9 @@ import type {
   UserFilters,
 } from './actions';
 import { clearTimeout } from 'timers';
+import { inputStyle } from '@/lib/styles';
 
-const INPUT_STYLE = "w-full max-w-40 sm:max-w-80 lg:max-w-42 text-sm px-2 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-900 placeholder:italic"
+const INPUT_STYLE = inputStyle("max-w-40 sm:max-w-80 lg:max-w-42 px-2")
 
 interface AddressCondition {
   id: string;
