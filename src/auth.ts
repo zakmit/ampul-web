@@ -1,7 +1,7 @@
 import NextAuth, { DefaultSession } from "next-auth"
+import Google from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
-import { authConfig } from "@/auth.config"
 
 declare module "next-auth" {
   interface Session {
@@ -25,8 +25,9 @@ declare module "@auth/core/adapters" {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  ...authConfig,
   adapter: PrismaAdapter(prisma),
+  providers: [Google],
+  trustHost: true,
   callbacks: {
     async session({ session, user }) {
       const adminEmails = process.env.ADMIN_EMAILS?.split(',') || []
