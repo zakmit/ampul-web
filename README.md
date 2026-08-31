@@ -10,7 +10,9 @@ A full-stack e-commerce website for a fictional fragrance brand, featuring inter
 
 [Admin Dashboard](https://ampul.vercel.app/admin)
 
-[Behance](https://www.behance.net/gallery/242458065/AMPUL-A-concept-driven-digital-experience)
+<!-- [Behance](https://www.behance.net/gallery/242458065/AMPUL-A-concept-driven-digital-experience) -->
+
+[Figma](https://www.figma.com/design/abDRQowVnEgn9bKCJhXxhI/AMPUL)
 
 ## About
 
@@ -20,7 +22,7 @@ AMPUL is a fictional fragrance brand inspired by the concept of ampoules—small
 
 | Category | Technologies |
 |----------|-------------|
-| **Framework** | Next.js 15, React 19, TypeScript |
+| **Framework** | Next.js 16, React 19, TypeScript |
 | **Database** | PostgreSQL, Prisma ORM |
 | **Styling** | Tailwind CSS 4 |
 | **3D Graphics** | Three.js, React Three Fiber |
